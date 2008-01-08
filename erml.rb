@@ -5,7 +5,7 @@
 
 require 'rubygems'
 require_gem 'eideticpdf'
-require 'ermlo'
+require 'erml_widgets'
 
 module EideticRML
 end
