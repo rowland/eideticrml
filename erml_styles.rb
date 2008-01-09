@@ -9,7 +9,7 @@ module EideticRML
   module Styles
     module ColorStyle
       def color(value=nil)
-        return @color if value.nil?
+        return @color || 0 if value.nil?
         @color = value
       end
     end
@@ -55,22 +55,22 @@ module EideticRML
       end
 
       def size(value=nil)
-        return @size if value.nil?
+        return @size  || EideticPDF::PageWriter::DEFAULT_FONT[:size]if value.nil?
         @size = value.to_f
       end
 
       def style(value=nil)
-        return @style if value.nil?
+        return @style || '' if value.nil?
         @style = value
       end
 
       def encoding(value=nil)
-        return @encoding if value.nil?
+        return @encoding || 'WinAnsiEncoding' if value.nil?
         @encoding = value
       end
 
       def sub_type(value=nil)
-        return @sub_type if value.nil?
+        return @sub_type || 'Type1' if value.nil?
         @sub_type = value
       end
     end
@@ -79,8 +79,8 @@ module EideticRML
       include ColorStyle
 
       def align(value=nil)
-        return @align if value.nil?
-        @align = value
+        return @align || :left if value.nil?
+        @align = [:left, :center, :right, :justify].include?(value.to_sym) ? value.to_sym : @align
       end
 
       def bullet(value=nil)
@@ -91,33 +91,38 @@ module EideticRML
 
     class PageStyle < Style
       def size(value=nil)
-        return @size if value.nil?
-        @size = value
+        return @size || :letter if value.nil?
+        @size = value.to_sym if EideticPDF::PageStyle::SIZES[value.to_sym]
       end
 
       def orientation(value=nil)
-        return @orientation if value.nil?
-        @orientation = value.to_sym
+        return @orientation || :portrait if value.nil?
+        @orientation = value.to_sym if [:portrait, :landscape].include?(value.to_sym)
       end
     end
 
     class LayoutStyle < Style
       def padding(value=nil, units=:pt)
-        return @padding if value.nil?
+        return @padding || 0 if value.nil?
         @padding, @units = parse_measurement(value, units)
       end
 
       def hpadding(value=nil, units=:pt)
-        return @hpadding || @padding if value.nil?
+        return @hpadding || padding if value.nil?
         @hpadding, @units = parse_measurement(value, units)
       end
 
       def vpadding(value=nil, units=:pt)
-        return @vpadding || @padding if value.nil?
+        return @vpadding || padding if value.nil?
         @vpadding, @units = parse_measurement(value, units)
       end
 
-      def manager(value=nil)
+      def units(value=nil)
+        return @units || :pt if value.nil?
+        @units = value.to_sym if EideticPDF::UNIT_CONVERSION[value.to_sym]
+      end
+
+      def manager(value=nil) # TODO
       end
     end
   end
