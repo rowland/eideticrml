@@ -58,6 +58,125 @@ module EideticRML
       end
 
       def background(value=nil)
+        # inherited
+      end
+
+      def font(value=nil)
+        # inherited
+      end
+    end
+
+    class Shape < Widget
+      def x(value=nil)
+      end
+      
+      def y(value=nil)
+      end
+    end
+
+    class Arc < Shape
+      StdWidgetFactory.instance.register_widget('arc', self)
+
+      def r(value=nil)
+      end
+
+      def start_angle(value=nil)
+      end
+
+      def end_angle(value=nil)
+      end
+    end
+
+    class Arch < Arc
+      StdWidgetFactory.instance.register_widget('arc', self)
+ 
+      undef_method :r
+
+      def r1(value=nil)
+      end
+
+      def r2(value=nil)
+      end
+    end
+
+    class Circle < Shape
+      StdWidgetFactory.instance.register_widget('circle', self)
+
+      def clip(value=nil)
+      end
+
+      def r(value=nil)
+      end
+
+      def reverse(value=nil)
+      end
+    end
+
+    class Ellipse < Circle
+      StdWidgetFactory.instance.register_widget('ellipse', self)
+
+      undef_method :r
+
+      def rotation(value=nil)
+      end
+      
+      def rx(value=nil)
+      end
+
+      def ry(value=nil)
+      end
+    end
+
+    class Image < Widget
+      StdWidgetFactory.instance.register_widget('image', self)
+
+      def url(value=nil)
+      end
+    end
+
+    class Pie < Arc
+      StdWidgetFactory.instance.register_widget('pie', self)
+    end
+
+    class Polygon < Circle
+      StdWidgetFactory.instance.register_widget('polygon', self)
+
+      def rotation(value=nil)
+      end
+
+      def sides(value=nil)
+      end
+    end
+
+    class Rectangle < Widget
+      StdWidgetFactory.instance.register_widget('rect', self)
+
+      def clip(value=nil)
+      end
+
+      def corners(value=nil)
+      end
+
+      def path(value=nil)
+      end
+
+      def reverse(value=nil)
+      end
+    end
+
+    class Star < Shape
+      StdWidgetFactory.instance.register_widget('star', self)
+
+      def reverse(value=nil)
+      end
+
+      def rotation(value=nil)
+      end
+
+      def points(value=nil)
+      end
+
+      def r(value=nil)
       end
     end
 
@@ -82,7 +201,12 @@ module EideticRML
     end
 
     class Container < Widget
+      StdWidgetFactory.instance.register_widget('div', self)
+
       def children
+      end
+
+      def layout(value=nil)
       end
 
       def margins(*margins)
@@ -104,12 +228,37 @@ module EideticRML
     class Page < Container
       StdWidgetFactory.instance.register_widget('page', self)
 
-      def style(value=nil)
+      def crop(value=nil)
+        # inherited
+      end
+
+      def size(value=nil)
+        # inherited
+      end
+      
+      def orientation(value=nil)
+        # inherited
+      end
+      
+      def rotate(value=nil)
+        # inherited
+      end
+
+      def compress(value=nil)
+      end
+
+      def orientation(value=nil)
       end
     end
 
-    class Document < Container
+    class Document < Page
       StdWidgetFactory.instance.register_widget('doc', self)
+
+      def pages_up(value=nil)
+      end
+
+      def pages_up_layout(value=nil)
+      end
     end
   end
 end
