@@ -7,13 +7,13 @@ module EideticRML
   module LayoutManagers
     class LayoutManager
     end
-    
+
     class AbsoluteLayout < LayoutManager
     end
-    
+
     class HBoxLayout < LayoutManager
     end
-    
+
     class VBoxLayout < LayoutManager
     end
   end
