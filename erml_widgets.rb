@@ -3,9 +3,10 @@
 #  Created by Brent Rowland on 2008-01-06.
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
-require 'rubygems'
-require_gem 'eideticpdf'
-require 'epdfpw'
+# require 'rubygems'
+# require_gem 'eideticpdf'
+# require 'epdfpw'
+require 'erml_support'
 require 'singleton'
 require 'erml_widget_factories'
 
@@ -18,10 +19,13 @@ module EideticRML
     end
 
     class Widget
+      include Support
+
       attr_reader :parent
 
       def initialize(parent)
         @parent = parent
+        parent.children << self if parent.respond_to?(:children)
       end
 
       def position(value)
@@ -43,6 +47,8 @@ module EideticRML
       end
 
       def units(value=nil)
+        return @units || @parent.units if value.nil?
+        @units = value.to_sym if EideticPDF::UNIT_CONVERSION[value.to_sym]
       end
 
       def borders(value=nil)
@@ -66,6 +72,9 @@ module EideticRML
 
       def font(value=nil)
         # inherited
+      end
+      
+      def print(writer)
       end
     end
 
@@ -201,6 +210,10 @@ module EideticRML
 
     class Paragraph < Text
       StdWidgetFactory.instance.register_widget('p', self)
+      
+      def print(writer)
+        writer.paragraph(@text)
+      end
     end
 
     class Container < Widget
@@ -211,24 +224,48 @@ module EideticRML
       def initialize(parent)
         super(parent)
         @children = []
+        @margin_top, @margin_right, @margin_bottom, @margin_left = @margins = Array.new(4, 0)
       end
 
       def layout(value=nil)
       end
 
-      def margins(*margins)
+      def margins(value=nil)
+        return @margins if value.nil?
+        value = value.split(',') if value.respond_to?(:to_str)
+        value = value.map { |n| n.to_f }
+        @margins = case value.size
+          when 4: value
+          when 2: value * 2
+          when 1: value * 4
+        else @margins
+        end
+        @margin_top, @margin_right, @margin_bottom, @margin_left = @margins
       end
 
       def margin_top(value=nil)
+        return @margin_top if value.nil?
+        @margins[0] = @margin_top = value.to_f
       end
 
       def margin_right(value=nil)
+        return @margin_right if value.nil?
+        @margins[1] = @margin_right = value.to_f
       end
 
       def margin_bottom(value=nil)
+        return @margin_bottom if value.nil?
+        @margins[2] = @margin_bottom = value.to_f
       end
 
       def margin_left(value=nil)
+        return @margin_left if value.nil?
+        @margins[3] = @margin_left = value.to_f
+      end
+
+      def print(writer)
+        super(writer)
+        children.each { |child| child.print(writer) }
       end
     end
 
@@ -237,7 +274,6 @@ module EideticRML
 
       def initialize(parent)
         super(parent)
-        parent.pages << self unless parent.nil?
       end
 
       def crop(value=nil)
@@ -261,8 +297,11 @@ module EideticRML
 
       def orientation(value=nil)
       end
-      
+
       def print(writer)
+        writer.open_page(:units => units, :margins => @margins)
+        super(writer)
+        writer.close_page
       end
     end
 
@@ -272,9 +311,14 @@ module EideticRML
       attr_reader :styles
       alias :pages :children
 
-      def initialize
-        super(nil)
+      def initialize(parent=nil)
+        super(parent)
         @styles = []
+      end
+
+      def units(value=nil)
+        return @units || :pt if value.nil?
+        super(value)
       end
 
       def pages_up(value=nil)
@@ -284,7 +328,7 @@ module EideticRML
       end
 
       def print(writer)
-        writer.open
+        writer.open(:units => units, :margins => margins)
         pages.each { |page| page.print(writer) }
         writer.close
       end
