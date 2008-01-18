@@ -208,7 +208,8 @@ module EideticRML
 
       attr_reader :children
 
-      def initialize
+      def initialize(parent)
+        super(parent)
         @children = []
       end
 
@@ -234,6 +235,11 @@ module EideticRML
     class Page < Container
       StdWidgetFactory.instance.register_widget('page', self)
 
+      def initialize(parent)
+        super(parent)
+        parent.pages << self unless parent.nil?
+      end
+
       def crop(value=nil)
         # inherited
       end
@@ -255,6 +261,9 @@ module EideticRML
 
       def orientation(value=nil)
       end
+      
+      def print(writer)
+      end
     end
 
     class Document < Page
@@ -264,6 +273,7 @@ module EideticRML
       alias :pages :children
 
       def initialize
+        super(nil)
         @styles = []
       end
 
@@ -275,6 +285,7 @@ module EideticRML
 
       def print(writer)
         writer.open
+        pages.each { |page| page.print(writer) }
         writer.close
       end
 
