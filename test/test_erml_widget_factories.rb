@@ -33,6 +33,11 @@ class FactoryTestCases < Test::Unit::TestCase
     assert_equal(TestWidget, @wf.instance_eval("@klasses['test_widget']"))
   end
 
+  def test_has_widget?
+    @wf.register_widget('test_widget', TestWidget)
+    assert(@wf.has_widget?('test_widget'))
+  end
+
   def test_make_widget
     @wf.register_widget('test_widget', TestWidget)
     w = @wf.make_widget('test_widget', nil)
