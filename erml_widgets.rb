@@ -3,6 +3,9 @@
 #  Created by Brent Rowland on 2008-01-06.
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
+require 'rubygems'
+require_gem 'eideticpdf'
+require 'epdfpw'
 require 'singleton'
 require 'erml_widget_factories'
 
@@ -203,7 +206,10 @@ module EideticRML
     class Container < Widget
       StdWidgetFactory.instance.register_widget('div', self)
 
-      def children
+      attr_reader :children
+
+      def initialize
+        @children = []
       end
 
       def layout(value=nil)
@@ -252,12 +258,30 @@ module EideticRML
     end
 
     class Document < Page
-      StdWidgetFactory.instance.register_widget('doc', self)
+      StdWidgetFactory.instance.register_widget('erml', self)
+
+      attr_reader :styles
+      alias :pages :children
+
+      def initialize
+        @styles = []
+      end
 
       def pages_up(value=nil)
       end
 
       def pages_up_layout(value=nil)
+      end
+
+      def print(writer)
+        writer.open
+        writer.close
+      end
+
+      def to_s
+        writer = EideticPDF::DocumentWriter.new
+        print(writer)
+        writer.to_s
       end
     end
   end
