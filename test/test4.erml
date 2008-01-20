@@ -1,8 +1,10 @@
-<doc units="in" margins="1">
-	<page>
-		<h>First Page</h>
-	</page>
-	<page>
-		<h>Second Page</h>
-	</page>
-</doc>
+<erml units="in" margins="1">
+	<pages>
+		<page>
+			<h>First Page</h>
+		</page>
+		<page>
+			<h>Second Page</h>
+		</page>
+	</pages>
+</erml>
