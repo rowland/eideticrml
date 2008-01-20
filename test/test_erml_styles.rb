@@ -94,7 +94,7 @@ class FontStyleTestCases < Test::Unit::TestCase
   end
   
   def test_name
-    assert_equal(nil, @font_style.name)
+    assert_equal('Helvetica', @font_style.name)
     @font_style.name 'bigred'
     assert_equal('bigred', @font_style.name)
   end

@@ -17,6 +17,10 @@ module EideticRML
     class Style
       include Support
 
+      def initialize(attrs={})
+        attrs.each { |key, value| self.send(key, value) }
+      end
+
       def id(value=nil)
         return @id if value.nil?
         @id = value.to_s
@@ -25,6 +29,9 @@ module EideticRML
 
     class PenStyle < Style
       include ColorStyle
+
+      def apply(writer)
+      end
 
       def width(value=nil, units=:pt)
         return @width || 0 if value.nil?
@@ -44,18 +51,25 @@ module EideticRML
 
     class BrushStyle < Style
       include ColorStyle
+
+      def apply(writer)
+      end
     end
 
     class FontStyle < Style
       include ColorStyle
 
+      def apply(writer)
+        writer.font(name, size, :style => style, :color => color, :encoding => encoding, :sub_type => sub_type)
+      end
+
       def name(value=nil)
-        return @name if value.nil?
+        return @name || EideticPDF::PageWriter::DEFAULT_FONT[:name] if value.nil?
         @name = value
       end
 
       def size(value=nil)
-        return @size  || EideticPDF::PageWriter::DEFAULT_FONT[:size]if value.nil?
+        return @size || EideticPDF::PageWriter::DEFAULT_FONT[:size] if value.nil?
         @size = value.to_f
       end
 

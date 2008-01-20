@@ -3,10 +3,8 @@
 #  Created by Brent Rowland on 2008-01-06.
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
-# require 'rubygems'
-# require_gem 'eideticpdf'
-# require 'epdfpw'
 require 'erml_support'
+require 'erml_styles'
 require 'singleton'
 require 'erml_widget_factories'
 
@@ -47,7 +45,7 @@ module EideticRML
       end
 
       def units(value=nil)
-        return @units || @parent.units if value.nil?
+        return @units || parent.units if value.nil?
         @units = value.to_sym if EideticPDF::UNIT_CONVERSION[value.to_sym]
       end
 
@@ -71,10 +69,29 @@ module EideticRML
       end
 
       def font(value=nil)
-        # inherited
+        return @font || parent.font if value.nil?
+        f = root.styles.find { |style| style.id == value }
+        raise ArgumentError, "Font Style #{value} not found." unless f.is_a?(Styles::FontStyle)
+        @font = f
+      end
+
+      def font_color(value=nil)
+      end
+
+      def font_size(value=nil)
+      end
+
+      def font_style(value=nil)
+        return font.style if value.nil?
+        @font = font.clone
+        @font.style(value)
+      end
+
+      def print(writer)
       end
       
-      def print(writer)
+      def root
+        parent.nil? ? self : parent.root
       end
     end
 
@@ -197,6 +214,10 @@ module EideticRML
         return @text || '' if value.nil?
         @text = value
       end
+
+      def print(writer)
+        font.apply(writer)
+      end
     end
 
     class Label < Text
@@ -210,9 +231,23 @@ module EideticRML
 
     class Paragraph < Text
       StdWidgetFactory.instance.register_widget('p', self)
-      
+
+      def align(value=nil)
+        return @style.nil? ? parent.paragraph_style : @style.align if value.nil?
+        @style = style.clone
+        @style.align(value)
+      end
+
       def print(writer)
-        writer.paragraph(@text)
+        super(writer)
+        writer.paragraph(@text, :align => style.align)
+      end
+
+      def style(value=nil)
+        return @style || parent.paragraph_style if value.nil?
+        ps = root.styles.find { |style| style.id == value }
+        raise ArgumentError, "Paragraph Style #{value} not found." unless ps.is_a?(Styles::ParagraphStyle)
+        @style = ps
       end
     end
 
@@ -224,43 +259,54 @@ module EideticRML
       def initialize(parent)
         super(parent)
         @children = []
-        @margin_top, @margin_right, @margin_bottom, @margin_left = @margins = Array.new(4, 0)
+      end
+
+      def font(value=nil)
+        return @font || parent.font if value.nil?
+        @font = value
       end
 
       def layout(value=nil)
       end
 
       def margins(value=nil)
-        return @margins if value.nil?
+        return [margin_top, margin_right, margin_bottom, margin_left] if value.nil?
         value = value.split(',') if value.respond_to?(:to_str)
         value = value.map { |n| n.to_f }
-        @margins = case value.size
+        m = case value.size
           when 4: value
           when 2: value * 2
           when 1: value * 4
-        else @margins
+        else nil
         end
-        @margin_top, @margin_right, @margin_bottom, @margin_left = @margins
+        @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
       end
 
       def margin_top(value=nil)
-        return @margin_top if value.nil?
-        @margins[0] = @margin_top = value.to_f
+        return @margin_top || 0 if value.nil?
+        @margin_top = value.to_f
       end
 
       def margin_right(value=nil)
-        return @margin_right if value.nil?
-        @margins[1] = @margin_right = value.to_f
+        return @margin_right || 0 if value.nil?
+        @margin_right = value.to_f
       end
 
       def margin_bottom(value=nil)
-        return @margin_bottom if value.nil?
-        @margins[2] = @margin_bottom = value.to_f
+        return @margin_bottom || 0 if value.nil?
+        @margin_bottom = value.to_f
       end
 
       def margin_left(value=nil)
-        return @margin_left if value.nil?
-        @margins[3] = @margin_left = value.to_f
+        return @margin_left || 0 if value.nil?
+        @margin_left = value.to_f
+      end
+
+      def paragraph_style(value=nil)
+        return @paragraph_style || parent.paragraph_style if value.nil?
+        ps = root.styles.find { |style| style.id == value }
+        raise ArgumentError, "Paragraph Style #{value} not found." unless ps.is_a?(Styles::ParagraphStyle)
+        @paragraph_style = ps
       end
 
       def print(writer)
@@ -274,16 +320,22 @@ module EideticRML
 
       def initialize(parent)
         super(parent)
+        @default_margins = true
+      end
+
+      def compress(value=nil)
       end
 
       def crop(value=nil)
         # inherited
       end
 
-      def size(value=nil)
-        # inherited
+      def margins(value=nil)
+        return @default_margins ? parent.margins : super if value.nil?
+        super(value)
+        @default_margins = false
       end
-      
+
       def orientation(value=nil)
         # inherited
       end
@@ -292,14 +344,12 @@ module EideticRML
         # inherited
       end
 
-      def compress(value=nil)
-      end
-
-      def orientation(value=nil)
+      def size(value=nil)
+        # inherited
       end
 
       def print(writer)
-        writer.open_page(:units => units, :margins => @margins)
+        writer.open_page(:units => units, :margins => margins)
         super(writer)
         writer.close_page
       end
@@ -313,12 +363,10 @@ module EideticRML
 
       def initialize(parent=nil)
         super(parent)
+        @default_margins = false
         @styles = []
-      end
-
-      def units(value=nil)
-        return @units || :pt if value.nil?
-        super(value)
+        @font = Styles::FontStyle.new
+        @paragraph_style = Styles::ParagraphStyle.new
       end
 
       def pages_up(value=nil)
@@ -337,6 +385,11 @@ module EideticRML
         writer = EideticPDF::DocumentWriter.new
         print(writer)
         writer.to_s
+      end
+
+      def units(value=nil)
+        return @units || :pt if value.nil?
+        super(value)
       end
     end
   end
