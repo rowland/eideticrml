@@ -19,11 +19,12 @@ module EideticRML
     class Widget
       include Support
 
-      attr_reader :parent
+      attr_reader :parent, :width_pct, :height_pct
 
-      def initialize(parent)
+      def initialize(parent, attrs={})
         @parent = parent
         parent.children << self if parent.respond_to?(:children)
+        attrs.each { |key, value| self.send(key, value) }
       end
 
       def position(value)
@@ -33,16 +34,35 @@ module EideticRML
       end
 
       def left(value=nil)
+        return @left || 0 if value.nil?
       end
 
       def top(value=nil)
+        return @top || 0 if value.nil?
       end
 
       def width(value=nil)
+        return @width || 0 if value.nil?
+        if value =~ /(\d+(\.\d+)?)%/
+          @width_pct = $1.to_f.quo(100)
+          @width = @width_pct * from_units(parent.units, parent.content_width)
+        else
+          @width = value.to_f
+        end
       end
 
       def height(value=nil)
+        return @height || 0 if value.nil?
+        if value =~ /(\d+(\.\d+)?)%/
+          @height_pct = $1.to_f.quo(100)
+          @height = @height_pct * from_units(parent.units, parent.content_height)
+        else
+          @height = value.to_f
+        end
       end
+
+      alias content_width width
+      alias content_height height
 
       def units(value=nil)
         return @units || parent.units if value.nil?
@@ -50,6 +70,10 @@ module EideticRML
       end
 
       def borders(value=nil)
+        return @borders if value.nil?
+        bs = root.styles.find { |style| style.id == value }
+        raise ArgumentError, "Pen Style #{value} not found." unless bs.is_a?(Styles::PenStyle)
+        @borders = bs
       end
 
       def border_top(value=nil)
@@ -88,17 +112,25 @@ module EideticRML
       end
 
       def print(writer)
+        @borders.apply(writer) unless @borders.nil?
       end
-      
+
       def root
         parent.nil? ? self : parent.root
+      end
+
+    protected
+      def from_units(units, measurement)
+        units == self.units ?
+          measurement :
+          measurement.to_f * EideticPDF::UNIT_CONVERSION[units] / EideticPDF::UNIT_CONVERSION[self.units]
       end
     end
 
     class Shape < Widget
       def x(value=nil)
       end
-      
+
       def y(value=nil)
       end
     end
@@ -118,7 +150,7 @@ module EideticRML
 
     class Arch < Arc
       StdWidgetFactory.instance.register_widget('arc', self)
- 
+
       undef_method :r
 
       def r1(value=nil)
@@ -148,7 +180,7 @@ module EideticRML
 
       def rotation(value=nil)
       end
-      
+
       def rx(value=nil)
       end
 
@@ -184,9 +216,19 @@ module EideticRML
       end
 
       def corners(value=nil)
+        return @corners if value.nil?
+        value = value.split(',') if value.respond_to?(:to_str)
+        @corners = value.map { |n| n.to_f } if [1,2,4,8].include?(value.size)
       end
 
       def path(value=nil)
+      end
+
+      def print(writer)
+        options = {}
+        options[:corners] = @corners unless @corners.nil?
+        super(writer)
+        writer.rectangle(left, top, width, height, options)
       end
 
       def reverse(value=nil)
@@ -256,9 +298,17 @@ module EideticRML
 
       attr_reader :children
 
-      def initialize(parent)
-        super(parent)
+      def initialize(parent, attrs={})
+        super(parent, attrs)
         @children = []
+      end
+
+      def content_height
+        height - margin_top - margin_bottom
+      end
+
+      def content_width
+        width - margin_left - margin_right
       end
 
       def font(value=nil)
@@ -318,9 +368,9 @@ module EideticRML
     class Page < Container
       StdWidgetFactory.instance.register_widget('page', self)
 
-      def initialize(parent)
-        super(parent)
+      def initialize(parent, attrs={})
         @default_margins = true
+        super(parent, attrs)
       end
 
       def compress(value=nil)
@@ -328,6 +378,10 @@ module EideticRML
 
       def crop(value=nil)
         # inherited
+      end
+
+      def height
+        from_units(:pt, style.height)
       end
 
       def margins(value=nil)
@@ -339,7 +393,7 @@ module EideticRML
       def orientation(value=nil)
         # inherited
       end
-      
+
       def rotate(value=nil)
         # inherited
       end
@@ -348,10 +402,21 @@ module EideticRML
         # inherited
       end
 
+      def style(value=nil)
+        return @page_style || parent.page_style if value.nil?
+        ps = root.styles.find { |style| style.id == value }
+        raise ArgumentError, "Page Style #{value} not found." unless ps.is_a?(Styles::PageStyle)
+        @page_style = ps
+      end
+
       def print(writer)
         writer.open_page(:units => units, :margins => margins)
         super(writer)
         writer.close_page
+      end
+
+      def width
+        from_units(:pt, style.width)
       end
     end
 
@@ -361,12 +426,18 @@ module EideticRML
       attr_reader :styles
       alias :pages :children
 
-      def initialize(parent=nil)
-        super(parent)
+      def initialize(parent=nil, attrs={})
+        super(parent, attrs)
         @default_margins = false
         @styles = []
+        @page_style = Styles::PageStyle.new
         @font = Styles::FontStyle.new
         @paragraph_style = Styles::ParagraphStyle.new
+      end
+
+      def page_style(value=nil)
+        return @page_style if value.nil?
+        super(value)
       end
 
       def pages_up(value=nil)
@@ -376,7 +447,8 @@ module EideticRML
       end
 
       def print(writer)
-        writer.open(:units => units, :margins => margins)
+        # writer.open(:units => units, :margins => margins)
+        writer.open
         pages.each { |page| page.print(writer) }
         writer.close
       end

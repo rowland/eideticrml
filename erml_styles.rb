@@ -31,6 +31,9 @@ module EideticRML
       include ColorStyle
 
       def apply(writer)
+        writer.line_color(color)
+        writer.line_width(width, units)
+        writer.line_dash_pattern(pattern)
       end
 
       def width(value=nil, units=:pt)
@@ -104,14 +107,22 @@ module EideticRML
     end
 
     class PageStyle < Style
-      def size(value=nil)
-        return @size || :letter if value.nil?
-        @size = value.to_sym if EideticPDF::PageStyle::SIZES[value.to_sym]
+      def height
+        EideticPDF::PageStyle::SIZES[size][orientation == :portrait ? 1 : 0]
       end
 
       def orientation(value=nil)
         return @orientation || :portrait if value.nil?
         @orientation = value.to_sym if [:portrait, :landscape].include?(value.to_sym)
+      end
+
+      def size(value=nil)
+        return @size || :letter if value.nil?
+        @size = value.to_sym if EideticPDF::PageStyle::SIZES[value.to_sym]
+      end
+
+      def width
+        EideticPDF::PageStyle::SIZES[size][orientation == :portrait ? 0 : 1]
       end
     end
 
