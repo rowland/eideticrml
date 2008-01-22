@@ -1,5 +1,5 @@
-<erml units="in" margins="1">
-	<pages>
+<erml>
+	<pages units="in" margins="1">
 		<page>
 			<h>First Page</h>
 		</page>
