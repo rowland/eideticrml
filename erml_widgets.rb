@@ -28,9 +28,11 @@ module EideticRML
       end
 
       def position(value)
+        # TODO
       end
 
       def size(value=nil)
+        # TODO
       end
 
       def left(value=nil)
@@ -77,19 +79,24 @@ module EideticRML
       end
 
       def border_top(value=nil)
+        # TODO
       end
 
       def border_right(value=nil)
+        # TODO
       end
 
       def border_bottom(value=nil)
+        # TODO
       end
 
       def border_left(value=nil)
+        # TODO
       end
 
       def background(value=nil)
         # inherited
+        # TODO
       end
 
       def font(value=nil)
@@ -100,9 +107,11 @@ module EideticRML
       end
 
       def font_color(value=nil)
+        # TODO
       end
 
       def font_size(value=nil)
+        # TODO
       end
 
       def font_style(value=nil)
@@ -129,34 +138,49 @@ module EideticRML
 
     class Shape < Widget
       def x(value=nil)
+        # TODO
       end
 
       def y(value=nil)
+        # TODO
       end
     end
 
     class Arc < Shape
       StdWidgetFactory.instance.register_widget('arc', self)
 
+      def print(writer)
+        # TODO
+      end
+
       def r(value=nil)
+        # TODO
       end
 
       def start_angle(value=nil)
+        # TODO
       end
 
       def end_angle(value=nil)
+        # TODO
       end
     end
 
     class Arch < Arc
       StdWidgetFactory.instance.register_widget('arc', self)
 
+      def print(writer)
+        # TODO
+      end
+
       undef_method :r
 
       def r1(value=nil)
+        # TODO
       end
 
       def r2(value=nil)
+        # TODO
       end
     end
 
@@ -164,48 +188,77 @@ module EideticRML
       StdWidgetFactory.instance.register_widget('circle', self)
 
       def clip(value=nil)
+        # TODO
+      end
+
+      def print(writer)
+        # TODO
       end
 
       def r(value=nil)
+        # TODO
       end
 
       def reverse(value=nil)
+        # TODO
       end
     end
 
     class Ellipse < Circle
       StdWidgetFactory.instance.register_widget('ellipse', self)
 
+      def print(writer)
+        # TODO
+      end
+
       undef_method :r
 
       def rotation(value=nil)
+        # TODO
       end
 
       def rx(value=nil)
+        # TODO
       end
 
       def ry(value=nil)
+        # TODO
       end
     end
 
     class Image < Widget
       StdWidgetFactory.instance.register_widget('image', self)
 
+      def print(writer)
+        # TODO
+      end
+
       def url(value=nil)
+        # TODO
       end
     end
 
     class Pie < Arc
       StdWidgetFactory.instance.register_widget('pie', self)
+
+      def print(writer)
+        # TODO
+      end
     end
 
     class Polygon < Circle
       StdWidgetFactory.instance.register_widget('polygon', self)
 
+      def print(writer)
+        # TODO
+      end
+
       def rotation(value=nil)
+        # TODO
       end
 
       def sides(value=nil)
+        # TODO
       end
     end
 
@@ -213,6 +266,7 @@ module EideticRML
       StdWidgetFactory.instance.register_widget('rect', self)
 
       def clip(value=nil)
+        # TODO
       end
 
       def corners(value=nil)
@@ -222,6 +276,7 @@ module EideticRML
       end
 
       def path(value=nil)
+        # TODO
       end
 
       def print(writer)
@@ -232,6 +287,7 @@ module EideticRML
       end
 
       def reverse(value=nil)
+        # TODO
       end
     end
 
@@ -239,26 +295,39 @@ module EideticRML
       StdWidgetFactory.instance.register_widget('star', self)
 
       def reverse(value=nil)
+        # TODO
       end
 
       def rotation(value=nil)
+        # TODO
       end
 
       def points(value=nil)
+        # TODO
       end
 
       def r(value=nil)
+        # TODO
+      end
+
+      def print(writer)
+        # TODO
       end
     end
 
     class Text < Widget
+      def print(writer)
+        font.apply(writer)
+      end
+
       def text(value=nil)
         return @text || '' if value.nil?
         @text = value
       end
 
-      def print(writer)
-        font.apply(writer)
+      def underline(value=nil)
+        return @underline if value.nil?
+        @underline = (value == true) or (value == 'true')
       end
     end
 
@@ -282,7 +351,7 @@ module EideticRML
 
       def print(writer)
         super(writer)
-        writer.paragraph(@text, :align => style.align)
+        writer.paragraph(@text, :align => style.align, :underline => underline)
       end
 
       def style(value=nil)
@@ -317,6 +386,7 @@ module EideticRML
       end
 
       def layout(value=nil)
+        # TODO
       end
 
       def margins(value=nil)
@@ -374,10 +444,12 @@ module EideticRML
       end
 
       def compress(value=nil)
+        # TODO
       end
 
       def crop(value=nil)
         # inherited
+        # TODO
       end
 
       def height
@@ -392,14 +464,17 @@ module EideticRML
 
       def orientation(value=nil)
         # inherited
+        # TODO
       end
 
       def rotate(value=nil)
         # inherited
+        # TODO
       end
 
       def size(value=nil)
         # inherited
+        # TODO
       end
 
       def style(value=nil)
@@ -441,9 +516,11 @@ module EideticRML
       end
 
       def pages_up(value=nil)
+        # TODO
       end
 
       def pages_up_layout(value=nil)
+        # TODO
       end
 
       def print(writer)
