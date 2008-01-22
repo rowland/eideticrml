@@ -93,3 +93,19 @@ class VBoxLayoutTestCases < Test::Unit::TestCase
   def test_layout(writer)
   end
 end
+
+class TableLayoutTestCases < Test::Unit::TestCase
+  def setup
+    @container = Container.new(nil)
+    @style = LayoutStyle.new
+    @lm = LayoutManager.for_name('table').new(@container, @style)
+  end
+
+  def test_initialize
+    assert_not_nil(@lm)
+    assert_kind_of(TableLayout, @lm)
+  end
+
+  def test_layout(writer)
+  end
+end

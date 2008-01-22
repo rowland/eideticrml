@@ -4,6 +4,7 @@
 #  Copyright (c) 2008, Eidetic Software. All rights reserved.
 
 require 'erml_support'
+require 'erml_layout_managers'
 
 module EideticRML
   module Styles
@@ -147,7 +148,9 @@ module EideticRML
         @units = value.to_sym if EideticPDF::UNIT_CONVERSION[value.to_sym]
       end
 
-      def manager(value=nil) # TODO
+      def manager(value=nil)
+        return @manager if value.nil?
+        @manager = LayoutManagers::LayoutManager.for_name(value)
       end
     end
   end

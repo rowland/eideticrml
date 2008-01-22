@@ -7,8 +7,10 @@ $: << File.dirname(__FILE__) + '/../'
 require 'test/unit'
 require 'erml'
 require 'erml_styles'
+require 'erml_layout_managers'
 
 include EideticRML::Styles
+include EideticRML::LayoutManagers
 
 class StyleTestCases < Test::Unit::TestCase
   def setup
@@ -253,6 +255,9 @@ class LayoutStyleTestCases < Test::Unit::TestCase
     assert_equal([1.25, :in], [@layout_style.vpadding, @layout_style.units])
   end
 
-  def test_manager # TODO
+  def test_manager
+    assert_nil(@layout_style.manager)
+    @layout_style.manager('absolute')
+    assert_equal(AbsoluteLayout, @layout_style.manager)
   end
 end

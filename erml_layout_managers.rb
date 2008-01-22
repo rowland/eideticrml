@@ -26,6 +26,7 @@ module EideticRML
       register('absolute', self)
 
       def layout(writer)
+        # TODO
       end
     end
 
@@ -33,6 +34,7 @@ module EideticRML
       register('flow', self)
 
       def layout(writer)
+        # TODO
       end
     end
 
@@ -40,6 +42,7 @@ module EideticRML
       register('hbox', self)
 
       def layout(writer)
+        # TODO
       end
     end
 
@@ -47,6 +50,15 @@ module EideticRML
       register('vbox', self)
 
       def layout(writer)
+        # TODO
+      end
+    end
+    
+    class TableLayout < LayoutManager
+      register('table', self)
+      
+      def layout(writer)
+        # TODO
       end
     end
   end
