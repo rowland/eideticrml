@@ -26,9 +26,19 @@ module EideticRML
         return @id if value.nil?
         @id = value.to_s
       end
+
+      def self.register(name, klass)
+        (@@klasses ||= {})[name] = klass
+      end
+
+      def self.for_name(name)
+        @@klasses[name] unless @@klasses.nil?
+      end
     end
 
     class PenStyle < Style
+      register('pen', self)
+
       include ColorStyle
 
       def apply(writer)
@@ -54,6 +64,8 @@ module EideticRML
     end
 
     class BrushStyle < Style
+      register('brush', self)
+
       include ColorStyle
 
       def apply(writer)
@@ -61,6 +73,8 @@ module EideticRML
     end
 
     class FontStyle < Style
+      register('font', self)
+
       include ColorStyle
 
       def apply(writer)
@@ -94,6 +108,8 @@ module EideticRML
     end
 
     class ParagraphStyle < Style
+      register('para', self)
+
       include ColorStyle
 
       def align(value=nil)
@@ -108,6 +124,8 @@ module EideticRML
     end
 
     class PageStyle < Style
+      register('page', self)
+
       def height
         EideticPDF::PageStyle::SIZES[size][orientation == :portrait ? 1 : 0]
       end
@@ -128,6 +146,8 @@ module EideticRML
     end
 
     class LayoutStyle < Style
+      register('layout', self)
+
       def padding(value=nil, units=:pt)
         return @padding || 0 if value.nil?
         @padding, @units = parse_measurement(value, units)

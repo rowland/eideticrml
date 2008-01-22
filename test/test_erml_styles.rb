@@ -12,8 +12,12 @@ require 'erml_layout_managers'
 include EideticRML::Styles
 include EideticRML::LayoutManagers
 
+class TestStyle < Style
+end
+
 class StyleTestCases < Test::Unit::TestCase
   def setup
+    Style.register('test', TestStyle)
     @style = Style.new
   end
 
@@ -24,11 +28,24 @@ class StyleTestCases < Test::Unit::TestCase
     @style.id 33
     assert_equal('33', @style.id)
   end
+
+  def test_register
+    assert_equal(TestStyle, Style.class_eval("@@klasses['test']"))
+  end
+
+  def test_for_name
+    assert_equal(TestStyle, Style.for_name('test'))
+  end
 end
 
 class PenStyleTestCases < Test::Unit::TestCase
   def setup
-    @pen_style = PenStyle.new
+    @pen_style = Style.for_name('pen').new
+  end
+
+  def test_initialize
+    assert_not_nil(@pen_style)
+    assert_kind_of(PenStyle, @pen_style)
   end
 
   def test_units
@@ -72,7 +89,12 @@ end
 
 class BrushStyleTestCases < Test::Unit::TestCase
   def setup
-    @brush_style = BrushStyle.new
+    @brush_style = Style.for_name('brush').new
+  end
+
+  def test_initialize
+    assert_not_nil(@brush_style)
+    assert_kind_of(BrushStyle, @brush_style)
   end
 
   def test_color
@@ -86,7 +108,12 @@ end
 
 class FontStyleTestCases < Test::Unit::TestCase
   def setup
-    @font_style = FontStyle.new
+    @font_style = Style.for_name('font').new
+  end
+
+  def test_initialize
+    assert_not_nil(@font_style)
+    assert_kind_of(FontStyle, @font_style)
   end
 
   def test_color
@@ -128,7 +155,12 @@ end
 
 class ParagraphStyleTestCases < Test::Unit::TestCase
   def setup
-    @paragraph_style = ParagraphStyle.new
+    @paragraph_style = Style.for_name('para').new
+  end
+
+  def test_initialize
+    assert_not_nil(@paragraph_style)
+    assert_kind_of(ParagraphStyle, @paragraph_style)
   end
 
   def test_color
@@ -160,7 +192,12 @@ end
 
 class PageStyleTestCases < Test::Unit::TestCase
   def setup
-    @page_style = PageStyle.new
+    @page_style = Style.for_name('page').new
+  end
+
+  def test_initialize
+    assert_not_nil(@page_style)
+    assert_kind_of(PageStyle, @page_style)
   end
 
   def test_size
@@ -198,7 +235,12 @@ end
 
 class LayoutStyleTestCases < Test::Unit::TestCase
   def setup
-    @layout_style = LayoutStyle.new
+    @layout_style = Style.for_name('layout').new
+  end
+
+  def test_initialize
+    assert_not_nil(@layout_style)
+    assert_kind_of(LayoutStyle, @layout_style)
   end
 
   def test_padding
