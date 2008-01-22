@@ -8,10 +8,22 @@ require 'erml_layout_managers'
 
 module EideticRML
   module Styles
-    module ColorStyle
+    module HasColor
       def color(value=nil)
         return @color || 0 if value.nil?
         @color = value
+      end
+    end
+
+    module HasWidth
+      def width(value=nil, units=:pt)
+        return @width || 0 if value.nil?
+        @width, @units = parse_measurement(value, units)
+      end
+
+      def units(value=nil)
+        return @units || :pt if value.nil?
+        @units = value.to_sym
       end
     end
 
@@ -39,7 +51,8 @@ module EideticRML
     class PenStyle < Style
       register('pen', self)
 
-      include ColorStyle
+      include HasColor
+      include HasWidth
 
       def apply(writer)
         writer.line_color(color)
@@ -47,26 +60,16 @@ module EideticRML
         writer.line_dash_pattern(pattern)
       end
 
-      def width(value=nil, units=:pt)
-        return @width || 0 if value.nil?
-        @width, @units = parse_measurement(value, units)
-      end
-
       def pattern(value=nil)
         return @pattern || :solid if value.nil?
         @pattern = EideticPDF::LINE_PATTERNS[value.to_sym] ? value.to_sym : value.to_s
-      end
-
-      def units(value=nil)
-        return @units || :pt if value.nil?
-        @units = value.to_sym
       end
     end
 
     class BrushStyle < Style
       register('brush', self)
 
-      include ColorStyle
+      include HasColor
 
       def apply(writer)
       end
@@ -75,7 +78,7 @@ module EideticRML
     class FontStyle < Style
       register('font', self)
 
-      include ColorStyle
+      include HasColor
 
       def apply(writer)
         writer.font(name, size, :style => style, :color => color, :encoding => encoding, :sub_type => sub_type)
@@ -107,10 +110,26 @@ module EideticRML
       end
     end
 
+    class BulletStyle < Style
+      register('bullet', self)
+
+      include HasWidth
+
+      def font(value=nil)
+        return @font if value.nil?
+        @font = value
+      end
+
+      def text(value=nil)
+        return @text if value.nil?
+        @text = value
+      end
+    end
+
     class ParagraphStyle < Style
       register('para', self)
 
-      include ColorStyle
+      include HasColor
 
       def align(value=nil)
         return @align || :left if value.nil?
