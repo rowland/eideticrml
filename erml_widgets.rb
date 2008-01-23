@@ -504,10 +504,10 @@ module EideticRML
       def initialize(parent=nil, attrs={})
         super(parent, attrs)
         @default_margins = false
-        @styles = []
-        @page_style = Styles::PageStyle.new
-        @font = Styles::FontStyle.new
-        @paragraph_style = Styles::ParagraphStyle.new
+        @styles = Styles::StyleCollection.new
+        @page_style = styles.add('page')
+        @font = styles.add('font')
+        @paragraph_style = styles.add('para')
       end
 
       def page_style(value=nil)

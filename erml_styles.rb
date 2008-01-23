@@ -30,7 +30,8 @@ module EideticRML
     class Style
       include Support
 
-      def initialize(attrs={})
+      def initialize(styles, attrs={})
+        @styles = styles
         attrs.each { |key, value| self.send(key, value) }
       end
 
@@ -45,6 +46,14 @@ module EideticRML
 
       def self.for_name(name)
         @@klasses[name] unless @@klasses.nil?
+      end
+    end
+
+    class StyleCollection < Array
+      def add(name, attrs={})
+        style = Style.for_name(name).new(self, attrs)
+        self << style
+        style
       end
     end
 
@@ -114,6 +123,16 @@ module EideticRML
       register('bullet', self)
 
       include HasWidth
+
+      def apply(writer)
+        unless writer.bullet(id)
+          writer.bullet(id, :width => width, :units => units) do |w|
+            prev_font = w.font(font, 12)
+            w.print(text)
+            w.font(prev_font)
+          end
+        end
+      end
 
       def font(value=nil)
         return @font if value.nil?

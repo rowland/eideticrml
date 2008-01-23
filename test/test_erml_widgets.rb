@@ -20,9 +20,8 @@ end
 class WidgetTestCases < Test::Unit::TestCase
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
-    @alt = FontStyle.new(:id => 'alt', :name => 'Times', :size => 10, :style => 'Bold', :encoding => 'CP1252', :color => '0xFFFFFF')
-    @blue_dash = PenStyle.new(:id => 'blue_dash', :color => 'Blue', :width => '4pt', :pattern => 'dashed')
-    @doc.styles << @alt << @blue_dash
+    @alt = @doc.styles.add('font', :id => 'alt', :name => 'Times', :size => 10, :style => 'Bold', :encoding => 'CP1252', :color => '0xFFFFFF')
+    @blue_dash = @doc.styles.add('pen', :id => 'blue_dash', :color => 'Blue', :width => '4pt', :pattern => 'dashed')
     @page = StdWidgetFactory.instance.make_widget('page', @doc)
     @widget = Widget.new(@page)
   end
@@ -130,8 +129,7 @@ end
 class ParagraphTestCases < Test::Unit::TestCase
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
-    @centered = ParagraphStyle.new(:id => 'centered', :align => :center)
-    @doc.styles << @centered
+    @centered = @doc.styles.add('para', :id => 'centered', :align => :center)
     @p = StdWidgetFactory.instance.make_widget('p', @doc)
   end
 
@@ -188,8 +186,7 @@ class ContainerTestCases < Test::Unit::TestCase
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @page = StdWidgetFactory.instance.make_widget('page', @doc)
-    @centered = ParagraphStyle.new(:id => 'centered', :align => :center)
-    @doc.styles << @centered
+    @centered = @doc.styles.add('para', :id => 'centered', :align => :center)
     @page.paragraph_style('centered')
     @div = StdWidgetFactory.instance.make_widget('div', @page)
   end
@@ -250,8 +247,7 @@ class PageTestCases < Test::Unit::TestCase
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @doc.units('in')
-    @legalland = PageStyle.new(:id => 'legalland', :orientation => 'landscape', :size => 'legal')
-    @doc.styles << @legalland
+    @legalland = @doc.styles.add('page', :id => 'legalland', :orientation => 'landscape', :size => 'legal')
     @page = StdWidgetFactory.instance.make_widget('page', @doc)
   end
 
@@ -297,8 +293,7 @@ class DocumentTestCases < Test::Unit::TestCase
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @doc.units('in')
-    @legalland = PageStyle.new(:id => 'legalland', :orientation => 'landscape', :size => 'legal')
-    @doc.styles << @legalland
+    @legalland = @doc.styles.add('page', :id => 'legalland', :orientation => 'landscape', :size => 'legal')
   end
 
   def test_make_widget

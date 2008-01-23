@@ -18,7 +18,7 @@ end
 class StyleTestCases < Test::Unit::TestCase
   def setup
     Style.register('test', TestStyle)
-    @style = Style.new
+    @style = Style.new(nil)
   end
 
   def test_id
@@ -40,7 +40,7 @@ end
 
 class PenStyleTestCases < Test::Unit::TestCase
   def setup
-    @pen_style = Style.for_name('pen').new
+    @pen_style = Style.for_name('pen').new(nil)
   end
 
   def test_initialize
@@ -89,7 +89,7 @@ end
 
 class BrushStyleTestCases < Test::Unit::TestCase
   def setup
-    @brush_style = Style.for_name('brush').new
+    @brush_style = Style.for_name('brush').new(nil)
   end
 
   def test_initialize
@@ -108,7 +108,7 @@ end
 
 class FontStyleTestCases < Test::Unit::TestCase
   def setup
-    @font_style = Style.for_name('font').new
+    @font_style = Style.for_name('font').new(nil)
   end
 
   def test_initialize
@@ -155,7 +155,7 @@ end
 
 class ParagraphStyleTestCases < Test::Unit::TestCase
   def setup
-    @paragraph_style = Style.for_name('para').new
+    @paragraph_style = Style.for_name('para').new(nil)
   end
 
   def test_initialize
@@ -192,7 +192,7 @@ end
 
 class PageStyleTestCases < Test::Unit::TestCase
   def setup
-    @page_style = Style.for_name('page').new
+    @page_style = Style.for_name('page').new(nil)
   end
 
   def test_initialize
@@ -235,7 +235,7 @@ end
 
 class LayoutStyleTestCases < Test::Unit::TestCase
   def setup
-    @layout_style = Style.for_name('layout').new
+    @layout_style = Style.for_name('layout').new(nil)
   end
 
   def test_initialize
