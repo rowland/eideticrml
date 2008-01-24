@@ -124,10 +124,15 @@ module EideticRML
 
       include HasWidth
 
+      def initialize(styles, attrs={})
+        super(styles, attrs)
+        @width, @units = 0.5, :in
+      end
+
       def apply(writer)
         unless writer.bullet(id)
           writer.bullet(id, :width => width, :units => units) do |w|
-            prev_font = w.font(font, 12)
+            prev_font = w.font(@font.name, @font.size, :style => @font.style, :encoding => @font.encoding, :sub_type => @font.sub_type)
             w.print(text)
             w.font(prev_font)
           end
@@ -136,7 +141,9 @@ module EideticRML
 
       def font(value=nil)
         return @font if value.nil?
-        @font = value
+        f = @styles.find { |style| style.id == value }
+        raise ArgumentError, "Font Style #{value} not found." unless f.is_a?(Styles::FontStyle)
+        @font = f
       end
 
       def text(value=nil)
@@ -155,9 +162,16 @@ module EideticRML
         @align = [:left, :center, :right, :justify].include?(value.to_sym) ? value.to_sym : @align
       end
 
+      def apply(writer)
+        @bullet.apply(writer) unless @bullet.nil?
+        writer.font_color(color)
+      end
+
       def bullet(value=nil)
         return @bullet if value.nil?
-        @bullet = value
+        b = @styles.find { |style| style.id == value }
+        raise ArgumentError, "Bullet Style #{value} not found." unless b.is_a?(Styles::BulletStyle)
+        @bullet = b
       end
     end
 

@@ -126,36 +126,15 @@ class RectangleTestCases < Test::Unit::TestCase
   end
 end
 
-class ParagraphTestCases < Test::Unit::TestCase
+class TextTestCases < Test::Unit::TestCase
   def setup
-    @doc = StdWidgetFactory.instance.make_widget('erml', nil)
-    @centered = @doc.styles.add('para', :id => 'centered', :align => :center)
-    @p = StdWidgetFactory.instance.make_widget('p', @doc)
-  end
-
-  def test_make_widget
-    assert_kind_of(Paragraph, @p)
-    assert_equal(@doc, @p.parent)
+    @text = Text.new(nil)
   end
 
   def test_text
-    assert_equal('', @p.text)
-    @p.text("paragraph")
-    assert_equal("paragraph", @p.text)
-  end
-
-  def assert_paragraph_defaults(ps)
-    assert_equal(:left, ps.align)
-    assert_nil(ps.bullet)
-  end
-
-  def test_style
-    assert_paragraph_defaults(@doc.paragraph_style)
-    assert_paragraph_defaults(@p.style)
-    @p.style('centered')
-    assert_equal(@centered, @p.style)
-    assert_equal(:center, @p.align)
-    assert_paragraph_defaults(@doc.paragraph_style)
+    assert_equal('', @text.text)
+    @text.text("text")
+    assert_equal("text", @text.text)
   end
 end
 
@@ -174,11 +153,40 @@ class LabelTestCases < Test::Unit::TestCase
     @label.angle(90)
     assert_equal(90, @label.angle)
   end
+end
 
-  def test_text
-    assert_equal('', @label.text)
-    @label.text("label")
-    assert_equal("label", @label.text)
+class ParagraphTestCases < Test::Unit::TestCase
+  def setup
+    @doc = StdWidgetFactory.instance.make_widget('erml', nil)
+    @centered = @doc.styles.add('para', :id => 'centered', :align => :center)
+    @zapf = @doc.styles.add('font', :id => 'zapf', :name => 'ZapfDingbats', :size => 12)
+    @bullet = @doc.styles.add('bullet', :id => 'bstar', :font => 'zapf', :text => "&#x4E;")
+    @p = StdWidgetFactory.instance.make_widget('p', @doc)
+  end
+
+  def test_make_widget
+    assert_kind_of(Paragraph, @p)
+    assert_equal(@doc, @p.parent)
+  end
+
+  def test_bullet
+    assert_nil(@p.bullet)
+    @p.bullet('bstar')
+    assert_equal(@bullet, @p.bullet)
+  end
+
+  def assert_paragraph_defaults(ps)
+    assert_equal(:left, ps.align)
+    assert_nil(ps.bullet)
+  end
+
+  def test_style
+    assert_paragraph_defaults(@doc.paragraph_style)
+    assert_paragraph_defaults(@p.style)
+    @p.style('centered')
+    assert_equal(@centered, @p.style)
+    assert_equal(:center, @p.align)
+    assert_paragraph_defaults(@doc.paragraph_style)
   end
 end
 

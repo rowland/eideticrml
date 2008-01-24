@@ -320,6 +320,11 @@ module EideticRML
         font.apply(writer)
       end
 
+      def strikeout(value=nil)
+        return @strikeout if value.nil?
+        @strikeout = (value == true) or (value == 'true')
+      end
+
       def text(value=nil)
         return @text || '' if value.nil?
         @text = value
@@ -349,9 +354,23 @@ module EideticRML
         @style.align(value)
       end
 
+      def bullet(value=nil)
+        return @bullet.nil? ? style.bullet : @bullet if value.nil?
+        bs = root.styles.find { |style| style.id == value }
+        raise ArgumentError, "Bullet Style #{value} not found." unless bs.is_a?(Styles::BulletStyle)
+        @bullet = bs
+      end
+
       def print(writer)
         super(writer)
-        writer.paragraph(@text, :align => style.align, :underline => underline)
+        options = { :align => style.align }
+        unless bullet.nil?
+          bullet.apply(writer)
+          options[:bullet] = bullet.id
+        end
+        prev_u = writer.underline(underline)
+        writer.paragraph(@text, options)
+        writer.underline(prev_u)
       end
 
       def style(value=nil)

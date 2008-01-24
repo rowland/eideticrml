@@ -153,9 +153,39 @@ class FontStyleTestCases < Test::Unit::TestCase
   end
 end
 
+class BulletStyleTestCases < Test::Unit::TestCase
+  def setup
+    @styles = StyleCollection.new
+    @font_style = @styles.add('font', :id => 'f1', :name => 'Courier', :size => 13)
+    @bullet_style = @styles.add('bullet')
+  end
+
+  def test_font
+    assert_nil(@bullet_style.font)
+    @bullet_style.font('f1')
+    assert_equal(@font_style, @bullet_style.font)
+  end
+
+  def test_text
+    assert_nil(@bullet_style.text)
+    @bullet_style.text("*")
+    assert_equal("*", @bullet_style.text)
+  end
+  
+  def test_width
+    assert_equal(0.5, @bullet_style.width)
+    assert_equal(:in, @bullet_style.units)
+    @bullet_style.width('18pt')
+    assert_equal(18, @bullet_style.width)
+    assert_equal(:pt, @bullet_style.units)
+  end
+end
+
 class ParagraphStyleTestCases < Test::Unit::TestCase
   def setup
-    @paragraph_style = Style.for_name('para').new(nil)
+    @styles = StyleCollection.new
+    @bullet_style = @styles.add('bullet', :id => '*')
+    @paragraph_style = @styles.add('para')
   end
 
   def test_initialize
@@ -186,7 +216,7 @@ class ParagraphStyleTestCases < Test::Unit::TestCase
   def test_bullet
     assert_nil(@paragraph_style.bullet)
     @paragraph_style.bullet '*'
-    assert_equal('*', @paragraph_style.bullet)
+    assert_equal(@bullet_style, @paragraph_style.bullet)
   end
 end
 
