@@ -31,6 +31,90 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(@page, @widget.parent)
   end
 
+  def test_position
+    assert_equal(:static, @widget.position)
+
+    @widget.position(:relative)
+    assert_equal(:relative, @widget.position)
+    @widget.position(:absolute)
+    assert_equal(:absolute, @widget.position)
+
+    @widget.position("static")
+    assert_equal(:static, @widget.position)
+    @widget.position("relative")
+    assert_equal(:relative, @widget.position)
+    @widget.position("absolute")
+    assert_equal(:absolute, @widget.position)
+  end
+
+  def test_top
+    assert_nil(@widget.top)
+    assert_equal(:static, @widget.position)
+
+    @widget.top(5)
+    assert_equal(5, @widget.top)
+    assert_equal(:static, @widget.position)
+
+    @widget.top("7")
+    assert_equal(7, @widget.top)
+    assert_equal(:static, @widget.position)
+
+    @widget.top("+9")
+    assert_equal(9, @widget.top)
+    assert_equal(:relative, @widget.position)
+  end
+
+  def test_right
+    assert_nil(@widget.right)
+    assert_equal(:static, @widget.position)
+
+    @widget.right(5)
+    assert_equal(5, @widget.right)
+    assert_equal(:static, @widget.position)
+
+    @widget.right("7")
+    assert_equal(7, @widget.right)
+    assert_equal(:static, @widget.position)
+
+    @widget.right("-9")
+    assert_equal(-9, @widget.right)
+    assert_equal(:relative, @widget.position)
+  end
+
+  def test_bottom
+    assert_nil(@widget.bottom)
+    assert_equal(:static, @widget.position)
+
+    @widget.bottom(5)
+    assert_equal(5, @widget.bottom)
+    assert_equal(:static, @widget.position)
+
+    @widget.bottom("7")
+    assert_equal(7, @widget.bottom)
+    assert_equal(:static, @widget.position)
+
+    @widget.bottom("-9")
+    assert_equal(-9, @widget.bottom)
+    assert_equal(:relative, @widget.position)
+  end
+
+  def test_left
+    assert_nil(@widget.left)
+    assert_equal(:static, @widget.position)
+
+    @widget.left(5)
+    assert_equal(5, @widget.left)
+    assert_equal(:static, @widget.position)
+
+    @widget.left("7")
+    assert_equal(7, @widget.left)
+    assert_equal(:static, @widget.position)
+
+    @widget.left("+9")
+    assert_equal(9, @widget.left)
+    assert_equal(:relative, @widget.position)
+  end
+
   def test_units
     assert_equal(:pt, @doc.units)
     assert_equal(:pt, @widget.units)
@@ -65,7 +149,7 @@ class WidgetTestCases < Test::Unit::TestCase
 
   def test_width
     @page.units(:in)
-    assert_equal(0, @widget.width)
+    assert_nil(@widget.width)
     @widget.width('5')
     assert_equal(5, @widget.width)
     @widget.width('50%')
@@ -75,7 +159,7 @@ class WidgetTestCases < Test::Unit::TestCase
 
   def test_height
     @page.units(:in)
-    assert_equal(0, @widget.height)
+    assert_nil(@widget.height)
     @widget.height('3.5')
     assert_equal(3.5, @widget.height)
     @widget.height('50%')
@@ -84,13 +168,13 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def test_content_width
-    assert_equal(0, @widget.content_width)
+    assert_nil(@widget.content_width)
     @widget.width('5')
     assert_equal(5, @widget.content_width) # same as width unless overridden
   end
 
   def test_content_height
-    assert_equal(0, @widget.content_height)
+    assert_nil(@widget.content_height)
     @widget.height('3.5')
     assert_equal(3.5, @widget.content_height) # same as height unless overridden
   end

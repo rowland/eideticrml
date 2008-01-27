@@ -19,6 +19,18 @@ module EideticRML
       [value, units]
     end
 
+    def from_units(units, measurement)
+      units == self.units ?
+        measurement :
+        measurement.to_f * EideticPDF::UNIT_CONVERSION[units] / EideticPDF::UNIT_CONVERSION[self.units]
+    end
+
+    def to_units(units, measurement)
+      units == self.units ?
+        measurement :
+        measurement.to_f * EideticPDF::UNIT_CONVERSION[self.units] / EideticPDF::UNIT_CONVERSION[units]
+    end
+
     module_function :parse_measurement
   end
 end

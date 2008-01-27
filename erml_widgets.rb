@@ -19,7 +19,7 @@ module EideticRML
     class Widget
       include Support
 
-      attr_reader :parent, :width_pct, :height_pct
+      attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel
 
       def initialize(parent, attrs={})
         @parent = parent
@@ -27,8 +27,9 @@ module EideticRML
         attrs.each { |key, value| self.send(key, value) }
       end
 
-      def position(value)
-        # TODO
+      def position(value=nil)
+        return @position || :static if value.nil?
+        @position = value.to_sym if [:static, :relative, :absolute].include?(value.to_sym)
       end
 
       def size(value=nil)
@@ -36,15 +37,31 @@ module EideticRML
       end
 
       def left(value=nil)
-        return @left || 0 if value.nil?
+        return @left if value.nil?
+        @position = :relative if value =~ /^[+-]/
+        @left = value.to_f
       end
 
       def top(value=nil)
-        return @top || 0 if value.nil?
+        return @top if value.nil?
+        @position = :relative if value =~ /^[+-]/
+        @top = value.to_f
+      end
+
+      def right(value=nil)
+        return @right if value.nil?
+        @position = :relative if value =~ /^[+-]/
+        @right = value.to_f
+      end
+
+      def bottom(value=nil)
+        return @bottom if value.nil?
+        @position = :relative if value =~ /^[+-]/
+        @bottom = value.to_f
       end
 
       def width(value=nil)
-        return @width || 0 if value.nil?
+        return @width if value.nil?
         if value =~ /(\d+(\.\d+)?)%/
           @width_pct = $1.to_f.quo(100)
           @width = @width_pct * from_units(parent.units, parent.content_width)
@@ -54,7 +71,7 @@ module EideticRML
       end
 
       def height(value=nil)
-        return @height || 0 if value.nil?
+        return @height if value.nil?
         if value =~ /(\d+(\.\d+)?)%/
           @height_pct = $1.to_f.quo(100)
           @height = @height_pct * from_units(parent.units, parent.content_height)
@@ -65,6 +82,14 @@ module EideticRML
 
       alias content_width width
       alias content_height height
+
+      def layout_widget(writer)
+        writer.units(units)
+        @left ||= 0
+        @top ||= 0
+        @width ||= 0
+        @height ||= 0
+      end
 
       def units(value=nil)
         return @units || parent.units if value.nil?
@@ -126,13 +151,6 @@ module EideticRML
 
       def root
         parent.nil? ? self : parent.root
-      end
-
-    protected
-      def from_units(units, measurement)
-        units == self.units ?
-          measurement :
-          measurement.to_f * EideticPDF::UNIT_CONVERSION[units] / EideticPDF::UNIT_CONVERSION[self.units]
       end
     end
 
@@ -280,6 +298,7 @@ module EideticRML
       end
 
       def print(writer)
+        raise "left, top, width & height must be set" if [left, top, width, height].any? { |value| value.nil? }
         options = {}
         options[:corners] = @corners unless @corners.nil?
         super(writer)
@@ -316,7 +335,13 @@ module EideticRML
     end
 
     class Text < Widget
+      def layout_widget(writer)
+        super(writer)
+        font.apply(writer)
+      end
+
       def print(writer)
+        super(writer)
         font.apply(writer)
       end
 
@@ -361,16 +386,20 @@ module EideticRML
         @bullet = bs
       end
 
+      def layout_widget(writer)
+        super(writer)
+        @rich_text ||= EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
+        @height = from_units(:pt, @rich_text.height(to_units(:pt, width)) * writer.line_height)
+      end
+
       def print(writer)
         super(writer)
-        options = { :align => style.align }
+        options = { :align => style.align, :underline => underline, :width => width }
         unless bullet.nil?
           bullet.apply(writer)
           options[:bullet] = bullet.id
         end
-        prev_u = writer.underline(underline)
-        writer.paragraph(@text, options)
-        writer.underline(prev_u)
+        writer.paragraph_xy(left, top, @rich_text || @text, options)
       end
 
       def style(value=nil)
@@ -405,7 +434,20 @@ module EideticRML
       end
 
       def layout(value=nil)
-        # TODO
+        return @layout_style if value.nil?
+        ls = root.styles.find { |style| style.id == value }
+        raise ArgumentError, "Layout Style #{value} not found." unless ls.is_a?(Styles::LayoutStyle)
+        @layout_style = ls
+      end
+
+      def layout_container(writer)
+        layout('flow') if layout.nil?
+        layout.manager.layout(self, writer)
+      end
+
+      def layout_widget(writer)
+        super(writer)
+        layout_container(writer)
       end
 
       def margins(value=nil)
@@ -505,6 +547,8 @@ module EideticRML
 
       def print(writer)
         writer.open_page(:units => units, :margins => margins)
+        layout_widget(writer)
+        # children.each { |child| child.layout_widget(writer) }
         super(writer)
         writer.close_page
       end
@@ -527,6 +571,11 @@ module EideticRML
         @page_style = styles.add('page')
         @font = styles.add('font')
         @paragraph_style = styles.add('para')
+        styles.add('layout', :id => 'absolute', :manager => 'absolute')
+        styles.add('layout', :id => 'flow', :manager => 'flow')
+        styles.add('layout', :id => 'hbox', :manager => 'hbox')
+        styles.add('layout', :id => 'vbox', :manager => 'vbox')
+        styles.add('layout', :id => 'table', :manager => 'table')
       end
 
       def page_style(value=nil)
@@ -543,7 +592,6 @@ module EideticRML
       end
 
       def print(writer)
-        # writer.open(:units => units, :margins => margins)
         writer.open
         pages.each { |page| page.print(writer) }
         writer.close

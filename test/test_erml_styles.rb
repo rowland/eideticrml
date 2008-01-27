@@ -330,6 +330,6 @@ class LayoutStyleTestCases < Test::Unit::TestCase
   def test_manager
     assert_nil(@layout_style.manager)
     @layout_style.manager('absolute')
-    assert_equal(AbsoluteLayout, @layout_style.manager)
+    assert_kind_of(AbsoluteLayout, @layout_style.manager)
   end
 end

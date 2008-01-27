@@ -52,8 +52,13 @@ module EideticRML
     class StyleCollection < Array
       def add(name, attrs={})
         style = Style.for_name(name).new(self, attrs)
+        delete(for_id(attrs[:id]))
         self << style
         style
+      end
+
+      def for_id(id)
+        find { |style| style.id == id }
       end
     end
 
@@ -222,7 +227,7 @@ module EideticRML
 
       def manager(value=nil)
         return @manager if value.nil?
-        @manager = LayoutManagers::LayoutManager.for_name(value)
+        @manager = LayoutManagers::LayoutManager.for_name(value).new(self)
       end
     end
   end

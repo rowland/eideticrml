@@ -32,9 +32,8 @@ end
 
 class AbsoluteLayoutTestCases < Test::Unit::TestCase
   def setup
-    @container = Container.new(nil)
     @style = LayoutStyle.new(nil)
-    @lm = LayoutManager.for_name('absolute').new(@container, @style)
+    @lm = LayoutManager.for_name('absolute').new(@style)
   end
 
   def test_initialize
@@ -48,9 +47,8 @@ end
 
 class FlowLayoutTestCases < Test::Unit::TestCase
   def setup
-    @container = Container.new(nil)
     @style = LayoutStyle.new(nil)
-    @lm = LayoutManager.for_name('flow').new(@container, @style)
+    @lm = LayoutManager.for_name('flow').new(@style)
   end
 
   def test_initialize
@@ -64,9 +62,8 @@ end
 
 class HBoxLayoutTestCases < Test::Unit::TestCase
   def setup
-    @container = Container.new(nil)
     @style = LayoutStyle.new(nil)
-    @lm = LayoutManager.for_name('hbox').new(@container, @style)
+    @lm = LayoutManager.for_name('hbox').new(@style)
   end
 
   def test_initialize
@@ -80,9 +77,8 @@ end
 
 class VBoxLayoutTestCases < Test::Unit::TestCase
   def setup
-    @container = Container.new(nil)
     @style = LayoutStyle.new(nil)
-    @lm = LayoutManager.for_name('vbox').new(@container, @style)
+    @lm = LayoutManager.for_name('vbox').new(@style)
   end
 
   def test_initialize
@@ -96,9 +92,8 @@ end
 
 class TableLayoutTestCases < Test::Unit::TestCase
   def setup
-    @container = Container.new(nil)
     @style = LayoutStyle.new(nil)
-    @lm = LayoutManager.for_name('table').new(@container, @style)
+    @lm = LayoutManager.for_name('table').new(@style)
   end
 
   def test_initialize

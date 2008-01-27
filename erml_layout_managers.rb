@@ -6,11 +6,19 @@
 module EideticRML
   module LayoutManagers
     class LayoutManager
-      def initialize(container, style)
-        @container, @style = container, style
+      def initialize(style)
+        @style = style
       end
 
-      def layout(writer)
+      def layout(container, writer)
+      end
+
+      def hpadding(units)
+        @style.to_units(units, @style.hpadding)
+      end
+
+      def vpadding(units)
+        @style.to_units(units, @style.vpadding)
       end
 
       def self.register(name, klass)
@@ -25,7 +33,7 @@ module EideticRML
     class AbsoluteLayout < LayoutManager
       register('absolute', self)
 
-      def layout(writer)
+      def layout(container, writer)
         # TODO
       end
     end
@@ -33,15 +41,27 @@ module EideticRML
     class FlowLayout < LayoutManager
       register('flow', self)
 
-      def layout(writer)
-        # TODO
+      def layout(container, writer)
+        cx = cy = max_y = 0
+        container.children.select { |child| child.position == :static }.each do |widget|
+          widget.width('100%') if widget.width.nil?
+          widget.layout_widget(writer)
+          if cx != 0 and cx + widget.width > container.content_width
+            cy += max_y + vpadding(container.units)
+            cx = max_y = 0
+          end
+          widget.left(container.left + cx)
+          widget.top(container.top + cy)
+          cx += widget.width + hpadding(container.units)
+          max_y = [max_y, widget.height].max
+        end
       end
     end
 
     class HBoxLayout < LayoutManager
       register('hbox', self)
 
-      def layout(writer)
+      def layout(container, writer)
         # TODO
       end
     end
@@ -49,15 +69,15 @@ module EideticRML
     class VBoxLayout < LayoutManager
       register('vbox', self)
 
-      def layout(writer)
+      def layout(container, writer)
         # TODO
       end
     end
-    
+
     class TableLayout < LayoutManager
       register('table', self)
       
-      def layout(writer)
+      def layout(container, writer)
         # TODO
       end
     end
