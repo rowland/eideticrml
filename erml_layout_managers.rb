@@ -42,8 +42,8 @@ module EideticRML
             cy += max_y + @style.vpadding
             cx = max_y = 0
           end
-          widget.left(container.left + cx, :pt)
-          widget.top(container.top + cy, :pt)
+          widget.left(container.left + container.margin_left + cx, :pt)
+          widget.top(container.top + container.margin_top + cy, :pt)
           cx += widget.width + @style.hpadding
           max_y = [max_y, widget.height].max
         end

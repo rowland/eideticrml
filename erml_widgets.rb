@@ -91,7 +91,6 @@ module EideticRML
 
       def layout_widget(writer)
         # puts "widget: layout_widget"
-        # writer.units(units)
         @left ||= 0
         @top ||= 0
         @width ||= 0
@@ -598,10 +597,8 @@ module EideticRML
       end
 
       def print(writer)
-        # writer.open_page(:units => units, :margins => margins)
-        writer.open_page(:margins => margins)
+        writer.open_page
         layout_widget(writer)
-        # children.each { |child| child.layout_widget(writer) }
         super(writer)
         writer.close_page
       end
