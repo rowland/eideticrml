@@ -16,9 +16,10 @@ module EideticRML
     end
 
     module HasWidth
-      def width(value=nil, units=:pt)
+      def width(value=nil, units=nil)
         return @width || 0 if value.nil?
-        @width, @units = parse_measurement(value, units)
+        return from_points(@width, value) if value.is_a?(Symbol)
+        @width = parse_measurement_pts(value, units || self.units)
       end
 
       def units(value=nil)
@@ -33,6 +34,10 @@ module EideticRML
       def initialize(styles, attrs={})
         @styles = styles
         attrs.each { |key, value| self.send(key, value) }
+      end
+
+      def from_points(value, units)
+        value.to_f / EideticPDF::UNIT_CONVERSION[units]
       end
 
       def id(value=nil)
@@ -131,12 +136,12 @@ module EideticRML
 
       def initialize(styles, attrs={})
         super(styles, attrs)
-        @width, @units = 0.5, :in
+        @width, @units = 36, :pt
       end
 
       def apply(writer)
         unless writer.bullet(id)
-          writer.bullet(id, :width => width, :units => units) do |w|
+          writer.bullet(id, :width => width) do |w|
             prev_font = w.font(@font.name, @font.size, :style => @font.style, :encoding => @font.encoding, :sub_type => @font.sub_type)
             w.print(text)
             w.font(prev_font)
@@ -183,8 +188,8 @@ module EideticRML
     class PageStyle < Style
       register('page', self)
 
-      def height
-        EideticPDF::PageStyle::SIZES[size][orientation == :portrait ? 1 : 0]
+      def height(units=:pt)
+        from_points(EideticPDF::PageStyle::SIZES[size][orientation == :portrait ? 1 : 0], units)
       end
 
       def orientation(value=nil)
@@ -197,8 +202,8 @@ module EideticRML
         @size = value.to_sym if EideticPDF::PageStyle::SIZES[value.to_sym]
       end
 
-      def width
-        EideticPDF::PageStyle::SIZES[size][orientation == :portrait ? 0 : 1]
+      def width(units=:pt)
+        from_points(EideticPDF::PageStyle::SIZES[size][orientation == :portrait ? 0 : 1], units)
       end
     end
 
@@ -207,17 +212,20 @@ module EideticRML
 
       def padding(value=nil, units=:pt)
         return @padding || 0 if value.nil?
-        @padding, @units = parse_measurement(value, units)
+        return from_points(@padding || 0, value) if value.is_a?(Symbol)
+        @padding = parse_measurement_pts(value, units)
       end
 
       def hpadding(value=nil, units=:pt)
         return @hpadding || padding if value.nil?
-        @hpadding, @units = parse_measurement(value, units)
+        return from_points(@hpadding || padding, value) if value.is_a?(Symbol)
+        @hpadding = parse_measurement_pts(value, units)
       end
 
       def vpadding(value=nil, units=:pt)
         return @vpadding || padding if value.nil?
-        @vpadding, @units = parse_measurement(value, units)
+        return from_points(@vpadding || padding, value) if value.is_a?(Symbol)
+        @vpadding = parse_measurement_pts(value, units)
       end
 
       def units(value=nil)

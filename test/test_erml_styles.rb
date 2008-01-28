@@ -64,8 +64,8 @@ class PenStyleTestCases < Test::Unit::TestCase
     assert_equal(123, @pen_style.width)
     assert_equal(:pt, @pen_style.units)
     @pen_style.width '2cm'
-    assert_equal(2, @pen_style.width)
-    assert_equal(:cm, @pen_style.units)
+    assert_equal(56.7, @pen_style.width)
+    assert_equal(2, @pen_style.width(:cm))
   end
 
   def test_pattern
@@ -171,13 +171,25 @@ class BulletStyleTestCases < Test::Unit::TestCase
     @bullet_style.text("*")
     assert_equal("*", @bullet_style.text)
   end
-  
-  def test_width
-    assert_equal(0.5, @bullet_style.width)
-    assert_equal(:in, @bullet_style.units)
+
+  def test_width1
+    assert_equal(:pt, @bullet_style.units) # default units
+    assert_equal(36, @bullet_style.width) # default width
+    assert_equal(0.5, @bullet_style.width(:in)) # in specified units
+  end
+
+  def test_width2
     @bullet_style.width('18pt')
     assert_equal(18, @bullet_style.width)
-    assert_equal(:pt, @bullet_style.units)
+    assert_equal(0.25, @bullet_style.width(:in))
+  end
+
+  def test_width3
+    @bullet_style.units('cm')
+    assert_equal(:cm, @bullet_style.units)
+    @bullet_style.width('1')
+    assert_equal(28.35, @bullet_style.width)
+    assert_equal(1, @bullet_style.width(:cm))
   end
 end
 
@@ -256,10 +268,12 @@ class PageStyleTestCases < Test::Unit::TestCase
 
   def test_height
     assert_equal(792, @page_style.height)
+    assert_equal(11, @page_style.height(:in))
   end
 
   def test_width
     assert_equal(612, @page_style.width)
+    assert_equal(8.5, @page_style.width(:in))
   end
 end
 
@@ -275,56 +289,76 @@ class LayoutStyleTestCases < Test::Unit::TestCase
 
   def test_padding
     assert_equal(0, @layout_style.padding)
+    assert_equal(:pt, @layout_style.units)
 
     @layout_style.padding 5
-    assert_equal([5, :pt], [@layout_style.padding, @layout_style.units])
+    assert_equal(5, @layout_style.padding)
+
     @layout_style.padding 2, :cm
-    assert_equal([2, :cm], [@layout_style.padding, @layout_style.units])
+    assert_equal(56.7, @layout_style.padding)
+    assert_equal(2, @layout_style.padding(:cm))
+
     @layout_style.padding 1, 'in'
-    assert_equal([1, :in], [@layout_style.padding, @layout_style.units])
+    assert_equal(1, @layout_style.padding(:in))
+    assert_equal(72, @layout_style.padding)
 
     @layout_style.padding '5pt'
-    assert_equal([5, :pt], [@layout_style.padding, @layout_style.units])
+    assert_equal(5, @layout_style.padding)
+
     @layout_style.padding '2cm'
-    assert_equal([2, :cm], [@layout_style.padding, @layout_style.units])
+    assert_equal(2, @layout_style.padding(:cm))
+    assert_equal(56.7, @layout_style.padding)
+
     @layout_style.padding '1.25in'
-    assert_equal([1.25, :in], [@layout_style.padding, @layout_style.units])
+    assert_equal(1.25, @layout_style.padding(:in))
   end
 
   def test_hpadding
     assert_equal(0, @layout_style.hpadding)
 
     @layout_style.hpadding 5
-    assert_equal([5, :pt], [@layout_style.hpadding, @layout_style.units])
+    assert_equal(5, @layout_style.hpadding)
+
     @layout_style.hpadding 2, :cm
-    assert_equal([2, :cm], [@layout_style.hpadding, @layout_style.units])
+    assert_equal(2, @layout_style.hpadding(:cm))
+
     @layout_style.hpadding 1, 'in'
-    assert_equal([1, :in], [@layout_style.hpadding, @layout_style.units])
+    assert_equal(1, @layout_style.hpadding(:in))
+    assert_equal(72, @layout_style.hpadding)
 
     @layout_style.hpadding '5pt'
-    assert_equal([5, :pt], [@layout_style.hpadding, @layout_style.units])
+    assert_equal(5, @layout_style.hpadding)
+
     @layout_style.hpadding '2cm'
-    assert_equal([2, :cm], [@layout_style.hpadding, @layout_style.units])
+    assert_equal(2, @layout_style.hpadding(:cm))
+    assert_equal(56.7, @layout_style.hpadding)
+
     @layout_style.hpadding '1.25in'
-    assert_equal([1.25, :in], [@layout_style.hpadding, @layout_style.units])
+    assert_equal(1.25, @layout_style.hpadding(:in))
   end
 
   def test_vpadding
     assert_equal(0, @layout_style.vpadding)
 
     @layout_style.vpadding 5
-    assert_equal([5, :pt], [@layout_style.vpadding, @layout_style.units])
+    assert_equal(5, @layout_style.vpadding)
+
     @layout_style.vpadding 2, :cm
-    assert_equal([2, :cm], [@layout_style.vpadding, @layout_style.units])
+    assert_equal(2, @layout_style.vpadding(:cm))
+
     @layout_style.vpadding 1, 'in'
-    assert_equal([1, :in], [@layout_style.vpadding, @layout_style.units])
+    assert_equal(1, @layout_style.vpadding(:in))
+    assert_equal(72, @layout_style.vpadding)
 
     @layout_style.vpadding '5pt'
-    assert_equal([5, :pt], [@layout_style.vpadding, @layout_style.units])
+    assert_equal(5, @layout_style.vpadding)
+
     @layout_style.vpadding '2cm'
-    assert_equal([2, :cm], [@layout_style.vpadding, @layout_style.units])
+    assert_equal(2, @layout_style.vpadding(:cm))
+    assert_equal(56.7, @layout_style.vpadding)
+
     @layout_style.vpadding '1.25in'
-    assert_equal([1.25, :in], [@layout_style.vpadding, @layout_style.units])
+    assert_equal(1.25, @layout_style.vpadding(:in))
   end
 
   def test_manager

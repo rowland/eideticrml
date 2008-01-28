@@ -36,47 +36,53 @@ module EideticRML
         # TODO
       end
 
-      def left(value=nil)
+      def left(value=nil, units=nil)
         return @left if value.nil?
+        return to_units(value, @left) if value.is_a?(Symbol)
         @position = :relative if value =~ /^[+-]/
-        @left = value.to_f
+        @left = parse_measurement_pts(value, units || self.units)
       end
 
-      def top(value=nil)
+      def top(value=nil, units=nil)
         return @top if value.nil?
+        return to_units(value, @top) if value.is_a?(Symbol)
         @position = :relative if value =~ /^[+-]/
-        @top = value.to_f
+        @top = parse_measurement_pts(value, units || self.units)
       end
 
-      def right(value=nil)
+      def right(value=nil, units=nil)
         return @right if value.nil?
+        return to_units(value, @right) if value.is_a?(Symbol)
         @position = :relative if value =~ /^[+-]/
-        @right = value.to_f
+        @right = parse_measurement_pts(value, units || self.units)
       end
 
-      def bottom(value=nil)
+      def bottom(value=nil, units=nil)
         return @bottom if value.nil?
+        return to_units(value, @bottom) if value.is_a?(Symbol)
         @position = :relative if value =~ /^[+-]/
-        @bottom = value.to_f
+        @bottom = parse_measurement_pts(value, units || self.units)
       end
 
       def width(value=nil)
         return @width if value.nil?
+        return to_units(value, @width) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
           @width_pct = $1.to_f.quo(100)
-          @width = @width_pct * from_units(parent.units, parent.content_width)
+          @width = @width_pct * parent.content_width
         else
-          @width = value.to_f
+          @width = parse_measurement_pts(value, units)
         end
       end
 
       def height(value=nil)
         return @height if value.nil?
+        return to_units(value, @height) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
           @height_pct = $1.to_f.quo(100)
-          @height = @height_pct * from_units(parent.units, parent.content_height)
+          @height = @height_pct * parent.content_height
         else
-          @height = value.to_f
+          @height = parse_measurement_pts(value, units)
         end
       end
 
@@ -84,7 +90,8 @@ module EideticRML
       alias content_height height
 
       def layout_widget(writer)
-        writer.units(units)
+        # puts "widget: layout_widget"
+        # writer.units(units)
         @left ||= 0
         @top ||= 0
         @width ||= 0
@@ -146,6 +153,7 @@ module EideticRML
       end
 
       def print(writer)
+        # puts "widget: print"
         @borders.apply(writer) unless @borders.nil?
       end
 
@@ -290,7 +298,7 @@ module EideticRML
       def corners(value=nil)
         return @corners if value.nil?
         value = value.split(',') if value.respond_to?(:to_str)
-        @corners = value.map { |n| n.to_f } if [1,2,4,8].include?(value.size)
+        @corners = value.map { |n| parse_measurement_pts(n, units) } if [1,2,4,8].include?(value.size)
       end
 
       def path(value=nil)
@@ -336,6 +344,7 @@ module EideticRML
 
     class Text < Widget
       def layout_widget(writer)
+        # puts "text: layout_widget"
         super(writer)
         font.apply(writer)
       end
@@ -387,9 +396,12 @@ module EideticRML
       end
 
       def layout_widget(writer)
+        # puts "paragraph: layout_widget"
         super(writer)
+        bullet_width = bullet.nil? ? 0 : bullet.width
         @rich_text ||= EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
-        @height = from_units(:pt, @rich_text.height(to_units(:pt, width)) * writer.line_height)
+        @height = @rich_text.height(width - bullet_width) * writer.line_height
+        # puts "paragraph @height: #{@height} for width: #{width}"
       end
 
       def print(writer)
@@ -397,9 +409,11 @@ module EideticRML
         options = { :align => style.align, :underline => underline, :width => width }
         unless bullet.nil?
           bullet.apply(writer)
-          options[:bullet] = bullet.id
+          options[:bullet] = bullet.id unless bullet.nil?
         end
+        # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
         writer.paragraph_xy(left, top, @rich_text || @text, options)
+        # writer.rectangle(left, top, width, height, :borders => 0)
       end
 
       def style(value=nil)
@@ -425,6 +439,7 @@ module EideticRML
       end
 
       def content_width
+        # puts "content_width: #{width}, #{margin_left}, #{margin_right}"
         width - margin_left - margin_right
       end
 
@@ -446,41 +461,51 @@ module EideticRML
       end
 
       def layout_widget(writer)
+        # puts "container: layout_widget"
         super(writer)
         layout_container(writer)
       end
 
       def margins(value=nil)
         return [margin_top, margin_right, margin_bottom, margin_left] if value.nil?
-        value = value.split(',') if value.respond_to?(:to_str)
-        value = value.map { |n| n.to_f }
+        return [margin_top(value), margin_right(value), margin_bottom(value), margin_left(value)] if value.is_a?(Symbol)
+        if value.respond_to?(:to_str)
+          value = value.split(',').map do |n|
+            parse_measurement_pts(n, units)
+          end
+        end
         m = case value.size
           when 4: value
           when 2: value * 2
           when 1: value * 4
         else nil
         end
+        # puts "setting margins: #{m.inspect}"
         @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
       end
 
       def margin_top(value=nil)
         return @margin_top || 0 if value.nil?
-        @margin_top = value.to_f
+        return to_units(value, @margin_top) if value.is_a?(Symbol)
+        @margin_top = parse_measurement_pts(value, units)
       end
 
       def margin_right(value=nil)
         return @margin_right || 0 if value.nil?
-        @margin_right = value.to_f
+        return to_units(value, @margin_right) if value.is_a?(Symbol)
+        @margin_right = parse_measurement_pts(value, units)
       end
 
       def margin_bottom(value=nil)
         return @margin_bottom || 0 if value.nil?
-        @margin_bottom = value.to_f
+        return to_units(value, @margin_bottom) if value.is_a?(Symbol)
+        @margin_bottom = parse_measurement_pts(value, units)
       end
 
       def margin_left(value=nil)
         return @margin_left || 0 if value.nil?
-        @margin_left = value.to_f
+        return to_units(value, @margin_left) if value.is_a?(Symbol)
+        @margin_left = parse_measurement_pts(value, units)
       end
 
       def paragraph_style(value=nil)
@@ -513,12 +538,39 @@ module EideticRML
         # TODO
       end
 
-      def height
-        from_units(:pt, style.height)
+      def height(units=:pt)
+        to_units(units, style.height)
       end
 
       def margins(value=nil)
-        return @default_margins ? parent.margins : super if value.nil?
+        return @default_margins ? parent.margins(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        super(value)
+        @default_margins = false
+      end
+
+      def margin_top(value=nil)
+        return @default_margins ? parent.margin_top(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        super(value)
+        @default_margins = false
+      end
+
+      def margin_right(value=nil)
+        return @default_margins ? parent.margin_right(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        margins(margins) if @default_margins
+        super(value)
+        @default_margins = false
+      end
+
+      def margin_bottom(value=nil)
+        return @default_margins ? parent.margin_bottom(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        margins(margins) if @default_margins
+        super(value)
+        @default_margins = false
+      end
+
+      def margin_left(value=nil)
+        return @default_margins ? parent.margin_left(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        margins(margins) if @default_margins
         super(value)
         @default_margins = false
       end
@@ -546,15 +598,16 @@ module EideticRML
       end
 
       def print(writer)
-        writer.open_page(:units => units, :margins => margins)
+        # writer.open_page(:units => units, :margins => margins)
+        writer.open_page(:margins => margins)
         layout_widget(writer)
         # children.each { |child| child.layout_widget(writer) }
         super(writer)
         writer.close_page
       end
 
-      def width
-        from_units(:pt, style.width)
+      def width(units=:pt)
+        to_units(units, style.width)
       end
     end
 

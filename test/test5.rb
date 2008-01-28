@@ -8,7 +8,9 @@ include EideticRML::Styles
 
 doc = Document.new
 blue_dash = doc.styles.add('pen', :id => 'blue_dash', :color => 'Blue', :width => '4pt', :pattern => 'dashed')
-page = Page.new(doc, :units => 'in', :margins => '1')
+page = Page.new(doc)
+page.units 'in'
+page.margins '1'
 rect = Rectangle.new(page, :width => '100%', :height => '2', :borders => 'blue_dash', :corners => '0.5')
 
 pathname = "#{File.basename($0, '.rb')}.pdf"

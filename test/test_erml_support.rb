@@ -15,5 +15,14 @@ class ErmlSupportTestCases < Test::Unit::TestCase
     assert_equal([123.456, :pt], Support::parse_measurement("123.456"))
     assert_equal([123, :cm], Support::parse_measurement("123cm"))
     assert_equal([123.456, :cm], Support::parse_measurement("123.456cm"))
+    assert_equal([2, :in], Support::parse_measurement("2", :in))
+  end
+
+  def test_parse_measurement_pts
+    assert_equal(123, Support::parse_measurement_pts("123"))
+    assert_equal(123.456, Support::parse_measurement_pts("123.456"))
+    assert_equal(3487.05, Support::parse_measurement_pts("123cm"))
+    assert_equal(3499.9776, Support::parse_measurement_pts("123.456cm"))
+    assert_equal(144, Support::parse_measurement_pts("2", :in))
   end
 end

@@ -13,14 +13,6 @@ module EideticRML
       def layout(container, writer)
       end
 
-      def hpadding(units)
-        @style.to_units(units, @style.hpadding)
-      end
-
-      def vpadding(units)
-        @style.to_units(units, @style.vpadding)
-      end
-
       def self.register(name, klass)
         (@@klasses ||= {})[name] = klass
       end
@@ -47,12 +39,12 @@ module EideticRML
           widget.width('100%') if widget.width.nil?
           widget.layout_widget(writer)
           if cx != 0 and cx + widget.width > container.content_width
-            cy += max_y + vpadding(container.units)
+            cy += max_y + @style.vpadding
             cx = max_y = 0
           end
-          widget.left(container.left + cx)
-          widget.top(container.top + cy)
-          cx += widget.width + hpadding(container.units)
+          widget.left(container.left + cx, :pt)
+          widget.top(container.top + cy, :pt)
+          cx += widget.width + @style.hpadding
           max_y = [max_y, widget.height].max
         end
       end
