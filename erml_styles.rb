@@ -75,7 +75,7 @@ module EideticRML
 
       def apply(writer)
         writer.line_color(color)
-        writer.line_width(width, units)
+        writer.line_width([width, 1].max, units)
         writer.line_dash_pattern(pattern)
       end
 

@@ -23,6 +23,7 @@ class WidgetTestCases < Test::Unit::TestCase
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @alt = @doc.styles.add('font', :id => 'alt', :name => 'Times', :size => 10, :style => 'Bold', :encoding => 'CP1252', :color => '0xFFFFFF')
     @blue_dash = @doc.styles.add('pen', :id => 'blue_dash', :color => 'Blue', :width => '4pt', :pattern => 'dashed')
+    @dotted = @doc.styles.for_id('dotted')
     @page = StdWidgetFactory.instance.make_widget('page', @doc)
     @widget = Widget.new(@page)
   end
@@ -177,17 +178,21 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def test_content_width
-    assert_nil(@widget.content_width)
+    assert_equal(0, @widget.content_width)
     @widget.width('36')
     assert_equal(36, @widget.content_width) # same as width unless overridden
     assert_equal(0.5, @widget.content_width(:in)) # in specified units
+    @widget.margins([1,2,3,4])
+    assert_equal(30, @widget.content_width)
   end
 
   def test_content_height
-    assert_nil(@widget.content_height)
+    assert_equal(0, @widget.content_height)
     @widget.height('3.5in')
     assert_equal(252, @widget.content_height) # same as height unless overridden
     assert_equal(3.5, @widget.content_height(:in)) # in specified units
+    @widget.margins([1,2,3,4])
+    assert_equal(248, @widget.content_height)
   end
 
   def test_borders
@@ -198,6 +203,78 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal('Blue', @widget.borders.color)
     assert_equal(4, @widget.borders.width)
     assert_equal(:pt, @widget.borders.units)
+  end
+
+  def test_border_top
+    assert_nil(@widget.border_top)
+    @widget.border_top('blue_dash')
+    assert_equal(@blue_dash, @widget.border_top)
+    @widget.borders('dotted')
+    assert_equal(@dotted, @widget.border_top)
+  end
+
+  def test_border_right
+    assert_nil(@widget.border_right)
+    @widget.border_right('blue_dash')
+    assert_equal(@blue_dash, @widget.border_right)
+    @widget.borders('dotted')
+    assert_equal(@dotted, @widget.border_right)
+  end
+
+  def test_border_bottom
+    assert_nil(@widget.border_bottom)
+    @widget.border_bottom('blue_dash')
+    assert_equal(@blue_dash, @widget.border_bottom)
+    @widget.borders('dotted')
+    assert_equal(@dotted, @widget.border_bottom)
+  end
+
+  def test_border_left
+    assert_nil(@widget.border_left)
+    @widget.border_left('blue_dash')
+    assert_equal(@blue_dash, @widget.border_left)
+    @widget.borders('dotted')
+    assert_equal(@dotted, @widget.border_left)
+  end
+
+  def test_margins
+    assert_equal(0, @widget.margin_top)
+    assert_equal(0, @widget.margin_right)
+    assert_equal(0, @widget.margin_bottom)
+    assert_equal(0, @widget.margin_left)
+
+    @widget.margins('1in')
+    assert_equal(1, @widget.margin_top(:in))
+    assert_equal(1, @widget.margin_right(:in))
+    assert_equal(1, @widget.margin_bottom(:in))
+    assert_equal(1, @widget.margin_left(:in))
+
+    assert_equal(72, @widget.margin_top)
+    assert_equal(72, @widget.margin_right)
+    assert_equal(72, @widget.margin_bottom)
+    assert_equal(72, @widget.margin_left)
+
+    @widget.margins('1cm,2cm')
+    assert_equal(1, @widget.margin_top(:cm))
+    assert_equal(2, @widget.margin_right(:cm))
+    assert_equal(1, @widget.margin_bottom(:cm))
+    assert_equal(2, @widget.margin_left(:cm))
+
+    assert_equal(28.35, @widget.margin_top)
+    assert_equal(56.7, @widget.margin_right)
+    assert_equal(28.35, @widget.margin_bottom)
+    assert_equal(56.7, @widget.margin_left)
+
+    @widget.margins('1in,2cm,3cm,4pt')
+    assert_equal(1, @widget.margin_top(:in))
+    assert_equal(2, @widget.margin_right(:cm))
+    assert_close(3, @widget.margin_bottom(:cm))
+    assert_equal(4, @widget.margin_left(:pt))
+
+    assert_equal(72, @widget.margin_top)
+    assert_equal(56.7, @widget.margin_right)
+    assert_close(85.05, @widget.margin_bottom)
+    assert_equal(4, @widget.margin_left)
   end
 end
 
@@ -302,68 +379,8 @@ class ContainerTestCases < Test::Unit::TestCase
     assert_equal([0, 0, 0, 0], @div.margins)
   end
 
-  def test_margins
-    assert_equal(0, @div.margin_top)
-    assert_equal(0, @div.margin_right)
-    assert_equal(0, @div.margin_bottom)
-    assert_equal(0, @div.margin_left)
-
-    @div.margins('1in')
-    assert_equal(1, @div.margin_top(:in))
-    assert_equal(1, @div.margin_right(:in))
-    assert_equal(1, @div.margin_bottom(:in))
-    assert_equal(1, @div.margin_left(:in))
-
-    assert_equal(72, @div.margin_top)
-    assert_equal(72, @div.margin_right)
-    assert_equal(72, @div.margin_bottom)
-    assert_equal(72, @div.margin_left)
-
-    @div.margins('1cm,2cm')
-    assert_equal(1, @div.margin_top(:cm))
-    assert_equal(2, @div.margin_right(:cm))
-    assert_equal(1, @div.margin_bottom(:cm))
-    assert_equal(2, @div.margin_left(:cm))
-
-    assert_equal(28.35, @div.margin_top)
-    assert_equal(56.7, @div.margin_right)
-    assert_equal(28.35, @div.margin_bottom)
-    assert_equal(56.7, @div.margin_left)
-
-    @div.margins('1in,2cm,3cm,4pt')
-    assert_equal(1, @div.margin_top(:in))
-    assert_equal(2, @div.margin_right(:cm))
-    assert_close(3, @div.margin_bottom(:cm))
-    assert_equal(4, @div.margin_left(:pt))
-
-    assert_equal(72, @div.margin_top)
-    assert_equal(56.7, @div.margin_right)
-    assert_close(85.05, @div.margin_bottom)
-    assert_equal(4, @div.margin_left)
-  end
-
-  def test_margins2
-    doc = Document.new
-    page = Page.new(doc, :margins => '1') # initialize margins in constructor
-    assert_equal([1,1,1,1], page.margins)
-  end
-
   def test_paragraph_style
     assert_equal(:center, @div.paragraph_style.align)
-  end
-
-  def test_content_width
-    @div.width(10)
-    assert_equal(10, @div.content_width)
-    @div.margins([1,2,3,4])
-    assert_equal(4, @div.content_width)
-  end
-
-  def test_content_height
-    @div.height(10)
-    assert_equal(10, @div.content_height)
-    @div.margins([1,2,3,4])
-    assert_equal(6, @div.content_height)
   end
 end
 
@@ -416,6 +433,12 @@ class PageTestCases < Test::Unit::TestCase
 
     assert_equal([1,1,1,1], @doc.margins(:in)) # unchanged
     assert_equal([1,1,1,1], @doc.margins(:in)) # unchanged
+  end
+
+  def test_margins2
+    doc = Document.new
+    page = Page.new(doc, :margins => '1') # initialize margins in constructor
+    assert_equal([1,1,1,1], page.margins)
   end
 
   def test_style

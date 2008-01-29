@@ -86,8 +86,13 @@ module EideticRML
         end
       end
 
-      alias content_width width
-      alias content_height height
+      def content_height(units=:pt)
+        height(units) - margin_top(units) - margin_bottom(units)
+      end
+
+      def content_width(units=:pt)
+        width(units) - margin_left(units) - margin_right(units)
+      end
 
       def layout_widget(writer)
         # puts "widget: layout_widget"
@@ -104,30 +109,75 @@ module EideticRML
 
       def borders(value=nil)
         return @borders if value.nil?
-        bs = root.styles.find { |style| style.id == value }
-        raise ArgumentError, "Pen Style #{value} not found." unless bs.is_a?(Styles::PenStyle)
-        @borders = bs
+        @borders = pen_style(value)
+        @border_top = @border_right = @border_bottom = @border_left = nil
       end
 
       def border_top(value=nil)
-        # TODO
+        return @border_top || @borders if value.nil?
+        @border_top = pen_style(value)
       end
 
       def border_right(value=nil)
-        # TODO
+        return @border_right || @borders if value.nil?
+        @border_right = pen_style(value)
       end
 
       def border_bottom(value=nil)
-        # TODO
+        return @border_bottom || @borders if value.nil?
+        @border_bottom = pen_style(value)
       end
 
       def border_left(value=nil)
-        # TODO
+        return @border_left || @borders if value.nil?
+        @border_left = pen_style(value)
       end
 
       def background(value=nil)
         # inherited
         # TODO
+      end
+
+      def margin_top(value=nil)
+        return @margin_top || 0 if value.nil?
+        return to_units(value, @margin_top) if value.is_a?(Symbol)
+        @margin_top = parse_measurement_pts(value, units)
+      end
+
+      def margin_right(value=nil)
+        return @margin_right || 0 if value.nil?
+        return to_units(value, @margin_right) if value.is_a?(Symbol)
+        @margin_right = parse_measurement_pts(value, units)
+      end
+
+      def margin_bottom(value=nil)
+        return @margin_bottom || 0 if value.nil?
+        return to_units(value, @margin_bottom) if value.is_a?(Symbol)
+        @margin_bottom = parse_measurement_pts(value, units)
+      end
+
+      def margin_left(value=nil)
+        return @margin_left || 0 if value.nil?
+        return to_units(value, @margin_left) if value.is_a?(Symbol)
+        @margin_left = parse_measurement_pts(value, units)
+      end
+
+      def margins(value=nil)
+        return [margin_top, margin_right, margin_bottom, margin_left] if value.nil?
+        return [margin_top(value), margin_right(value), margin_bottom(value), margin_left(value)] if value.is_a?(Symbol)
+        if value.respond_to?(:to_str)
+          value = value.split(',').map do |n|
+            parse_measurement_pts(n, units)
+          end
+        end
+        m = case value.size
+          when 4: value
+          when 2: value * 2
+          when 1: value * 4
+        else nil
+        end
+        # puts "setting margins: #{m.inspect}"
+        @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
       end
 
       def font(value=nil)
@@ -153,11 +203,48 @@ module EideticRML
 
       def print(writer)
         # puts "widget: print"
-        @borders.apply(writer) unless @borders.nil?
+        draw_borders(writer)
       end
 
       def root
         parent.nil? ? self : parent.root
+      end
+
+    protected
+      def pen_style(id)
+        ps = root.styles.for_id(id)
+        raise ArgumentError, "Pen Style #{id} not found." unless ps.is_a?(Styles::PenStyle)
+        ps
+      end
+
+      def draw_borders(writer)
+        if [@border_top, @border_right, @border_bottom, @border_left].all? { |b| b.nil? }
+          unless @borders.nil?
+            @borders.apply(writer)
+            writer.rectangle(left + margin_left, top + margin_top, content_width, content_height)
+          end
+        else
+          unless @border_top.nil?
+            @border_top.apply(writer)
+            writer.move_to(left + margin_left, top + margin_top) # top left
+            writer.line_to(left + margin_left + content_width, top + margin_top) # top right
+          end
+          unless @border_right.nil?
+            @border_right.apply(writer)
+            writer.move_to(left + margin_left + content_width, top + margin_top) # top right
+            writer.line_to(left + margin_left + content_width, top + margin_top + content_height) # bottom right
+          end
+          unless @border_bottom.nil?
+            @border_bottom.apply(writer)
+            writer.move_to(left + margin_left + content_width, top + margin_top + content_height) # bottom right
+            writer.line_to(left + margin_left, top + margin_top + content_height) # bottom left
+          end
+          unless @border_left.nil?
+            @border_left.apply(writer)
+            writer.move_to(left + margin_left, top + margin_top + content_height) # bottom left
+            writer.line_to(left + margin_left, top + margin_top) # top left
+          end
+        end
       end
     end
 
@@ -433,15 +520,6 @@ module EideticRML
         @children = []
       end
 
-      def content_height
-        height - margin_top - margin_bottom
-      end
-
-      def content_width
-        # puts "content_width: #{width}, #{margin_left}, #{margin_right}"
-        width - margin_left - margin_right
-      end
-
       def font(value=nil)
         return @font || parent.font if value.nil?
         @font = value
@@ -463,48 +541,6 @@ module EideticRML
         # puts "container: layout_widget"
         super(writer)
         layout_container(writer)
-      end
-
-      def margins(value=nil)
-        return [margin_top, margin_right, margin_bottom, margin_left] if value.nil?
-        return [margin_top(value), margin_right(value), margin_bottom(value), margin_left(value)] if value.is_a?(Symbol)
-        if value.respond_to?(:to_str)
-          value = value.split(',').map do |n|
-            parse_measurement_pts(n, units)
-          end
-        end
-        m = case value.size
-          when 4: value
-          when 2: value * 2
-          when 1: value * 4
-        else nil
-        end
-        # puts "setting margins: #{m.inspect}"
-        @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
-      end
-
-      def margin_top(value=nil)
-        return @margin_top || 0 if value.nil?
-        return to_units(value, @margin_top) if value.is_a?(Symbol)
-        @margin_top = parse_measurement_pts(value, units)
-      end
-
-      def margin_right(value=nil)
-        return @margin_right || 0 if value.nil?
-        return to_units(value, @margin_right) if value.is_a?(Symbol)
-        @margin_right = parse_measurement_pts(value, units)
-      end
-
-      def margin_bottom(value=nil)
-        return @margin_bottom || 0 if value.nil?
-        return to_units(value, @margin_bottom) if value.is_a?(Symbol)
-        @margin_bottom = parse_measurement_pts(value, units)
-      end
-
-      def margin_left(value=nil)
-        return @margin_left || 0 if value.nil?
-        return to_units(value, @margin_left) if value.is_a?(Symbol)
-        @margin_left = parse_measurement_pts(value, units)
       end
 
       def paragraph_style(value=nil)
@@ -622,10 +658,13 @@ module EideticRML
         @font = styles.add('font')
         @paragraph_style = styles.add('para')
         styles.add('layout', :id => 'absolute', :manager => 'absolute')
-        styles.add('layout', :id => 'flow', :manager => 'flow')
-        styles.add('layout', :id => 'hbox', :manager => 'hbox')
-        styles.add('layout', :id => 'vbox', :manager => 'vbox')
-        styles.add('layout', :id => 'table', :manager => 'table')
+        styles.add('layout', :id => 'flow',     :manager => 'flow')
+        styles.add('layout', :id => 'hbox',     :manager => 'hbox')
+        styles.add('layout', :id => 'vbox',     :manager => 'vbox')
+        styles.add('layout', :id => 'table',    :manager => 'table')
+        styles.add('pen', :id => 'solid',  :pattern => 'solid',  :color => 'Black')
+        styles.add('pen', :id => 'dotted', :pattern => 'dotted', :color => 'Black')
+        styles.add('pen', :id => 'dashed', :pattern => 'dashed', :color => 'Black')
       end
 
       def page_style(value=nil)
