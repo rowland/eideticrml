@@ -33,6 +33,16 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(@page, @widget.parent)
   end
 
+  def test_align
+    assert_nil(@widget.align)
+    [:top, :right, :bottom, :left].each do |align|
+      @widget.align(align)
+      assert_equal(align, @widget.align)
+    end
+    @widget.align(:bogus)
+    assert_equal(:left, @widget.align) # unchanged
+  end
+
   def test_position
     assert_equal(:static, @widget.position)
 
@@ -50,75 +60,67 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def test_top
-    assert_nil(@widget.top)
     assert_equal(:static, @widget.position)
 
     @widget.top(18)
     assert_equal(18, @widget.top)
     assert_equal(0.25, @widget.top(:in))
-    assert_equal(:static, @widget.position)
-
-    @widget.top("7")
-    assert_equal(7, @widget.top)
-    assert_equal(:static, @widget.position)
-
-    @widget.top("+9")
-    assert_equal(9, @widget.top)
     assert_equal(:relative, @widget.position)
+
+    @widget.height("7in")
+    assert_equal(7.25, @widget.bottom(:in))
+
+    @widget.top("-2in")
+    assert_equal(9, @widget.top(:in))
   end
 
   def test_right
-    assert_nil(@widget.right)
     assert_equal(:static, @widget.position)
 
     @widget.right(36)
     assert_equal(36, @widget.right)
     assert_equal(0.5, @widget.right(:in))
-    assert_equal(:static, @widget.position)
-
-    @widget.right("7")
-    assert_equal(7, @widget.right)
-    assert_equal(:static, @widget.position)
-
-    @widget.right("-9")
-    assert_equal(-9, @widget.right)
     assert_equal(:relative, @widget.position)
+
+    @widget.right(342)
+    @widget.width(1, :in)
+    assert_equal(4.75, @widget.right(:in))
+    assert_equal(3.75, @widget.left(:in))
+
+    @widget.right("-1in")
+    assert_equal(6.5, @widget.left(:in))
   end
 
   def test_bottom
-    assert_nil(@widget.bottom)
     assert_equal(:static, @widget.position)
 
     @widget.bottom(54)
     assert_equal(54, @widget.bottom)
     assert_equal(0.75, @widget.bottom(:in))
-    assert_equal(:static, @widget.position)
-
-    @widget.bottom("7")
-    assert_equal(7, @widget.bottom)
-    assert_equal(:static, @widget.position)
-
-    @widget.bottom("-9")
-    assert_equal(-9, @widget.bottom)
     assert_equal(:relative, @widget.position)
+
+    @widget.height(36)
+    assert_equal(18, @widget.top)
+
+    @widget.bottom("-144")
+    @widget.height("72")
+    assert_equal(576, @widget.top)
+    assert_equal(8, @widget.top(:in))
   end
 
   def test_left
-    assert_nil(@widget.left)
     assert_equal(:static, @widget.position)
 
     @widget.left(72)
     assert_equal(72, @widget.left)
     assert_equal(1, @widget.left(:in))
-    assert_equal(:static, @widget.position)
-
-    @widget.left("7")
-    assert_equal(7, @widget.left)
-    assert_equal(:static, @widget.position)
-
-    @widget.left("+9")
-    assert_equal(9, @widget.left)
     assert_equal(:relative, @widget.position)
+
+    @widget.width("7in")
+    assert_equal(8, @widget.right(:in))
+
+    @widget.left("-2in")
+    assert_equal(6.5, @widget.left(:in))
   end
 
   def test_units
@@ -360,7 +362,7 @@ class ParagraphTestCases < Test::Unit::TestCase
     assert_paragraph_defaults(@p.style)
     @p.style('centered')
     assert_equal(@centered, @p.style)
-    assert_equal(:center, @p.align)
+    assert_equal(:center, @p.text_align)
     assert_paragraph_defaults(@doc.paragraph_style)
   end
 end

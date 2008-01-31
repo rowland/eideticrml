@@ -62,7 +62,33 @@ module EideticRML
       register('vbox', self)
 
       def layout(container, writer)
-        # TODO
+        static, relative = container.children.partition { |widget| widget.position == :static }
+        headers, unaligned = static.partition { |widget| widget.align == :top }
+        footers, unaligned = unaligned.partition { |widget| widget.align == :bottom }
+        static.each do |widget|
+          widget.width('100%') if widget.width.nil?
+          widget.left(container.left + container.margin_left, :pt)
+          widget.layout_widget(writer)
+        end
+        top = container.top + container.margin_top
+        # puts "top: #{top}"
+        bottom = container.bottom - container.margin_bottom
+        # puts "bottom: #{bottom}"
+        headers.each do |widget|
+          widget.top(top, :pt)
+          # puts "widget top: #{top}"
+          top += (widget.height + @style.vpadding)
+        end
+        footers.reverse.each do |widget|
+          widget.bottom(bottom, :pt)
+          # puts "widget bottom: #{bottom}"
+          bottom -= (widget.height + @style.vpadding)
+        end
+        unaligned.each do |widget|
+          widget.top(top, :pt)
+          # puts "unaligned top: #{top}"
+          top += (widget.height + @style.vpadding)
+        end
       end
     end
 

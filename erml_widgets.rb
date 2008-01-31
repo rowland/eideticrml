@@ -27,6 +27,11 @@ module EideticRML
         attrs.each { |key, value| self.send(key, value) }
       end
 
+      def align(value=nil)
+        return @align if value.nil?
+        @align = value.to_sym if [:top, :right, :bottom, :left].include?(value.to_sym)
+      end
+
       def position(value=nil)
         return @position || :static if value.nil?
         @position = value.to_sym if [:static, :relative, :absolute].include?(value.to_sym)
@@ -37,41 +42,45 @@ module EideticRML
       end
 
       def left(value=nil, units=nil)
-        return @left if value.nil?
-        return to_units(value, @left) if value.is_a?(Symbol)
-        @position = :relative if value =~ /^[+-]/
+        return @left || (@right.nil? ? nil : @right - width) if value.nil?
+        return to_units(value, @left || @right - width) if value.is_a?(Symbol)
+        @position = :relative if position == :static
         @left = parse_measurement_pts(value, units || self.units)
+        @left = parent.width + @left if @left < 0
       end
 
       def top(value=nil, units=nil)
-        return @top if value.nil?
-        return to_units(value, @top) if value.is_a?(Symbol)
-        @position = :relative if value =~ /^[+-]/
+        return @top || (@bottom.nil? ? nil : @bottom - height) if value.nil?
+        return to_units(value, @top || @bottom - height) if value.is_a?(Symbol)
+        @position = :relative if position == :static
         @top = parse_measurement_pts(value, units || self.units)
+        @top = parent.height + @top if @top < 0
       end
 
       def right(value=nil, units=nil)
-        return @right if value.nil?
-        return to_units(value, @right) if value.is_a?(Symbol)
-        @position = :relative if value =~ /^[+-]/
+        return @right || (@left.nil? ? nil : @left + width) if value.nil?
+        return to_units(value, @right || @left + width) if value.is_a?(Symbol)
+        @position = :relative if position == :static
         @right = parse_measurement_pts(value, units || self.units)
+        @right = parent.width + @right if @right < 0
       end
 
       def bottom(value=nil, units=nil)
-        return @bottom if value.nil?
-        return to_units(value, @bottom) if value.is_a?(Symbol)
-        @position = :relative if value =~ /^[+-]/
+        return @bottom || (@top.nil? ? nil : @top + height) if value.nil?
+        return to_units(value, @bottom || @top + height) if value.is_a?(Symbol)
+        @position = :relative if position == :static
         @bottom = parse_measurement_pts(value, units || self.units)
+        @bottom = parent.height + @bottom if @bottom < 0
       end
 
-      def width(value=nil)
+      def width(value=nil, units=nil)
         return @width if value.nil?
         return to_units(value, @width) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
           @width_pct = $1.to_f.quo(100)
           @width = @width_pct * parent.content_width
         else
-          @width = parse_measurement_pts(value, units)
+          @width = parse_measurement_pts(value, units || self.units)
         end
       end
 
@@ -96,10 +105,10 @@ module EideticRML
 
       def layout_widget(writer)
         # puts "widget: layout_widget"
-        @left ||= 0
-        @top ||= 0
-        @width ||= 0
-        @height ||= 0
+        # @left ||= 0
+        # @top ||= 0
+        # @width ||= 0
+        # @height ||= 0
       end
 
       def units(value=nil)
@@ -256,6 +265,11 @@ module EideticRML
       def y(value=nil)
         # TODO
       end
+
+    protected
+      def draw_borders(writer)
+        # suppress default behavior
+      end
     end
 
     class Arc < Shape
@@ -374,7 +388,7 @@ module EideticRML
       end
     end
 
-    class Rectangle < Widget
+    class Rectangle < Shape
       StdWidgetFactory.instance.register_widget('rect', self)
 
       def clip(value=nil)
@@ -392,11 +406,15 @@ module EideticRML
       end
 
       def print(writer)
+        # $stdout.puts [@left, @top, @width, @height, @right, @bottom].inspect if @align == :bottom
         raise "left, top, width & height must be set" if [left, top, width, height].any? { |value| value.nil? }
         options = {}
         options[:corners] = @corners unless @corners.nil?
         super(writer)
-        writer.rectangle(left, top, width, height, options)
+        unless @borders.nil?
+          @borders.apply(writer)
+          writer.rectangle(left + margin_left, top + margin_top, content_width, content_height, options)
+        end
       end
 
       def reverse(value=nil)
@@ -468,15 +486,9 @@ module EideticRML
     class Paragraph < Text
       StdWidgetFactory.instance.register_widget('p', self)
 
-      def align(value=nil)
-        return @style.nil? ? parent.paragraph_style : @style.align if value.nil?
-        @style = style.clone
-        @style.align(value)
-      end
-
       def bullet(value=nil)
         return @bullet.nil? ? style.bullet : @bullet if value.nil?
-        bs = root.styles.find { |style| style.id == value }
+        bs = root.styles.for_id(value)
         raise ArgumentError, "Bullet Style #{value} not found." unless bs.is_a?(Styles::BulletStyle)
         @bullet = bs
       end
@@ -498,6 +510,7 @@ module EideticRML
           options[:bullet] = bullet.id unless bullet.nil?
         end
         # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
+        raise "left & top must be set #{text.inspect}" if [left, top].any? { |value| value.nil? }
         writer.paragraph_xy(left, top, @rich_text || @text, options)
         # writer.rectangle(left, top, width, height, :borders => 0)
       end
@@ -507,6 +520,12 @@ module EideticRML
         ps = root.styles.find { |style| style.id == value }
         raise ArgumentError, "Paragraph Style #{value} not found." unless ps.is_a?(Styles::ParagraphStyle)
         @style = ps
+      end
+
+      def text_align(value=nil)
+        return @style.nil? ? parent.paragraph_style : @style.align if value.nil?
+        @style = style.clone
+        @style.align(value)
       end
     end
 
@@ -564,6 +583,10 @@ module EideticRML
         super(parent, attrs)
       end
 
+      def bottom(units=:pt)
+        height(units)
+      end
+
       def compress(value=nil)
         # TODO
       end
@@ -575,6 +598,10 @@ module EideticRML
 
       def height(units=:pt)
         to_units(units, style.height)
+      end
+
+      def left(units=:pt)
+        0
       end
 
       def margins(value=nil)
@@ -615,6 +642,17 @@ module EideticRML
         # TODO
       end
 
+      def print(writer)
+        writer.open_page
+        layout_widget(writer)
+        super(writer)
+        writer.close_page
+      end
+
+      def right(units=:pt)
+        width(units)
+      end
+
       def rotate(value=nil)
         # inherited
         # TODO
@@ -632,11 +670,8 @@ module EideticRML
         @page_style = ps
       end
 
-      def print(writer)
-        writer.open_page
-        layout_widget(writer)
-        super(writer)
-        writer.close_page
+      def top(units=:pt)
+        0
       end
 
       def width(units=:pt)

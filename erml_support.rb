@@ -10,7 +10,7 @@ require 'epdfpw'
 module EideticRML
   module Support
     def parse_measurement(value, units=:pt)
-      value, units = if value =~ /(\d+(\.\d+)?)([a-z]+)/
+      value, units = if value =~ /([+-]?\d+(\.\d+)?)([a-z]+)/
         [$1.to_f, ($3 || :pt).to_sym]
       else
         [value.to_f, units.to_sym]
