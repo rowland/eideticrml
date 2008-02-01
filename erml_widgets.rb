@@ -95,12 +95,28 @@ module EideticRML
         end
       end
 
+      def content_top(units=:pt)
+        top(units) + margin_top(units) + padding_top(units)
+      end
+
+      def content_right(units=:pt)
+        right(units) - (margin_right(units) + padding_right(units))
+      end
+
+      def content_bottom(units=:pt)
+        bottom(units) - (margin_bottom(units) + padding_bottom(units))
+      end
+
+      def content_left(units=:pt)
+        left(units) + margin_left(units) + padding_left(units)
+      end
+
       def content_height(units=:pt)
-        height(units) - margin_top(units) - margin_bottom(units)
+        height(units) - (margin_top(units) + margin_bottom(units) + padding_top(units) + padding_bottom(units))
       end
 
       def content_width(units=:pt)
-        width(units) - margin_left(units) - margin_right(units)
+        width(units) - (margin_left(units) + margin_right(units) + padding_left(units) + padding_right(units))
       end
 
       def layout_widget(writer)
@@ -178,6 +194,8 @@ module EideticRML
           value = value.split(',').map do |n|
             parse_measurement_pts(n, units)
           end
+        else
+          value = Array(value)
         end
         m = case value.size
           when 4: value
@@ -187,6 +205,50 @@ module EideticRML
         end
         # puts "setting margins: #{m.inspect}"
         @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
+      end
+
+      def padding_top(value=nil)
+        return @padding_top || 0 if value.nil?
+        return to_units(value, @padding_top) if value.is_a?(Symbol)
+        @padding_top = parse_measurement_pts(value, units)
+      end
+
+      def padding_right(value=nil)
+        return @padding_right || 0 if value.nil?
+        return to_units(value, @padding_right) if value.is_a?(Symbol)
+        @padding_right = parse_measurement_pts(value, units)
+      end
+
+      def padding_bottom(value=nil)
+        return @padding_bottom || 0 if value.nil?
+        return to_units(value, @padding_bottom) if value.is_a?(Symbol)
+        @padding_bottom = parse_measurement_pts(value, units)
+      end
+
+      def padding_left(value=nil)
+        return @padding_left || 0 if value.nil?
+        return to_units(value, @padding_left) if value.is_a?(Symbol)
+        @padding_left = parse_measurement_pts(value, units)
+      end
+
+      def padding(value=nil)
+        return [padding_top, padding_right, padding_bottom, padding_left] if value.nil?
+        return [padding_top(value), padding_right(value), padding_bottom(value), padding_left(value)] if value.is_a?(Symbol)
+        if value.respond_to?(:to_str)
+          value = value.split(',').map do |n|
+            parse_measurement_pts(n, units)
+          end
+        else
+          value = Array(value)
+        end
+        p = case value.size
+          when 4: value
+          when 2: value * 2
+          when 1: value * 4
+        else nil
+        end
+        # puts "setting paddings: #{p.inspect}"
+        @padding_top, @padding_right, @padding_bottom, @padding_left = p unless p.nil?
       end
 
       def font(value=nil)
@@ -230,28 +292,37 @@ module EideticRML
         if [@border_top, @border_right, @border_bottom, @border_left].all? { |b| b.nil? }
           unless @borders.nil?
             @borders.apply(writer)
-            writer.rectangle(left + margin_left, top + margin_top, content_width, content_height)
+            writer.rectangle(left + margin_left, top + margin_top,
+              width - margin_left - margin_right, height - margin_top - margin_bottom)
           end
         else
           unless @border_top.nil?
             @border_top.apply(writer)
             writer.move_to(left + margin_left, top + margin_top) # top left
-            writer.line_to(left + margin_left + content_width, top + margin_top) # top right
+            writer.line_to(right - margin_right, top + margin_top) # top right
+            # puts("top left", left + margin_left, top + margin_top) # top left
+            # puts("top right", right - margin_right, top + margin_top) # top right
           end
           unless @border_right.nil?
             @border_right.apply(writer)
-            writer.move_to(left + margin_left + content_width, top + margin_top) # top right
-            writer.line_to(left + margin_left + content_width, top + margin_top + content_height) # bottom right
+            writer.move_to(right - margin_right, top + margin_top) # top right
+            writer.line_to(right - margin_right, bottom - margin_bottom) # bottom right
+            # puts("top right", right - margin_right, top + margin_top) # top right
+            # puts("bottom right", right - margin_right, bottom - margin_bottom) # bottom right
           end
           unless @border_bottom.nil?
             @border_bottom.apply(writer)
-            writer.move_to(left + margin_left + content_width, top + margin_top + content_height) # bottom right
-            writer.line_to(left + margin_left, top + margin_top + content_height) # bottom left
+            writer.move_to(right - margin_right, bottom - margin_bottom) # bottom right
+            writer.line_to(left + margin_left, bottom - margin_bottom) # bottom left
+            # puts("bottom right", right - margin_right, bottom - margin_bottom) # bottom right
+            # puts("bottom left", left + margin_left, bottom - margin_bottom) # bottom left
           end
           unless @border_left.nil?
             @border_left.apply(writer)
-            writer.move_to(left + margin_left, top + margin_top + content_height) # bottom left
+            writer.move_to(left + margin_left, bottom - margin_bottom) # bottom left
             writer.line_to(left + margin_left, top + margin_top) # top left
+            # puts("bottom left", left + margin_left, bottom - margin_bottom) # bottom left
+            # puts("top left", left + margin_left, top + margin_top) # top left
           end
         end
       end
@@ -498,20 +569,21 @@ module EideticRML
         super(writer)
         bullet_width = bullet.nil? ? 0 : bullet.width
         @rich_text ||= EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
-        @height = @rich_text.height(width - bullet_width) * writer.line_height
+        @height = @rich_text.height(content_width - bullet_width) * writer.line_height + 
+          padding_top + padding_bottom - @rich_text.height.quo(writer.line_height)
         # puts "paragraph @height: #{@height} for width: #{width}"
       end
 
       def print(writer)
         super(writer)
-        options = { :align => style.align, :underline => underline, :width => width }
+        options = { :align => style.align, :underline => underline, :width => content_width }
         unless bullet.nil?
           bullet.apply(writer)
           options[:bullet] = bullet.id unless bullet.nil?
         end
         # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
         raise "left & top must be set #{text.inspect}" if [left, top].any? { |value| value.nil? }
-        writer.paragraph_xy(left, top, @rich_text || @text, options)
+        writer.paragraph_xy(content_left, content_top, @rich_text || @text, options)
         # writer.rectangle(left, top, width, height, :borders => 0)
       end
 

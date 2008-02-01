@@ -42,8 +42,8 @@ module EideticRML
             cy += max_y + @style.vpadding
             cx = max_y = 0
           end
-          widget.left(container.left + container.margin_left + cx, :pt)
-          widget.top(container.top + container.margin_top + cy, :pt)
+          widget.left(container.content_left + cx, :pt)
+          widget.top(container.content_top + cy, :pt)
           cx += widget.width + @style.hpadding
           max_y = [max_y, widget.height].max
         end
@@ -67,12 +67,12 @@ module EideticRML
         footers, unaligned = unaligned.partition { |widget| widget.align == :bottom }
         static.each do |widget|
           widget.width('100%') if widget.width.nil?
-          widget.left(container.left + container.margin_left, :pt)
+          widget.left(container.content_left, :pt)
           widget.layout_widget(writer)
         end
-        top = container.top + container.margin_top
+        top = container.content_top
         # puts "top: #{top}"
-        bottom = container.bottom - container.margin_bottom
+        bottom = container.content_bottom
         # puts "bottom: #{bottom}"
         headers.each do |widget|
           widget.top(top, :pt)

@@ -179,6 +179,42 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(5.5, @widget.height(:in))
   end
 
+  def test_content_top
+    @widget.top(50)
+    assert_equal(50, @widget.content_top)
+    @widget.padding(10)
+    assert_equal(60, @widget.content_top)
+    @widget.margins(5)
+    assert_equal(65, @widget.content_top)
+  end
+
+  def test_content_right
+    @widget.right(50)
+    assert_equal(50, @widget.content_right)
+    @widget.padding(10)
+    assert_equal(40, @widget.content_right)
+    @widget.margins(5)
+    assert_equal(35, @widget.content_right)
+  end
+
+  def test_content_bottom
+    @widget.bottom(50)
+    assert_equal(50, @widget.content_bottom)
+    @widget.padding(10)
+    assert_equal(40, @widget.content_bottom)
+    @widget.margins(5)
+    assert_equal(35, @widget.content_bottom)
+  end
+
+  def test_content_left
+    @widget.left(50)
+    assert_equal(50, @widget.content_left)
+    @widget.padding(10)
+    assert_equal(60, @widget.content_left)
+    @widget.margins(5)
+    assert_equal(65, @widget.content_left)
+  end
+
   def test_content_width
     assert_equal(0, @widget.content_width)
     @widget.width('36')
@@ -186,6 +222,8 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(0.5, @widget.content_width(:in)) # in specified units
     @widget.margins([1,2,3,4])
     assert_equal(30, @widget.content_width)
+    @widget.padding([4,3,2,1])
+    assert_equal(26, @widget.content_width)
   end
 
   def test_content_height
@@ -195,6 +233,8 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(3.5, @widget.content_height(:in)) # in specified units
     @widget.margins([1,2,3,4])
     assert_equal(248, @widget.content_height)
+    @widget.padding([4,3,2,1])
+    assert_equal(242, @widget.content_height)
   end
 
   def test_borders
@@ -277,6 +317,46 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(56.7, @widget.margin_right)
     assert_close(85.05, @widget.margin_bottom)
     assert_equal(4, @widget.margin_left)
+  end
+
+  def test_padding
+    assert_equal(0, @widget.padding_top)
+    assert_equal(0, @widget.padding_right)
+    assert_equal(0, @widget.padding_bottom)
+    assert_equal(0, @widget.padding_left)
+
+    @widget.padding('1in')
+    assert_equal(1, @widget.padding_top(:in))
+    assert_equal(1, @widget.padding_right(:in))
+    assert_equal(1, @widget.padding_bottom(:in))
+    assert_equal(1, @widget.padding_left(:in))
+
+    assert_equal(72, @widget.padding_top)
+    assert_equal(72, @widget.padding_right)
+    assert_equal(72, @widget.padding_bottom)
+    assert_equal(72, @widget.padding_left)
+
+    @widget.padding('1cm,2cm')
+    assert_equal(1, @widget.padding_top(:cm))
+    assert_equal(2, @widget.padding_right(:cm))
+    assert_equal(1, @widget.padding_bottom(:cm))
+    assert_equal(2, @widget.padding_left(:cm))
+
+    assert_equal(28.35, @widget.padding_top)
+    assert_equal(56.7, @widget.padding_right)
+    assert_equal(28.35, @widget.padding_bottom)
+    assert_equal(56.7, @widget.padding_left)
+
+    @widget.padding('1in,2cm,3cm,4pt')
+    assert_equal(1, @widget.padding_top(:in))
+    assert_equal(2, @widget.padding_right(:cm))
+    assert_close(3, @widget.padding_bottom(:cm))
+    assert_equal(4, @widget.padding_left(:pt))
+
+    assert_equal(72, @widget.padding_top)
+    assert_equal(56.7, @widget.padding_right)
+    assert_close(85.05, @widget.padding_bottom)
+    assert_equal(4, @widget.padding_left)
   end
 end
 
