@@ -128,34 +128,35 @@ module EideticRML
       end
 
       def units(value=nil)
+        # inherited
         return @units || parent.units if value.nil?
         @units = value.to_sym if EideticPDF::UNIT_CONVERSION[value.to_sym]
       end
 
       def borders(value=nil)
         return @borders if value.nil?
-        @borders = pen_style(value)
+        @borders = pen_style_for(value)
         @border_top = @border_right = @border_bottom = @border_left = nil
       end
 
       def border_top(value=nil)
         return @border_top || @borders if value.nil?
-        @border_top = pen_style(value)
+        @border_top = pen_style_for(value)
       end
 
       def border_right(value=nil)
         return @border_right || @borders if value.nil?
-        @border_right = pen_style(value)
+        @border_right = pen_style_for(value)
       end
 
       def border_bottom(value=nil)
         return @border_bottom || @borders if value.nil?
-        @border_bottom = pen_style(value)
+        @border_bottom = pen_style_for(value)
       end
 
       def border_left(value=nil)
         return @border_left || @borders if value.nil?
-        @border_left = pen_style(value)
+        @border_left = pen_style_for(value)
       end
 
       def background(value=nil)
@@ -252,10 +253,9 @@ module EideticRML
       end
 
       def font(value=nil)
+        # inherited
         return @font || parent.font if value.nil?
-        f = root.styles.find { |style| style.id == value }
-        raise ArgumentError, "Font Style #{value} not found." unless f.is_a?(Styles::FontStyle)
-        @font = f
+        @font = font_style_for(value)
       end
 
       def font_color(value=nil)
@@ -282,7 +282,13 @@ module EideticRML
       end
 
     protected
-      def pen_style(id)
+      def font_style_for(id)
+        fs = root.styles.for_id(id)
+        raise ArgumentError, "Font Style #{value} not found." unless fs.is_a?(Styles::FontStyle)
+        fs
+      end
+
+      def pen_style_for(id)
         ps = root.styles.for_id(id)
         raise ArgumentError, "Pen Style #{id} not found." unless ps.is_a?(Styles::PenStyle)
         ps
@@ -588,6 +594,7 @@ module EideticRML
       end
 
       def style(value=nil)
+        # inherited
         return @style || parent.paragraph_style if value.nil?
         ps = root.styles.find { |style| style.id == value }
         raise ArgumentError, "Paragraph Style #{value} not found." unless ps.is_a?(Styles::ParagraphStyle)
@@ -609,11 +616,6 @@ module EideticRML
       def initialize(parent, attrs={})
         super(parent, attrs)
         @children = []
-      end
-
-      def font(value=nil)
-        return @font || parent.font if value.nil?
-        @font = value
       end
 
       def layout(value=nil)
