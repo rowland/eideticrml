@@ -773,7 +773,7 @@ module EideticRML
         @font = styles.add('font', :id => 'font')
         @paragraph_style = styles.add('para', :id => 'p')
         styles.add('layout', :id => 'absolute', :manager => 'absolute')
-        styles.add('layout', :id => 'flow',     :manager => 'flow')
+        styles.add('layout', :id => 'flow',     :manager => 'flow', :padding => 5)
         styles.add('layout', :id => 'hbox',     :manager => 'hbox')
         styles.add('layout', :id => 'vbox',     :manager => 'vbox')
         styles.add('layout', :id => 'table',    :manager => 'table')
