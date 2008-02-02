@@ -187,7 +187,7 @@ module EideticRML
         @margin_left = parse_measurement_pts(value, units)
       end
 
-      def margins(value=nil)
+      def margin(value=nil)
         return [margin_top, margin_right, margin_bottom, margin_left] if value.nil?
         return [margin_top(value), margin_right(value), margin_bottom(value), margin_left(value)] if value.is_a?(Symbol)
         if value.respond_to?(:to_str)
@@ -203,7 +203,7 @@ module EideticRML
           when 1: value * 4
         else nil
         end
-        # puts "setting margins: #{m.inspect}"
+        # puts "setting margin: #{m.inspect}"
         @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
       end
 
@@ -651,7 +651,7 @@ module EideticRML
       StdWidgetFactory.instance.register_widget('page', self)
 
       def initialize(parent, attrs={})
-        @default_margins = true
+        @default_margin = true
         super(parent, attrs)
       end
 
@@ -676,37 +676,37 @@ module EideticRML
         0
       end
 
-      def margins(value=nil)
-        return @default_margins ? parent.margins(value) : super(value) if value.nil? or value.is_a?(Symbol)
+      def margin(value=nil)
+        return @default_margin ? parent.margin(value) : super(value) if value.nil? or value.is_a?(Symbol)
         super(value)
-        @default_margins = false
+        @default_margin = false
       end
 
       def margin_top(value=nil)
-        return @default_margins ? parent.margin_top(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        return @default_margin ? parent.margin_top(value) : super(value) if value.nil? or value.is_a?(Symbol)
         super(value)
-        @default_margins = false
+        @default_margin = false
       end
 
       def margin_right(value=nil)
-        return @default_margins ? parent.margin_right(value) : super(value) if value.nil? or value.is_a?(Symbol)
-        margins(margins) if @default_margins
+        return @default_margin ? parent.margin_right(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        margin(margin) if @default_margin
         super(value)
-        @default_margins = false
+        @default_margin = false
       end
 
       def margin_bottom(value=nil)
-        return @default_margins ? parent.margin_bottom(value) : super(value) if value.nil? or value.is_a?(Symbol)
-        margins(margins) if @default_margins
+        return @default_margin ? parent.margin_bottom(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        margin(margin) if @default_margin
         super(value)
-        @default_margins = false
+        @default_margin = false
       end
 
       def margin_left(value=nil)
-        return @default_margins ? parent.margin_left(value) : super(value) if value.nil? or value.is_a?(Symbol)
-        margins(margins) if @default_margins
+        return @default_margin ? parent.margin_left(value) : super(value) if value.nil? or value.is_a?(Symbol)
+        margin(margin) if @default_margin
         super(value)
-        @default_margins = false
+        @default_margin = false
       end
 
       def orientation(value=nil)
@@ -759,7 +759,7 @@ module EideticRML
 
       def initialize(parent=nil, attrs={})
         super(parent, attrs)
-        @default_margins = false
+        @default_margin = false
         @styles = Styles::StyleCollection.new
         @page_style = styles.add('page')
         @font = styles.add('font')

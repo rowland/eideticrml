@@ -7,7 +7,7 @@ include EideticRML::Widgets
 doc = Document.new
 page = Page.new(doc)
 page.units("in")
-page.margins("1")
+page.margin("1")
 p = Paragraph.new(page)
 p.text("Hello, World!")
 

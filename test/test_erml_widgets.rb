@@ -184,7 +184,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(50, @widget.content_top)
     @widget.padding(10)
     assert_equal(60, @widget.content_top)
-    @widget.margins(5)
+    @widget.margin(5)
     assert_equal(65, @widget.content_top)
   end
 
@@ -193,7 +193,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(50, @widget.content_right)
     @widget.padding(10)
     assert_equal(40, @widget.content_right)
-    @widget.margins(5)
+    @widget.margin(5)
     assert_equal(35, @widget.content_right)
   end
 
@@ -202,7 +202,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(50, @widget.content_bottom)
     @widget.padding(10)
     assert_equal(40, @widget.content_bottom)
-    @widget.margins(5)
+    @widget.margin(5)
     assert_equal(35, @widget.content_bottom)
   end
 
@@ -211,7 +211,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(50, @widget.content_left)
     @widget.padding(10)
     assert_equal(60, @widget.content_left)
-    @widget.margins(5)
+    @widget.margin(5)
     assert_equal(65, @widget.content_left)
   end
 
@@ -220,7 +220,7 @@ class WidgetTestCases < Test::Unit::TestCase
     @widget.width('36')
     assert_equal(36, @widget.content_width) # same as width unless overridden
     assert_equal(0.5, @widget.content_width(:in)) # in specified units
-    @widget.margins([1,2,3,4])
+    @widget.margin([1,2,3,4])
     assert_equal(30, @widget.content_width)
     @widget.padding([4,3,2,1])
     assert_equal(26, @widget.content_width)
@@ -231,7 +231,7 @@ class WidgetTestCases < Test::Unit::TestCase
     @widget.height('3.5in')
     assert_equal(252, @widget.content_height) # same as height unless overridden
     assert_equal(3.5, @widget.content_height(:in)) # in specified units
-    @widget.margins([1,2,3,4])
+    @widget.margin([1,2,3,4])
     assert_equal(248, @widget.content_height)
     @widget.padding([4,3,2,1])
     assert_equal(242, @widget.content_height)
@@ -279,13 +279,13 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(@dotted, @widget.border_left)
   end
 
-  def test_margins
+  def test_margin
     assert_equal(0, @widget.margin_top)
     assert_equal(0, @widget.margin_right)
     assert_equal(0, @widget.margin_bottom)
     assert_equal(0, @widget.margin_left)
 
-    @widget.margins('1in')
+    @widget.margin('1in')
     assert_equal(1, @widget.margin_top(:in))
     assert_equal(1, @widget.margin_right(:in))
     assert_equal(1, @widget.margin_bottom(:in))
@@ -296,7 +296,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(72, @widget.margin_bottom)
     assert_equal(72, @widget.margin_left)
 
-    @widget.margins('1cm,2cm')
+    @widget.margin('1cm,2cm')
     assert_equal(1, @widget.margin_top(:cm))
     assert_equal(2, @widget.margin_right(:cm))
     assert_equal(1, @widget.margin_bottom(:cm))
@@ -307,7 +307,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(28.35, @widget.margin_bottom)
     assert_equal(56.7, @widget.margin_left)
 
-    @widget.margins('1in,2cm,3cm,4pt')
+    @widget.margin('1in,2cm,3cm,4pt')
     assert_equal(1, @widget.margin_top(:in))
     assert_equal(2, @widget.margin_right(:cm))
     assert_close(3, @widget.margin_bottom(:cm))
@@ -458,7 +458,7 @@ class ContainerTestCases < Test::Unit::TestCase
 
   def test_make_widget
     assert_equal(@page, @div.parent)
-    assert_equal([0, 0, 0, 0], @div.margins)
+    assert_equal([0, 0, 0, 0], @div.margin)
   end
 
   def test_paragraph_style
@@ -480,47 +480,47 @@ class PageTestCases < Test::Unit::TestCase
     assert_equal(@doc, @page.parent)
   end
 
-  def test_margins
-    assert_equal([0,0,0,0], @doc.margins)
-    assert_equal([0,0,0,0], @page.margins) # inherited
+  def test_margin
+    assert_equal([0,0,0,0], @doc.margin)
+    assert_equal([0,0,0,0], @page.margin) # inherited
 
-    @doc.margins('1')
-    assert_equal([72,72,72,72], @doc.margins) # in points
+    @doc.margin('1')
+    assert_equal([72,72,72,72], @doc.margin) # in points
     assert_equal(72, @doc.margin_top)
     assert_equal(72, @doc.margin_right)
     assert_equal(72, @doc.margin_bottom)
     assert_equal(72, @doc.margin_left)
 
-    assert_equal([1,1,1,1], @doc.margins(:in)) # in specified units
+    assert_equal([1,1,1,1], @doc.margin(:in)) # in specified units
     assert_equal(1, @doc.margin_top(:in))
     assert_equal(1, @doc.margin_right(:in))
     assert_equal(1, @doc.margin_bottom(:in))
     assert_equal(1, @doc.margin_left(:in))
 
-    assert_equal([72,72,72,72], @page.margins) # inherited, in points
+    assert_equal([72,72,72,72], @page.margin) # inherited, in points
     assert_equal(72, @page.margin_top)
     assert_equal(72, @page.margin_right)
     assert_equal(72, @page.margin_bottom)
     assert_equal(72, @page.margin_left)
 
-    assert_equal([1,1,1,1], @page.margins(:in)) # inherited, in specified units
+    assert_equal([1,1,1,1], @page.margin(:in)) # inherited, in specified units
     assert_equal(1, @page.margin_top(:in))
     assert_equal(1, @page.margin_right(:in))
     assert_equal(1, @page.margin_bottom(:in))
     assert_equal(1, @page.margin_left(:in))
 
-    @page.margins('2')
-    assert_equal([144,144,144,144], @page.margins) # in points
-    assert_equal([2,2,2,2], @page.margins(:in)) # in specified units
+    @page.margin('2')
+    assert_equal([144,144,144,144], @page.margin) # in points
+    assert_equal([2,2,2,2], @page.margin(:in)) # in specified units
 
-    assert_equal([1,1,1,1], @doc.margins(:in)) # unchanged
-    assert_equal([1,1,1,1], @doc.margins(:in)) # unchanged
+    assert_equal([1,1,1,1], @doc.margin(:in)) # unchanged
+    assert_equal([1,1,1,1], @doc.margin(:in)) # unchanged
   end
 
-  def test_margins2
+  def test_margin2
     doc = Document.new
-    page = Page.new(doc, :margins => '1') # initialize margins in constructor
-    assert_equal([1,1,1,1], page.margins)
+    page = Page.new(doc, :margin => '1') # initialize margin in constructor
+    assert_equal([1,1,1,1], page.margin)
   end
 
   def test_style

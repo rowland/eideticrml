@@ -11,7 +11,7 @@ doc.styles.add('layout', :id => 'vbox', :manager => 'vbox', :padding => '18')
 doc.styles.add('pen', :id => 'blue_dash', :color => 'Blue', :width => 2, :pattern => 'dashed')
 doc.styles.add('pen', :id => 'red_dash', :color => 'Red', :width => 2, :pattern => 'dashed')
 
-page = Page.new(doc, :units => 'in', :margins => '1', :layout => 'vbox')
+page = Page.new(doc, :units => 'in', :margin => '1', :layout => 'vbox')
 Paragraph.new(page, :underline => true, :align => 'top', :text => "VBox Layout")
 Paragraph.new(page, :borders => 'dotted', :text_align => :justify, :align => 'top', :padding => 5, :text => "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
 Paragraph.new(page, :borders => 'dashed', :text_align => :justify, :padding => 5, :text => "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")

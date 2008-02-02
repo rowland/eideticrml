@@ -1,6 +1,6 @@
 <erml>
 	<pages>
-		<page units="in" margins="1">
+		<page units="in" margin="1">
 			<p>Hello, World!</p>
 		</page>
 	</pages>
