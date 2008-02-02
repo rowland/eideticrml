@@ -679,18 +679,21 @@ module EideticRML
       end
 
       def margin(value=nil)
+        # inherited
         return @default_margin ? parent.margin(value) : super(value) if value.nil? or value.is_a?(Symbol)
         super(value)
         @default_margin = false
       end
 
       def margin_top(value=nil)
+        # inherited
         return @default_margin ? parent.margin_top(value) : super(value) if value.nil? or value.is_a?(Symbol)
         super(value)
         @default_margin = false
       end
 
       def margin_right(value=nil)
+        # inherited
         return @default_margin ? parent.margin_right(value) : super(value) if value.nil? or value.is_a?(Symbol)
         margin(margin) if @default_margin
         super(value)
@@ -698,6 +701,7 @@ module EideticRML
       end
 
       def margin_bottom(value=nil)
+        # inherited
         return @default_margin ? parent.margin_bottom(value) : super(value) if value.nil? or value.is_a?(Symbol)
         margin(margin) if @default_margin
         super(value)
@@ -705,6 +709,7 @@ module EideticRML
       end
 
       def margin_left(value=nil)
+        # inherited
         return @default_margin ? parent.margin_left(value) : super(value) if value.nil? or value.is_a?(Symbol)
         margin(margin) if @default_margin
         super(value)
@@ -738,6 +743,7 @@ module EideticRML
       end
 
       def style(value=nil)
+        # inherited
         return @page_style || parent.page_style if value.nil?
         ps = root.styles.find { |style| style.id == value }
         raise ArgumentError, "Page Style #{value} not found." unless ps.is_a?(Styles::PageStyle)
@@ -763,9 +769,9 @@ module EideticRML
         super(parent, attrs)
         @default_margin = false
         @styles = Styles::StyleCollection.new
-        @page_style = styles.add('page')
-        @font = styles.add('font')
-        @paragraph_style = styles.add('para')
+        @page_style = styles.add('page', :id => 'page')
+        @font = styles.add('font', :id => 'font')
+        @paragraph_style = styles.add('para', :id => 'p')
         styles.add('layout', :id => 'absolute', :manager => 'absolute')
         styles.add('layout', :id => 'flow',     :manager => 'flow')
         styles.add('layout', :id => 'hbox',     :manager => 'hbox')

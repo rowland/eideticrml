@@ -157,7 +157,7 @@ class BulletStyleTestCases < Test::Unit::TestCase
   def setup
     @styles = StyleCollection.new
     @font_style = @styles.add('font', :id => 'f1', :name => 'Courier', :size => 13)
-    @bullet_style = @styles.add('bullet')
+    @bullet_style = @styles.add('bullet', :id => 'b1')
   end
 
   def test_font
@@ -197,7 +197,7 @@ class ParagraphStyleTestCases < Test::Unit::TestCase
   def setup
     @styles = StyleCollection.new
     @bullet_style = @styles.add('bullet', :id => '*')
-    @paragraph_style = @styles.add('para')
+    @paragraph_style = @styles.add('para', :id => 'p')
   end
 
   def test_initialize

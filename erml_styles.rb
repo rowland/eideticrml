@@ -36,6 +36,10 @@ module EideticRML
         attrs.each { |key, value| self.send(key, value) }
       end
 
+      def initialize_copy(other)
+        @id = nil
+      end
+
       def from_points(value, units)
         value.to_f / EideticPDF::UNIT_CONVERSION[units]
       end
@@ -56,9 +60,14 @@ module EideticRML
 
     class StyleCollection < Array
       def add(name, attrs={})
-        style = Style.for_name(name).new(self, attrs)
-        delete(for_id(attrs[:id]))
-        self << style
+        raise ArgumentError, "id required for style" if attrs[:id].nil?
+        style = for_id(attrs[:id])
+        if style.nil?
+          style = Style.for_name(name).new(self, attrs)
+          self << style
+        else
+          attrs.each { |key, value| style.send(key, value) }
+        end
         style
       end
 
@@ -151,7 +160,7 @@ module EideticRML
 
       def font(value=nil)
         return @font if value.nil?
-        f = @styles.find { |style| style.id == value }
+        f = @styles.for_id(value)
         raise ArgumentError, "Font Style #{value} not found." unless f.is_a?(Styles::FontStyle)
         @font = f
       end
@@ -179,7 +188,7 @@ module EideticRML
 
       def bullet(value=nil)
         return @bullet if value.nil?
-        b = @styles.find { |style| style.id == value }
+        b = @styles.for_id(value)
         raise ArgumentError, "Bullet Style #{value} not found." unless b.is_a?(Styles::BulletStyle)
         @bullet = b
       end
