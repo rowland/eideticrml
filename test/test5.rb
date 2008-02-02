@@ -11,7 +11,7 @@ blue_dash = doc.styles.add('pen', :id => 'blue_dash', :color => 'Blue', :width =
 page = Page.new(doc)
 page.units 'in'
 page.margin '1'
-rect = Rectangle.new(page, :width => '100%', :height => '2', :borders => 'blue_dash', :corners => '0.5')
+rect = Rectangle.new(page, :width => '100%', :height => '2', :border => 'blue_dash', :corners => '0.5')
 
 pathname = "#{File.basename($0, '.rb')}.pdf"
 File.open(pathname, 'w') { |f| f.write(doc) }

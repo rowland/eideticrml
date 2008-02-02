@@ -237,21 +237,21 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(242, @widget.content_height)
   end
 
-  def test_borders
-    assert_nil(@widget.borders)
-    @widget.borders('blue_dash')
-    assert_not_nil(@widget.borders)
-    assert_equal('blue_dash', @widget.borders.id)
-    assert_equal('Blue', @widget.borders.color)
-    assert_equal(4, @widget.borders.width)
-    assert_equal(:pt, @widget.borders.units)
+  def test_border
+    assert_nil(@widget.border)
+    @widget.border('blue_dash')
+    assert_not_nil(@widget.border)
+    assert_equal('blue_dash', @widget.border.id)
+    assert_equal('Blue', @widget.border.color)
+    assert_equal(4, @widget.border.width)
+    assert_equal(:pt, @widget.border.units)
   end
 
   def test_border_top
     assert_nil(@widget.border_top)
     @widget.border_top('blue_dash')
     assert_equal(@blue_dash, @widget.border_top)
-    @widget.borders('dotted')
+    @widget.border('dotted')
     assert_equal(@dotted, @widget.border_top)
   end
 
@@ -259,7 +259,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_nil(@widget.border_right)
     @widget.border_right('blue_dash')
     assert_equal(@blue_dash, @widget.border_right)
-    @widget.borders('dotted')
+    @widget.border('dotted')
     assert_equal(@dotted, @widget.border_right)
   end
 
@@ -267,7 +267,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_nil(@widget.border_bottom)
     @widget.border_bottom('blue_dash')
     assert_equal(@blue_dash, @widget.border_bottom)
-    @widget.borders('dotted')
+    @widget.border('dotted')
     assert_equal(@dotted, @widget.border_bottom)
   end
 
@@ -275,7 +275,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_nil(@widget.border_left)
     @widget.border_left('blue_dash')
     assert_equal(@blue_dash, @widget.border_left)
-    @widget.borders('dotted')
+    @widget.border('dotted')
     assert_equal(@dotted, @widget.border_left)
   end
 

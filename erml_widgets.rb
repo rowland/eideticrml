@@ -133,29 +133,29 @@ module EideticRML
         @units = value.to_sym if EideticPDF::UNIT_CONVERSION[value.to_sym]
       end
 
-      def borders(value=nil)
-        return @borders if value.nil?
-        @borders = pen_style_for(value)
+      def border(value=nil)
+        return @border if value.nil?
+        @border = pen_style_for(value)
         @border_top = @border_right = @border_bottom = @border_left = nil
       end
 
       def border_top(value=nil)
-        return @border_top || @borders if value.nil?
+        return @border_top || @border if value.nil?
         @border_top = pen_style_for(value)
       end
 
       def border_right(value=nil)
-        return @border_right || @borders if value.nil?
+        return @border_right || @border if value.nil?
         @border_right = pen_style_for(value)
       end
 
       def border_bottom(value=nil)
-        return @border_bottom || @borders if value.nil?
+        return @border_bottom || @border if value.nil?
         @border_bottom = pen_style_for(value)
       end
 
       def border_left(value=nil)
-        return @border_left || @borders if value.nil?
+        return @border_left || @border if value.nil?
         @border_left = pen_style_for(value)
       end
 
@@ -274,7 +274,7 @@ module EideticRML
 
       def print(writer)
         # puts "widget: print"
-        draw_borders(writer)
+        draw_border(writer)
       end
 
       def root
@@ -294,10 +294,10 @@ module EideticRML
         ps
       end
 
-      def draw_borders(writer)
+      def draw_border(writer)
         if [@border_top, @border_right, @border_bottom, @border_left].all? { |b| b.nil? }
-          unless @borders.nil?
-            @borders.apply(writer)
+          unless @border.nil?
+            @border.apply(writer)
             writer.rectangle(left + margin_left, top + margin_top,
               width - margin_left - margin_right, height - margin_top - margin_bottom)
           end
@@ -344,7 +344,7 @@ module EideticRML
       end
 
     protected
-      def draw_borders(writer)
+      def draw_border(writer)
         # suppress default behavior
       end
     end
@@ -488,8 +488,8 @@ module EideticRML
         options = {}
         options[:corners] = @corners unless @corners.nil?
         super(writer)
-        unless @borders.nil?
-          @borders.apply(writer)
+        unless @border.nil?
+          @border.apply(writer)
           writer.rectangle(left + margin_left, top + margin_top, content_width, content_height, options)
         end
       end
@@ -590,7 +590,6 @@ module EideticRML
         # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
         raise "left & top must be set #{text.inspect}" if [left, top].any? { |value| value.nil? }
         writer.paragraph_xy(content_left, content_top, @rich_text || @text, options)
-        # writer.rectangle(left, top, width, height, :borders => 0)
       end
 
       def style(value=nil)
