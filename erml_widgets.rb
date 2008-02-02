@@ -255,6 +255,7 @@ module EideticRML
       def font(value=nil)
         # inherited
         return @font || parent.font if value.nil?
+        return @font || @font = parent.font.clone if value == :copy
         @font = font_style_for(value)
       end
 
@@ -284,7 +285,7 @@ module EideticRML
     protected
       def font_style_for(id)
         fs = root.styles.for_id(id)
-        raise ArgumentError, "Font Style #{value} not found." unless fs.is_a?(Styles::FontStyle)
+        raise ArgumentError, "Font Style #{id} not found." unless fs.is_a?(Styles::FontStyle)
         fs
       end
 
@@ -595,15 +596,21 @@ module EideticRML
       def style(value=nil)
         # inherited
         return @style || parent.paragraph_style if value.nil?
-        ps = root.styles.find { |style| style.id == value }
-        raise ArgumentError, "Paragraph Style #{value} not found." unless ps.is_a?(Styles::ParagraphStyle)
-        @style = ps
+        return @style || @style = parent.paragraph_style.clone if value == :copy
+        @style = paragraph_style_for(value)
       end
 
       def text_align(value=nil)
         return @style.nil? ? parent.paragraph_style : @style.align if value.nil?
         @style = style.clone
         @style.align(value)
+      end
+
+    protected
+      def paragraph_style_for(id)
+        ps = root.styles.for_id(id)
+        raise ArgumentError, "Paragraph Style #{id} not found." unless ps.is_a?(Styles::ParagraphStyle)
+        ps
       end
     end
 
@@ -744,9 +751,8 @@ module EideticRML
       def style(value=nil)
         # inherited
         return @page_style || parent.page_style if value.nil?
-        ps = root.styles.find { |style| style.id == value }
-        raise ArgumentError, "Page Style #{value} not found." unless ps.is_a?(Styles::PageStyle)
-        @page_style = ps
+        return @page_style || @page_style = parent.page_style.clone if value == :copy
+        @page_style = page_style_for(value)
       end
 
       def top(units=:pt)
@@ -755,6 +761,13 @@ module EideticRML
 
       def width(units=:pt)
         to_units(units, style.width)
+      end
+
+    protected
+      def page_style_for(id)
+        ps = root.styles.for_id(id)
+        raise ArgumentError, "Page Style #{id} not found." unless ps.is_a?(Styles::PageStyle)
+        ps
       end
     end
 

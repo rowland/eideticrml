@@ -149,6 +149,15 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_font_defaults(@doc.font) # unchanged
   end
 
+  def test_font_copy
+    assert_font_defaults(@doc.font)
+    assert_font_defaults(@widget.font) # same as parent
+    @widget.font(:copy).size(20)
+    assert_equal(20, @widget.font.size)
+    assert_not_equal(@alt, @widget.font)
+    assert_font_defaults(@doc.font) # unchanged
+  end
+
   def test_font_style
     @widget.font_style('Bold')
     assert_equal('Bold', @widget.font.style)
@@ -445,6 +454,15 @@ class ParagraphTestCases < Test::Unit::TestCase
     assert_equal(:center, @p.text_align)
     assert_paragraph_defaults(@doc.paragraph_style)
   end
+
+  def test_style_copy
+    assert_paragraph_defaults(@doc.paragraph_style)
+    assert_paragraph_defaults(@p.style)
+    @p.style(:copy).align('right')
+    assert_not_equal(@centered, @p.style)
+    assert_equal(:right, @p.text_align)
+    assert_paragraph_defaults(@doc.paragraph_style)
+  end
 end
 
 class ContainerTestCases < Test::Unit::TestCase
@@ -529,6 +547,16 @@ class PageTestCases < Test::Unit::TestCase
     @page.style('legalland')
     assert_equal(:landscape, @page.style.orientation)
     assert_equal(:legal, @page.style.size)
+  end
+
+  def test_style_copy
+    assert_equal(:portrait, @page.style.orientation)
+    assert_equal(:letter, @page.style.size)
+    default_style = @page.style
+    @page.style(:copy).orientation('landscape')
+    assert_not_equal(default_style, @page.style)
+    assert_equal(:landscape, @page.style.orientation) # changed
+    assert_equal(:letter, @page.style.size) # unchanged
   end
 
   def test_width
