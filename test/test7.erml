@@ -1,6 +1,6 @@
 <erml>
 	<styles>
-		<layout id="flow" manager="flow" padding="12" />
+		<layout id="flow" padding="12" />
 		<pen id="blue_dash" color="Blue" width="2" pattern="dashed" />
 		<pen id="red_dash" color="Red" width="2" pattern="dashed" />
 	</styles>

@@ -7,7 +7,7 @@ include EideticRML::Widgets
 include EideticRML::Styles
 
 doc = Document.new
-doc.styles.add('layout', :id => 'vbox', :manager => 'vbox', :padding => '18')
+doc.styles.add('layout', :id => 'vbox', :padding => '18')
 doc.styles.add('pen', :id => 'blue_dash', :color => 'Blue', :width => 2, :pattern => 'dashed')
 doc.styles.add('pen', :id => 'red_dash', :color => 'Red', :width => 2, :pattern => 'dashed')
 

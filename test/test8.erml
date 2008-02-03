@@ -1,6 +1,6 @@
 <erml>
 	<styles>
-		<layout id="vbox" manager="vbox" padding="18" />
+		<layout id="vbox" padding="18" />
 		<pen id="blue_dash" color="Blue" width="2" pattern="dashed" />
 		<pen id="red_dash" color="Red" width="2" pattern="dashed" />
 	</styles>

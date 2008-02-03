@@ -24,7 +24,13 @@ module EideticRML
       def initialize(parent, attrs={})
         @parent = parent
         parent.children << self if parent.respond_to?(:children)
-        attrs.each { |key, value| self.send(key, value) }
+        attrs = attrs.inject({}) { |m, kv| m[kv.first.to_s] = kv.last; m }
+        pre_keys, post_keys = attrs.keys & attributes_first, attrs.keys & attributes_last
+        keys = attrs.keys - pre_keys - post_keys
+        pre_keys.each { |key| self.send(key, attrs[key]) }
+        keys.each { |key| self.send(key, attrs[key]) }
+        post_keys.each { |key| self.send(key, attrs[key]) }
+        # attrs.each { |key, value| self.send(key, value) }
       end
 
       def align(value=nil)
@@ -120,11 +126,6 @@ module EideticRML
       end
 
       def layout_widget(writer)
-        # puts "widget: layout_widget"
-        # @left ||= 0
-        # @top ||= 0
-        # @width ||= 0
-        # @height ||= 0
       end
 
       def units(value=nil)
@@ -204,7 +205,6 @@ module EideticRML
           when 1: value * 4
         else nil
         end
-        # puts "setting margin: #{m.inspect}"
         @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
       end
 
@@ -248,7 +248,6 @@ module EideticRML
           when 1: value * 4
         else nil
         end
-        # puts "setting paddings: #{p.inspect}"
         @padding_top, @padding_right, @padding_bottom, @padding_left = p unless p.nil?
       end
 
@@ -283,6 +282,14 @@ module EideticRML
       end
 
     protected
+      def attributes_first
+        @attributes_first ||= %w(units).freeze
+      end
+
+      def attributes_last
+        @attributes_last ||= [].freeze
+      end
+
       def font_style_for(id)
         fs = root.styles.for_id(id)
         raise ArgumentError, "Font Style #{id} not found." unless fs.is_a?(Styles::FontStyle)
@@ -307,29 +314,21 @@ module EideticRML
             @border_top.apply(writer)
             writer.move_to(left + margin_left, top + margin_top) # top left
             writer.line_to(right - margin_right, top + margin_top) # top right
-            # puts("top left", left + margin_left, top + margin_top) # top left
-            # puts("top right", right - margin_right, top + margin_top) # top right
           end
           unless @border_right.nil?
             @border_right.apply(writer)
             writer.move_to(right - margin_right, top + margin_top) # top right
             writer.line_to(right - margin_right, bottom - margin_bottom) # bottom right
-            # puts("top right", right - margin_right, top + margin_top) # top right
-            # puts("bottom right", right - margin_right, bottom - margin_bottom) # bottom right
           end
           unless @border_bottom.nil?
             @border_bottom.apply(writer)
             writer.move_to(right - margin_right, bottom - margin_bottom) # bottom right
             writer.line_to(left + margin_left, bottom - margin_bottom) # bottom left
-            # puts("bottom right", right - margin_right, bottom - margin_bottom) # bottom right
-            # puts("bottom left", left + margin_left, bottom - margin_bottom) # bottom left
           end
           unless @border_left.nil?
             @border_left.apply(writer)
             writer.move_to(left + margin_left, bottom - margin_bottom) # bottom left
             writer.line_to(left + margin_left, top + margin_top) # top left
-            # puts("bottom left", left + margin_left, bottom - margin_bottom) # bottom left
-            # puts("top left", left + margin_left, top + margin_top) # top left
           end
         end
       end
@@ -484,7 +483,6 @@ module EideticRML
       end
 
       def print(writer)
-        # $stdout.puts [@left, @top, @width, @height, @right, @bottom].inspect if @align == :bottom
         raise "left, top, width & height must be set" if [left, top, width, height].any? { |value| value.nil? }
         options = {}
         options[:corners] = @corners unless @corners.nil?
@@ -626,9 +624,7 @@ module EideticRML
 
       def layout(value=nil)
         return @layout_style if value.nil?
-        ls = root.styles.find { |style| style.id == value }
-        raise ArgumentError, "Layout Style #{value} not found." unless ls.is_a?(Styles::LayoutStyle)
-        @layout_style = ls
+        @layout_style = layout_style_for(value)
       end
 
       def layout_container(writer)
@@ -644,14 +640,25 @@ module EideticRML
 
       def paragraph_style(value=nil)
         return @paragraph_style || parent.paragraph_style if value.nil?
-        ps = root.styles.find { |style| style.id == value }
-        raise ArgumentError, "Paragraph Style #{value} not found." unless ps.is_a?(Styles::ParagraphStyle)
-        @paragraph_style = ps
+        @paragraph_style = paragraph_style_for(value)
       end
 
       def print(writer)
         super(writer)
         children.each { |child| child.print(writer) }
+      end
+
+    protected
+      def layout_style_for(id)
+        ls = root.styles.for_id(id)
+        raise ArgumentError, "Layout Style #{id} not found." unless ls.is_a?(Styles::LayoutStyle)
+        ls
+      end
+
+      def paragraph_style_for(id)
+        ps = root.styles.for_id(id)
+        raise ArgumentError, "Paragraph Style #{id} not found." unless ps.is_a?(Styles::ParagraphStyle)
+        ps
       end
     end
 
@@ -774,13 +781,11 @@ module EideticRML
     class Document < Page
       StdWidgetFactory.instance.register_widget('erml', self)
 
-      attr_reader :styles
       alias :pages :children
 
       def initialize(parent=nil, attrs={})
         super(parent, attrs)
         @default_margin = false
-        @styles = Styles::StyleCollection.new
         @page_style = styles.add('page', :id => 'page')
         @font = styles.add('font', :id => 'font')
         @paragraph_style = styles.add('para', :id => 'p')
@@ -811,6 +816,10 @@ module EideticRML
         writer.open
         pages.each { |page| page.print(writer) }
         writer.close
+      end
+
+      def styles
+        @styles ||= Styles::StyleCollection.new
       end
 
       def to_s
