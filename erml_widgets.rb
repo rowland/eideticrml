@@ -85,6 +85,8 @@ module EideticRML
         if value =~ /(\d+(\.\d+)?)%/
           @width_pct = $1.to_f.quo(100)
           @width = @width_pct * parent.content_width
+        elsif value.to_s =~ /^[+-]/
+          @width = parent.content_width + parse_measurement_pts(value, units || self.units)
         else
           @width = parse_measurement_pts(value, units || self.units)
         end
@@ -96,6 +98,8 @@ module EideticRML
         if value =~ /(\d+(\.\d+)?)%/
           @height_pct = $1.to_f.quo(100)
           @height = @height_pct * parent.content_height
+        elsif value.to_s =~ /^[+-]/
+          @height = parent.content_height + parse_measurement_pts(value, units || self.units)
         else
           @height = parse_measurement_pts(value, units)
         end
@@ -197,7 +201,7 @@ module EideticRML
             parse_measurement_pts(n, units)
           end
         else
-          value = Array(value)
+          value = Array(value).map { |m| from_units(units, m) }
         end
         m = case value.size
           when 4: value
@@ -240,7 +244,7 @@ module EideticRML
             parse_measurement_pts(n, units)
           end
         else
-          value = Array(value)
+          value = Array(value).map { |p| from_units(units, p) }
         end
         p = case value.size
           when 4: value

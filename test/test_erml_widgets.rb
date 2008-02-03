@@ -164,28 +164,60 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_font_defaults(@doc.font) # unchanged
   end
 
-  def test_width
+  def test_width_fixed
     @page.units(:in)
     assert_nil(@widget.width)
     @widget.width('5')
-    assert_equal(360, @widget.width)
     assert_equal(5, @widget.width(:in))
-    @widget.width('50%')
-    assert_equal(0.5, @widget.width_pct)
-    assert_equal(306, @widget.width)
-    assert_equal(4.25, @widget.width(:in))
+    assert_equal(360, @widget.width)
   end
 
-  def test_height
+  def test_width_percent
+    @page.units(:in)
+    assert_nil(@widget.width)
+    @widget.width('50%')
+    assert_equal(0.5, @widget.width_pct)
+    assert_equal(4.25, @widget.width(:in))
+    assert_equal(306, @widget.width)
+  end
+
+  def test_width_relative
+    @page.margin('1in')
+    assert_nil(@widget.width)
+    @widget.width('-2in')
+    assert_equal(4.5, @widget.width(:in))
+    assert_equal(324, @widget.width)
+    @widget.width('+1in')
+    assert_equal(7.5, @widget.width(:in))
+    assert_equal(540, @widget.width)
+  end
+
+  def test_height_fixed
     @page.units(:in)
     assert_nil(@widget.height)
     @widget.height('3.5')
-    assert_equal(252, @widget.height)
     assert_equal(3.5, @widget.height(:in))
+    assert_equal(252, @widget.height)
+  end
+
+  def test_height_percent
+    @page.units(:in)
+    assert_nil(@widget.height)
     @widget.height('50%')
     assert_equal(0.5, @widget.height_pct)
-    assert_equal(396, @widget.height)
     assert_equal(5.5, @widget.height(:in))
+    assert_equal(396, @widget.height)
+  end
+
+  def test_height_relative
+    @page.margin('1in')
+    assert_nil(@widget.height)
+    @widget.height('-2in')
+    assert_equal(7, @widget.height(:in))
+    assert_equal(504, @widget.height)
+    @widget.height('+1in')
+    assert_equal(10, @widget.height(:in))
+    assert_equal(720, @widget.height)
   end
 
   def test_content_top
@@ -328,6 +360,13 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(4, @widget.margin_left)
   end
 
+  def test_margin_numeric
+    @page.units(:in)
+    @widget.margin(1)
+    assert_equal([1,1,1,1], @widget.margin(:in))
+    assert_equal([72,72,72,72], @widget.margin)
+  end
+
   def test_padding
     assert_equal(0, @widget.padding_top)
     assert_equal(0, @widget.padding_right)
@@ -366,6 +405,13 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(56.7, @widget.padding_right)
     assert_close(85.05, @widget.padding_bottom)
     assert_equal(4, @widget.padding_left)
+  end
+
+  def test_padding_numeric
+    @page.units(:in)
+    @widget.padding(1)
+    assert_equal([1,1,1,1], @widget.padding(:in))
+    assert_equal([72,72,72,72], @widget.padding)
   end
 end
 
