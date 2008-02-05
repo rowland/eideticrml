@@ -79,6 +79,14 @@ module EideticRML
         @bottom = parent.height + @bottom if @bottom < 0
       end
 
+      def preferred_width(writer, units=:pt)
+        @width || 0
+      end
+
+      def preferred_height(writer, units=:pt)
+        @height || 0
+      end
+
       def width(value=nil, units=nil)
         return @width if value.nil?
         return to_units(value, @width) if value.is_a?(Symbol)
@@ -92,7 +100,7 @@ module EideticRML
         end
       end
 
-      def height(value=nil)
+      def height(value=nil, units=nil)
         return @height if value.nil?
         return to_units(value, @height) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
@@ -101,35 +109,44 @@ module EideticRML
         elsif value.to_s =~ /^[+-]/
           @height = parent.content_height + parse_measurement_pts(value, units || self.units)
         else
-          @height = parse_measurement_pts(value, units)
+          @height = parse_measurement_pts(value, units || self.units)
         end
       end
 
       def content_top(units=:pt)
-        top(units) + margin_top(units) + padding_top(units)
+        to_units(units, top + margin_top + padding_top)
       end
 
       def content_right(units=:pt)
-        right(units) - (margin_right(units) + padding_right(units))
+        to_units(units, right - margin_right - padding_right)
       end
 
       def content_bottom(units=:pt)
-        bottom(units) - (margin_bottom(units) + padding_bottom(units))
+        to_units(units, bottom - margin_bottom - padding_bottom)
       end
 
       def content_left(units=:pt)
-        left(units) + margin_left(units) + padding_left(units)
+        to_units(units, left + margin_left + padding_left)
       end
 
       def content_height(units=:pt)
-        height(units) - (margin_top(units) + margin_bottom(units) + padding_top(units) + padding_bottom(units))
+        to_units(units, (height || 0) - non_content_height)
       end
 
       def content_width(units=:pt)
-        width(units) - (margin_left(units) + margin_right(units) + padding_left(units) + padding_right(units))
+        to_units(units, (width || 0) - non_content_width)
+      end
+
+      def non_content_height
+        margin_top + padding_top + padding_bottom + margin_bottom
+      end
+
+      def non_content_width
+        margin_left + padding_left + padding_right + margin_right
       end
 
       def layout_widget(writer)
+        # width("100%") if width.nil?
       end
 
       def units(value=nil)
@@ -285,6 +302,11 @@ module EideticRML
         parent.nil? ? self : parent.root
       end
 
+      def visible(value=nil)
+        return @visible.nil? ? true : @visible if value.nil?
+        @visible = !!value
+      end
+
     protected
       def attributes_first
         @attributes_first ||= %w(units).freeze
@@ -292,18 +314,6 @@ module EideticRML
 
       def attributes_last
         @attributes_last ||= [].freeze
-      end
-
-      def font_style_for(id)
-        fs = root.styles.for_id(id)
-        raise ArgumentError, "Font Style #{id} not found." unless fs.is_a?(Styles::FontStyle)
-        fs
-      end
-
-      def pen_style_for(id)
-        ps = root.styles.for_id(id)
-        raise ArgumentError, "Pen Style #{id} not found." unless ps.is_a?(Styles::PenStyle)
-        ps
       end
 
       def draw_border(writer)
@@ -335,6 +345,18 @@ module EideticRML
             writer.line_to(left + margin_left, top + margin_top) # top left
           end
         end
+      end
+
+      def font_style_for(id)
+        fs = root.styles.for_id(id)
+        raise ArgumentError, "Font Style #{id} not found." unless fs.is_a?(Styles::FontStyle)
+        fs
+      end
+
+      def pen_style_for(id)
+        ps = root.styles.for_id(id)
+        raise ArgumentError, "Pen Style #{id} not found." unless ps.is_a?(Styles::PenStyle)
+        ps
       end
     end
 
@@ -568,19 +590,30 @@ module EideticRML
 
       def bullet(value=nil)
         return @bullet.nil? ? style.bullet : @bullet if value.nil?
-        bs = root.styles.for_id(value)
-        raise ArgumentError, "Bullet Style #{value} not found." unless bs.is_a?(Styles::BulletStyle)
-        @bullet = bs
+        @bullet = bullet_style_for(value)
+      end
+
+      def preferred_width(writer, units=:pt)
+        # @preferred_width = @width || rich_text(writer).width(parent.content_width - bullet_width - non_content_width) + bullet_width + non_content_width
+        @preferred_width = @width || parent.content_width
+        to_units(units, @preferred_width)
+      end
+
+      def preferred_height(writer, units=:pt)
+        @preferred_height = if width.nil?
+          rich_text(writer).height(parent.content_width - bullet_width - non_content_width) * writer.line_height + 
+            non_content_height - rich_text(writer).height.quo(writer.line_height)
+        else
+          rich_text(writer).height(content_width - bullet_width) * writer.line_height + 
+            non_content_height - rich_text(writer).height.quo(writer.line_height)
+        end
+        to_units(units, @preferred_height)
       end
 
       def layout_widget(writer)
         # puts "paragraph: layout_widget"
         super(writer)
-        bullet_width = bullet.nil? ? 0 : bullet.width
-        @rich_text ||= EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
-        @height = @rich_text.height(content_width - bullet_width) * writer.line_height + 
-          padding_top + padding_bottom - @rich_text.height.quo(writer.line_height)
-        # puts "paragraph @height: #{@height} for width: #{width}"
+        @height = preferred_height(writer)
       end
 
       def print(writer)
@@ -609,10 +642,28 @@ module EideticRML
       end
 
     protected
+      def bullet_style_for(id)
+        bs = root.styles.for_id(id)
+        raise ArgumentError, "Bullet Style #{value} not found." unless bs.is_a?(Styles::BulletStyle)
+        bs
+      end
+
+      def bullet_width
+        bullet.nil? ? 0 : bullet.width
+      end
+
       def paragraph_style_for(id)
         ps = root.styles.for_id(id)
         raise ArgumentError, "Paragraph Style #{id} not found." unless ps.is_a?(Styles::ParagraphStyle)
         ps
+      end
+
+      def rich_text(writer)
+        if @rich_text.nil?
+          font.apply(writer)
+          @rich_text = EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
+        end
+        @rich_text
       end
     end
 
@@ -645,6 +696,11 @@ module EideticRML
       def paragraph_style(value=nil)
         return @paragraph_style || parent.paragraph_style if value.nil?
         @paragraph_style = paragraph_style_for(value)
+      end
+
+      def preferred_width(writer, units=:pt)
+        @preferred_width = @width || parent.content_width
+        to_units(units, @preferred_width)
       end
 
       def print(writer)

@@ -268,6 +268,7 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def test_content_height
+    # assert_nil(instance)
     assert_equal(0, @widget.content_height)
     @widget.height('3.5in')
     assert_equal(252, @widget.content_height) # same as height unless overridden
@@ -466,17 +467,26 @@ class LabelTestCases < Test::Unit::TestCase
 end
 
 class ParagraphTestCases < Test::Unit::TestCase
+  Lorem = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @centered = @doc.styles.add('para', :id => 'centered', :align => :center)
     @zapf = @doc.styles.add('font', :id => 'zapf', :name => 'ZapfDingbats', :size => 12)
     @bullet = @doc.styles.add('bullet', :id => 'bstar', :font => 'zapf', :text => "&#x4E;")
-    @p = StdWidgetFactory.instance.make_widget('p', @doc)
+    @page = StdWidgetFactory.instance.make_widget('page', @doc)
+    @p = StdWidgetFactory.instance.make_widget('p', @page)
+    @writer = EideticPDF::DocumentWriter.new
+    @writer.open
+  end
+
+  def teardown
+    @writer.close
   end
 
   def test_make_widget
     assert_kind_of(Paragraph, @p)
-    assert_equal(@doc, @p.parent)
+    assert_equal(@page, @p.parent)
   end
 
   def test_bullet
@@ -508,6 +518,27 @@ class ParagraphTestCases < Test::Unit::TestCase
     assert_not_equal(@centered, @p.style)
     assert_equal(:right, @p.text_align)
     assert_paragraph_defaults(@doc.paragraph_style)
+  end
+
+  def test_preferred_width
+    @page.margin("1in")
+    @p.text(Lorem)
+    pw = @p.preferred_width(@writer, :in)
+    assert(pw <= 6.5)
+    assert(pw >= 6.0)
+  end
+
+  def test_preferred_height_small
+    @p.text("Hello")
+    ph = @p.preferred_height(@writer)
+    assert_in_delta(12, ph, 1)
+  end
+
+  def test_preferred_height_large
+    @page.margin("1in")
+    @p.text(Lorem)
+    ph = @p.preferred_height(@writer)
+    assert_in_delta(107, ph, 1)
   end
 end
 
