@@ -43,8 +43,9 @@ module EideticRML
         @position = value.to_sym if [:static, :relative, :absolute].include?(value.to_sym)
       end
 
-      def size(value=nil)
-        # TODO
+      def name(value=nil)
+        return @name if value.nil?
+        @name = $1 if value.to_s =~ /(\w+)/
       end
 
       def left(value=nil, units=nil)
@@ -146,7 +147,6 @@ module EideticRML
       end
 
       def layout_widget(writer)
-        # width("100%") if width.nil?
       end
 
       def units(value=nil)

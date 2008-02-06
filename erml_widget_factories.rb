@@ -13,13 +13,15 @@ module EideticRML
       def register_widget(name, klass)
         @klasses[name] = klass
       end
-      
+
       def has_widget?(name)
         !!@klasses[name]
       end
 
       def make_widget(name, parent)
-        @klasses[name].new(parent)
+        widget = @klasses[name].new(parent)
+        widget.name(name)
+        widget
       end
 
       @@factories = {}
