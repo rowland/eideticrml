@@ -67,6 +67,22 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal('widget', @widget.tag)
   end
 
+  def test_id
+    assert_nil(@widget.id)
+    @widget.id(' !@#$%')
+    assert_nil(@widget.id) # unchanged
+    @widget.id('widget')
+    assert_equal('widget', @widget.id)
+  end
+
+  def test_klass
+    assert_nil(@widget.klass)
+    @widget.klass(' !@#$%')
+    assert_nil(@widget.klass) # unchanged
+    @widget.klass('foo bar')
+    assert_equal('foo bar', @widget.klass)
+  end
+
   def test_top
     assert_equal(:static, @widget.position)
 

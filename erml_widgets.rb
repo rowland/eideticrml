@@ -45,7 +45,17 @@ module EideticRML
 
       def tag(value=nil)
         return @tag if value.nil?
-        @tag = $1 if value.to_s =~ /(\w+)/
+        @tag = $1 if value.to_s =~ /^(\w+)$/
+      end
+
+      def id(value=nil)
+        return @id if value.nil?
+        @id = $1 if value.to_s =~ /^(\w+)$/
+      end
+
+      def klass(value=nil)
+        return @klass if value.nil?
+        @klass = $1 if value.to_s =~ /^\s*(\w+(\s+\w+)*)\s*$/
       end
 
       def left(value=nil, units=nil)
