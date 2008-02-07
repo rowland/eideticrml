@@ -45,17 +45,31 @@ module EideticRML
 
       def tag(value=nil)
         return @tag if value.nil?
-        @tag = $1 if value.to_s =~ /^(\w+)$/
+        @tag = $1.freeze if value.to_s =~ /^(\w+)$/
+        @path = nil
       end
 
       def id(value=nil)
         return @id if value.nil?
-        @id = $1 if value.to_s =~ /^(\w+)$/
+        @id = $1.freeze if value.to_s =~ /^(\w+)$/
+        @path = nil
       end
 
       def klass(value=nil)
         return @klass if value.nil?
-        @klass = $1 if value.to_s =~ /^\s*(\w+(\s+\w+)*)\s*$/
+        @klass = $1.freeze if value.to_s =~ /^\s*(\w+(\s+\w+)*)\s*$/
+        @path = nil
+      end
+
+      def selector_tag
+        value = (tag || '').dup
+        value << '#' << id unless id.nil?
+        value << '.' << klass.split(/\s/).join('.') unless klass.nil?
+        value
+      end
+
+      def path
+        @path ||= (parent.nil? ? '/' << selector_tag : parent.path.dup << '/' << selector_tag).freeze
       end
 
       def left(value=nil, units=nil)
@@ -305,6 +319,7 @@ module EideticRML
 
       def print(writer)
         # puts "widget: print"
+        # $stderr.puts path
         draw_border(writer)
       end
 

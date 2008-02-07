@@ -83,6 +83,38 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal('foo bar', @widget.klass)
   end
 
+  def test_selector_tag
+    assert_equal('erml', @doc.selector_tag)
+    assert_equal('page', @page.selector_tag)
+
+    p1 = StdWidgetFactory.instance.make_widget('p', @page)
+    assert_equal('p', p1.selector_tag)
+    p1.id('id')
+    assert_equal('p#id', p1.selector_tag)
+    p1.klass('class')
+    assert_equal('p#id.class', p1.selector_tag)
+
+    p2 = StdWidgetFactory.instance.make_widget('p', @page)
+    p2.klass('class')
+    assert_equal('p.class', p2.selector_tag)
+  end
+
+  def test_path
+    assert_equal('/erml', @doc.path)
+    assert_equal('/erml/page', @page.path)
+
+    p1 = StdWidgetFactory.instance.make_widget('p', @page)
+    assert_equal('/erml/page/p', p1.path)
+    p1.id('id')
+    assert_equal('/erml/page/p#id', p1.path)
+    p1.klass('class')
+    assert_equal('/erml/page/p#id.class', p1.path)
+
+    p2 = StdWidgetFactory.instance.make_widget('p', @page)
+    p2.klass('class')
+    assert_equal('/erml/page/p.class', p2.path)
+  end
+
   def test_top
     assert_equal(:static, @widget.position)
 
