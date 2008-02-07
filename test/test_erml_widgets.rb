@@ -59,12 +59,12 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(:absolute, @widget.position)
   end
 
-  def test_name
-    assert_nil(@widget.name)
-    @widget.name(' !@#$%')
-    assert_nil(@widget.name)
-    @widget.name('widget')
-    assert_equal('widget', @widget.name)
+  def test_tag
+    assert_nil(@widget.tag)
+    @widget.tag(' !@#$%')
+    assert_nil(@widget.tag) # unchanged
+    @widget.tag('widget')
+    assert_equal('widget', @widget.tag)
   end
 
   def test_top
@@ -495,7 +495,7 @@ class ParagraphTestCases < Test::Unit::TestCase
   def test_make_widget
     assert_kind_of(Paragraph, @p)
     assert_equal(@page, @p.parent)
-    assert_equal('p', @p.name)
+    assert_equal('p', @p.tag)
   end
 
   def test_bullet

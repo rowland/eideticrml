@@ -43,9 +43,9 @@ module EideticRML
         @position = value.to_sym if [:static, :relative, :absolute].include?(value.to_sym)
       end
 
-      def name(value=nil)
-        return @name if value.nil?
-        @name = $1 if value.to_s =~ /(\w+)/
+      def tag(value=nil)
+        return @tag if value.nil?
+        @tag = $1 if value.to_s =~ /(\w+)/
       end
 
       def left(value=nil, units=nil)

@@ -10,17 +10,17 @@ module EideticRML
         @klasses = {}
       end
 
-      def register_widget(name, klass)
-        @klasses[name] = klass
+      def register_widget(tag, klass)
+        @klasses[tag] = klass
       end
 
-      def has_widget?(name)
-        !!@klasses[name]
+      def has_widget?(tag)
+        !!@klasses[tag]
       end
 
-      def make_widget(name, parent)
-        widget = @klasses[name].new(parent)
-        widget.name(name)
+      def make_widget(tag, parent)
+        widget = @klasses[tag].new(parent)
+        widget.tag(tag)
         widget
       end
 

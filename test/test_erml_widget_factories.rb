@@ -5,11 +5,12 @@
 
 $: << File.dirname(__FILE__) + '/../'
 require 'test/unit'
+require 'erml_widgets'
 require 'erml_widget_factories'
 
 include EideticRML::Widgets
 
-class TestWidget
+class TestWidget < Widget
   def initialize(parent)
   end
 end
