@@ -11,8 +11,6 @@ require 'erml_widget_factories'
 include EideticRML::Widgets
 
 class TestWidget < Widget
-  def initialize(parent)
-  end
 end
 
 class FactoryTestCases < Test::Unit::TestCase

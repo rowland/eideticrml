@@ -119,7 +119,10 @@ module EideticRML
           # puts "unaligned left: #{left}"
           left += (widget.width + @style.hpadding)
         end
-        container.height(static.map { |widget| widget.height }.max + container.non_content_height, :pt) if container.height.nil?
+        if container.height.nil?
+          content_height = static.map { |widget| widget.height }.max || 0
+          container.height(content_height + container.non_content_height, :pt)
+        end
         container.children.each { |widget| widget.layout_widget(writer) }
       end
 

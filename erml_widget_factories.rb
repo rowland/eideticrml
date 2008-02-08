@@ -18,8 +18,8 @@ module EideticRML
         !!@klasses[tag]
       end
 
-      def make_widget(tag, parent)
-        widget = @klasses[tag].new(parent)
+      def make_widget(tag, parent, attrs={})
+        widget = @klasses[tag].new(parent, attrs)
         widget.tag(tag)
         widget
       end
