@@ -45,3 +45,16 @@ task :clean do
   rm Dir["*.pdf"]
   rm Dir["test/*.pdf"]
 end
+
+desc "Render test erml files to pdf."
+task :ermls do
+  require 'erml'
+  Dir["test/*.erml"].each do |erml|
+    pdf = "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
+    doc = File.open(erml) do |f|
+      EideticRML::XmlParser.parse(f)
+    end
+    File.open(pdf, 'w') { |f| f.write(doc) }
+    `open #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+  end
+end
