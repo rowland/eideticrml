@@ -121,19 +121,31 @@ class FontStyleTestCases < Test::Unit::TestCase
     @font_style.color 'Red'
     assert_equal('Red', @font_style.color)
   end
-  
+
   def test_name
     assert_equal('Helvetica', @font_style.name)
     @font_style.name 'bigred'
     assert_equal('bigred', @font_style.name)
   end
-  
+
   def test_size
     assert_equal(12, @font_style.size)
     @font_style.size 14.5
     assert_equal(14.5, @font_style.size)
   end
-  
+
+  def test_strikeout
+    assert(!@font_style.strikeout)
+    @font_style.strikeout(true)
+    assert(@font_style.strikeout)
+    @font_style.strikeout(false)
+    assert(!@font_style.strikeout)
+    @font_style.strikeout("true")
+    assert(@font_style.strikeout)
+    @font_style.strikeout("false")
+    assert(!@font_style.strikeout)
+  end
+
   def test_style
     assert_equal('', @font_style.style)
     @font_style.style 'Bold'
@@ -150,6 +162,18 @@ class FontStyleTestCases < Test::Unit::TestCase
     assert_equal('Type1', @font_style.sub_type)
     @font_style.sub_type 'TrueType'
     assert_equal('TrueType', @font_style.sub_type)
+  end
+
+  def test_underline
+    assert(!@font_style.underline)
+    @font_style.underline(true)
+    assert(@font_style.underline)
+    @font_style.underline(false)
+    assert(!@font_style.underline)
+    @font_style.underline("true")
+    assert(@font_style.underline)
+    @font_style.underline("false")
+    assert(!@font_style.underline)
   end
 end
 

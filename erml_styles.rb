@@ -125,6 +125,11 @@ module EideticRML
         @size = value.to_f
       end
 
+      def strikeout(value=nil)
+        return @strikeout if value.nil?
+        @strikeout = (value == true) || (value == 'true')
+      end
+
       def style(value=nil)
         return @style || '' if value.nil?
         @style = value
@@ -138,6 +143,11 @@ module EideticRML
       def sub_type(value=nil)
         return @sub_type || 'Type1' if value.nil?
         @sub_type = value
+      end
+
+      def underline(value=nil)
+        return @underline if value.nil?
+        @underline = (value == true) || (value == 'true')
       end
     end
 

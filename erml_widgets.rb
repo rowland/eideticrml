@@ -591,8 +591,10 @@ module EideticRML
       end
 
       def strikeout(value=nil)
-        return @strikeout if value.nil?
-        @strikeout = (value == true) or (value == 'true')
+        return font.strikeout if value.nil?
+        font(:copy).strikeout(value)
+        # return @strikeout if value.nil?
+        # @strikeout = (value == true) || (value == 'true')
       end
 
       def text(value=nil)
@@ -601,8 +603,10 @@ module EideticRML
       end
 
       def underline(value=nil)
-        return @underline if value.nil?
-        @underline = (value == true) || (value == 'true')
+        return font.underline if value.nil?
+        font(:copy).underline(value)
+        # return @underline if value.nil?
+        # @underline = (value == true) || (value == 'true')
       end
     end
 

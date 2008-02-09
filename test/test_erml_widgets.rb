@@ -592,10 +592,34 @@ class ParagraphTestCases < Test::Unit::TestCase
     assert_in_delta(107, ph, 1)
   end
 
+  def test_strikeout
+    assert(!@p.strikeout)
+    @p.strikeout(true)
+    assert(@p.strikeout)
+    @p.strikeout(false)
+    assert(!@p.strikeout)
+    @p.strikeout("true")
+    assert(@p.strikeout)
+    @p.strikeout("false")
+    assert(!@p.strikeout)
+  end
+
   def test_text
     assert_equal('', @p.text)
     @p.text("text")
     assert_equal("text", @p.text)
+  end
+
+  def test_underline
+    assert(!@p.underline)
+    @p.underline(true)
+    assert(@p.underline)
+    @p.underline(false)
+    assert(!@p.underline)
+    @p.underline("true")
+    assert(@p.underline)
+    @p.underline("false")
+    assert(!@p.underline)
   end
 end
 
