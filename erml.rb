@@ -42,7 +42,7 @@ module EideticRML
         tag, attrs = @tag_aliases[id.to_s] || [id.to_s, {}]
         factory = Widgets::StdWidgetFactory.instance # TODO: select factory by namespace
         raise ArgumentError, "Unknown tag: #{tag}." unless factory.has_widget?(tag)
-        widget = factory.make_widget(tag, current, attrs.merge(args.first))
+        widget = factory.make_widget(tag, current, attrs.merge(fix_attrs(args.first)))
         @stack.push(widget)
         result = if block_given?
           yield
@@ -62,6 +62,16 @@ module EideticRML
   private
     def current
       @stack.last
+    end
+
+    def fix_attrs(attrs)
+      if attrs.nil?
+        {}
+      elsif attrs.respond_to?(:to_str)
+        { :text => attrs }
+      else
+        attrs
+      end
     end
   end
 
@@ -85,6 +95,7 @@ module EideticRML
     end
 
     def pages(attrs={}, &block)
+      @doc.attributes(attrs)
       @pages ||= PageBuilder.new(@doc)
       @pages.instance_eval(&block) if block_given?
       @pages
@@ -93,14 +104,6 @@ module EideticRML
     def print(options={})
       file = options[:file] || "#{File.basename($0, '.rb')}.pdf"
       File.open(file,'w') { |f| f.write(@doc) }
-    end
-
-  private
-    def attrs_from_hash(hash)
-      attrs = ''
-      return attrs if hash.nil?
-      hash.each { |k, v| attrs << %Q{ %s="%s"} % [k, v] }
-      attrs
     end
   end
 
@@ -162,6 +165,14 @@ module EideticRML
         widget = factory.make_widget(tag, current, attrs.merge(args.first))
         @stack.push(widget)
       end
+    end
+
+    def tag_alias(attrs)
+      id, tag = attrs.delete('id').to_s, attrs.delete('tag').to_s
+      raise ArgumentError, "Invalid id for tag_alias: #{id}." unless id =~ /^(\w+)$/
+      raise ArgumentError, "Invalid tag for tag_alias: #{tag}." unless tag =~ /^(\w+)$/
+      @tag_aliases[id] = [tag, attrs.freeze]
+      @stack.push(current)
     end
 
     def text(text)
@@ -235,6 +246,7 @@ module EideticRML
 
     def pages(attrs)
       # puts "pages"
+      @doc.attributes(attrs)
       @parser = XmlPageParser.new(@stack, @doc)
     end
   end

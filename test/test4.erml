@@ -1,5 +1,6 @@
 <erml>
 	<pages units="in" margin="1">
+		<tag_alias id="h" tag="p" font_style="Bold" text_align="center" />
 		<page>
 			<h>First Page</h>
 		</page>

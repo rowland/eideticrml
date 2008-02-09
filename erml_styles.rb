@@ -63,7 +63,10 @@ module EideticRML
         raise ArgumentError, "id required for style" if attrs[:id].nil?
         style = for_id(attrs[:id])
         if style.nil?
-          style = Style.for_name(name).new(self, attrs)
+          if (style_class = Style.for_name(name.to_s)).nil?
+            raise ArgumentError, "Unknown style #{name}."
+          end
+          style = style_class.new(self, attrs)
           self << style
         else
           attrs.each { |key, value| style.send(key, value) }

@@ -24,6 +24,10 @@ module EideticRML
       def initialize(parent, attrs={})
         @parent = parent
         parent.children << self if parent.respond_to?(:children)
+        attributes(attrs)
+      end
+
+      def attributes(attrs)
         attrs = attrs.inject({}) { |m, kv| m[kv.first.to_s] = kv.last; m }
         pre_keys, post_keys = attrs.keys & attributes_first, attrs.keys & attributes_last
         keys = attrs.keys - pre_keys - post_keys
@@ -526,6 +530,7 @@ module EideticRML
       def corners(value=nil)
         return @corners if value.nil?
         value = value.split(',') if value.respond_to?(:to_str)
+        value = Array(value)
         @corners = value.map { |n| parse_measurement_pts(n, units) } if [1,2,4,8].include?(value.size)
       end
 
@@ -597,7 +602,7 @@ module EideticRML
 
       def underline(value=nil)
         return @underline if value.nil?
-        @underline = (value == true) or (value == 'true')
+        @underline = (value == true) || (value == 'true')
       end
     end
 
