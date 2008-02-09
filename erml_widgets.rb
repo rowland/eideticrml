@@ -578,7 +578,7 @@ module EideticRML
       end
     end
 
-    class Text < Widget
+    module Text
       def layout_widget(writer)
         # puts "text: layout_widget"
         super(writer)
@@ -606,8 +606,10 @@ module EideticRML
       end
     end
 
-    class Label < Text
+    class Label < Widget
       StdWidgetFactory.instance.register_widget('label', self)
+
+      include Text
 
       def angle(value=nil)
         return @angle || 0 if value.nil?
@@ -615,8 +617,65 @@ module EideticRML
       end
     end
 
-    class Paragraph < Text
+    class Container < Widget
+      StdWidgetFactory.instance.register_widget('div', self)
+
+      attr_reader :children
+
+      def initialize(parent, attrs={})
+        super(parent, attrs)
+        @children = []
+      end
+
+      def layout(value=nil)
+        return @layout_style if value.nil?
+        @layout_style = layout_style_for(value)
+      end
+
+      def layout_container(writer)
+        layout('flow') if layout.nil?
+        layout.manager.layout(self, writer)
+      end
+
+      def layout_widget(writer)
+        # puts "container: layout_widget"
+        super(writer)
+        layout_container(writer)
+      end
+
+      def paragraph_style(value=nil)
+        return @paragraph_style || parent.paragraph_style if value.nil?
+        @paragraph_style = paragraph_style_for(value)
+      end
+
+      def preferred_width(writer, units=:pt)
+        @preferred_width = @width || parent.content_width
+        to_units(units, @preferred_width)
+      end
+
+      def print(writer)
+        super(writer)
+        children.each { |child| child.print(writer) }
+      end
+
+    protected
+      def layout_style_for(id)
+        ls = root.styles.for_id(id)
+        raise ArgumentError, "Layout Style #{id} not found." unless ls.is_a?(Styles::LayoutStyle)
+        ls
+      end
+
+      def paragraph_style_for(id)
+        ps = root.styles.for_id(id)
+        raise ArgumentError, "Paragraph Style #{id} not found." unless ps.is_a?(Styles::ParagraphStyle)
+        ps
+      end
+    end
+
+    class Paragraph < Container
       StdWidgetFactory.instance.register_widget('p', self)
+
+      include Text
 
       def bullet(value=nil)
         return @bullet.nil? ? style.bullet : @bullet if value.nil?
@@ -694,61 +753,6 @@ module EideticRML
           @rich_text = EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
         end
         @rich_text
-      end
-    end
-
-    class Container < Widget
-      StdWidgetFactory.instance.register_widget('div', self)
-
-      attr_reader :children
-
-      def initialize(parent, attrs={})
-        super(parent, attrs)
-        @children = []
-      end
-
-      def layout(value=nil)
-        return @layout_style if value.nil?
-        @layout_style = layout_style_for(value)
-      end
-
-      def layout_container(writer)
-        layout('flow') if layout.nil?
-        layout.manager.layout(self, writer)
-      end
-
-      def layout_widget(writer)
-        # puts "container: layout_widget"
-        super(writer)
-        layout_container(writer)
-      end
-
-      def paragraph_style(value=nil)
-        return @paragraph_style || parent.paragraph_style if value.nil?
-        @paragraph_style = paragraph_style_for(value)
-      end
-
-      def preferred_width(writer, units=:pt)
-        @preferred_width = @width || parent.content_width
-        to_units(units, @preferred_width)
-      end
-
-      def print(writer)
-        super(writer)
-        children.each { |child| child.print(writer) }
-      end
-
-    protected
-      def layout_style_for(id)
-        ls = root.styles.for_id(id)
-        raise ArgumentError, "Layout Style #{id} not found." unless ls.is_a?(Styles::LayoutStyle)
-        ls
-      end
-
-      def paragraph_style_for(id)
-        ps = root.styles.for_id(id)
-        raise ArgumentError, "Paragraph Style #{id} not found." unless ps.is_a?(Styles::ParagraphStyle)
-        ps
       end
     end
 

@@ -493,18 +493,6 @@ class RectangleTestCases < Test::Unit::TestCase
   end
 end
 
-class TextTestCases < Test::Unit::TestCase
-  def setup
-    @text = Text.new(nil)
-  end
-
-  def test_text
-    assert_equal('', @text.text)
-    @text.text("text")
-    assert_equal("text", @text.text)
-  end
-end
-
 class LabelTestCases < Test::Unit::TestCase
   def setup
     @label = StdWidgetFactory.instance.make_widget('label', nil)
@@ -519,6 +507,12 @@ class LabelTestCases < Test::Unit::TestCase
     assert_equal(0, @label.angle)
     @label.angle(90)
     assert_equal(90, @label.angle)
+  end
+
+  def test_text
+    assert_equal('', @label.text)
+    @label.text("text")
+    assert_equal("text", @label.text)
   end
 end
 
@@ -596,6 +590,12 @@ class ParagraphTestCases < Test::Unit::TestCase
     @p.text(Lorem)
     ph = @p.preferred_height(@writer)
     assert_in_delta(107, ph, 1)
+  end
+
+  def test_text
+    assert_equal('', @p.text)
+    @p.text("text")
+    assert_equal("text", @p.text)
   end
 end
 
