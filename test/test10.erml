@@ -1,0 +1,19 @@
+<erml>
+	<styles>
+		<layout id="vbox" padding="18" />
+		<pen id="blue_dash" color="Blue" width="2" pattern="dashed" />
+		<pen id="red_dash" color="Red" width="2" pattern="dashed" />
+	</styles>
+	<pages>
+		<tag_alias id="b" tag="span" font.style="Bold" />
+		<tag_alias id="i" tag="span" font.style="Oblique" />
+		<tag_alias id="bi" tag="span" font.style="BoldOblique" />
+		<tag_alias id="u" tag="span" underline="true" />
+		<tag_alias id="red" tag="span" font.color="Red" />
+		<page units="in" margin="1">
+			<p underline="true">Rich Text</p>
+			<p text_align="justify">Lorem <b>ipsum</b> dolor sit amet, <i>consectetur</i> adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. <red>Ut enim ad minim veniam</red>, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			<p text_align="justify"><u>Lorem ipsum dolor sit amet</u>, consectetur adipisicing elit, sed do eiusmod <bi>tempor incididunt</bi> ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+		</page>
+	</pages>
+</erml>

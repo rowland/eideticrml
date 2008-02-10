@@ -31,9 +31,9 @@ module EideticRML
         attrs = attrs.inject({}) { |m, kv| m[kv.first.to_s] = kv.last; m }
         pre_keys, post_keys = attrs.keys & attributes_first, attrs.keys & attributes_last
         keys = attrs.keys - pre_keys - post_keys
-        pre_keys.each { |key| self.send(key, attrs[key]) }
-        keys.each { |key| self.send(key, attrs[key]) }
-        post_keys.each { |key| self.send(key, attrs[key]) }
+        pre_keys.each { |key| attribute(key, attrs[key]) }
+        keys.each { |key| attribute(key, attrs[key]) }
+        post_keys.each { |key| attribute(key, attrs[key]) }
         # attrs.each { |key, value| self.send(key, value) }
       end
 
@@ -337,12 +337,21 @@ module EideticRML
       end
 
     protected
+      def attribute(id, value)
+        keys = id.to_s.split('.', 2)
+        if keys.size == 1
+          self.send(keys[0], value)
+        else
+          self.send(keys[0], :copy).send(keys[1], value)
+        end
+      end
+
       def attributes_first
         @attributes_first ||= %w(units).freeze
       end
 
       def attributes_last
-        @attributes_last ||= [].freeze
+        @attributes_last ||= %w(text).freeze
       end
 
       def draw_border(writer)
@@ -593,8 +602,6 @@ module EideticRML
       def strikeout(value=nil)
         return font.strikeout if value.nil?
         font(:copy).strikeout(value)
-        # return @strikeout if value.nil?
-        # @strikeout = (value == true) || (value == 'true')
       end
 
       def text(value=nil)
@@ -605,8 +612,23 @@ module EideticRML
       def underline(value=nil)
         return font.underline if value.nil?
         font(:copy).underline(value)
-        # return @underline if value.nil?
-        # @underline = (value == true) || (value == 'true')
+      end
+    end
+
+    class Span < Widget
+      StdWidgetFactory.instance.register_widget('span', self)
+
+      include Text
+
+      def initialize(parent, attrs={})
+        raise ArgumentError, "Span must be child of Paragraph or another Span." unless parent.is_a?(Span) or parent.is_a?(Paragraph)
+        super(parent, attrs)
+      end
+
+      def text(value=nil, font=nil)
+        return super if value.nil?
+        super(value)
+        parent.text(value, font || self.font)
       end
     end
 
@@ -718,7 +740,7 @@ module EideticRML
         end
         # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
         raise "left & top must be set #{text.inspect}" if [left, top].any? { |value| value.nil? }
-        writer.paragraph_xy(content_left, content_top, @rich_text || @text, options)
+        writer.paragraph_xy(content_left, content_top, rich_text(writer), options)
       end
 
       def style(value=nil)
@@ -726,6 +748,13 @@ module EideticRML
         return @style || parent.paragraph_style if value.nil?
         return @style || @style = parent.paragraph_style.clone if value == :copy
         @style = paragraph_style_for(value)
+      end
+
+      def text(value=nil, font=nil)
+        return @text_pieces if value.nil?
+        @text_pieces ||= []
+        value.lstrip! if @text_pieces.empty?
+        @text_pieces << [value, font || self.font] unless value.empty?
       end
 
       def text_align(value=nil)
@@ -753,8 +782,14 @@ module EideticRML
 
       def rich_text(writer)
         if @rich_text.nil?
-          font.apply(writer)
-          @rich_text = EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
+          # font.apply(writer)
+          # @rich_text = EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
+          @rich_text = EideticPDF::PdfText::RichText.new
+          @text_pieces.each do |piece|
+            text, font = piece
+            font.apply(writer)
+            @rich_text.add(text, writer.font, :color => font.color, :underline => font.underline)
+          end
         end
         @rich_text
       end

@@ -177,7 +177,7 @@ module EideticRML
 
     def text(text)
       if current.respond_to?(:text)
-        current.text(text.strip)
+        current.text(text)
       end
     end
 

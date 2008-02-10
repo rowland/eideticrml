@@ -605,9 +605,10 @@ class ParagraphTestCases < Test::Unit::TestCase
   end
 
   def test_text
-    assert_equal('', @p.text)
+    assert_nil(@p.text)
+    # assert_equal('', @p.text)
     @p.text("text")
-    assert_equal("text", @p.text)
+    assert_equal(["text", @p.font], @p.text.first)
   end
 
   def test_underline
