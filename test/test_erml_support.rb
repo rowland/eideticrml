@@ -26,3 +26,49 @@ class ErmlSupportTestCases < Test::Unit::TestCase
     assert_equal(144, Support::parse_measurement_pts("2", :in))
   end
 end
+
+class GridTestCases < Test::Unit::TestCase
+  def setup
+    @grid = Support::Grid.new(3, 2, 0)
+  end
+
+  def test_index_get
+    3.times do |c|
+      2.times do |r|
+        assert_equal(0, @grid[c,r])
+      end
+    end
+  end
+
+  def set6
+    @grid[0, 0] = 1
+    @grid[1, 0] = 2
+    @grid[2, 0] = 3
+    @grid[0, 1] = 4
+    @grid[1, 1] = 5
+    @grid[2, 1] = 6
+  end
+
+  def test_index_set
+    set6
+    assert_equal(1,  @grid[0, 0])
+    assert_equal(2,  @grid[1, 0])
+    assert_equal(3,  @grid[2, 0])
+    assert_equal(4,  @grid[0, 1])
+    assert_equal(5,  @grid[1, 1])
+    assert_equal(6,  @grid[2, 1])
+  end
+  
+  def test_col
+    set6
+    assert_equal([1, 4], @grid.col(0))
+    assert_equal([2, 5], @grid.col(1))
+    assert_equal([3, 6], @grid.col(2))
+  end
+
+  def test_row
+    set6
+    assert_equal([1, 2, 3], @grid.row(0))
+    assert_equal([4, 5, 6], @grid.row(1))
+  end
+end

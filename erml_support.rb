@@ -33,5 +33,32 @@ module EideticRML
     end
 
     module_function :parse_measurement, :parse_measurement_pts
+
+    class Grid
+      attr_reader :cols, :rows
+
+      def initialize(cols, rows, value=nil)
+        @cols, @rows = cols, rows
+        @cells = Array.new(cols * rows) { value }
+      end
+
+      def [](col, row)
+        @cells[row * cols + col]
+      end
+
+      def []=(col, row, value)
+        @cells[row * cols + col] = value
+      end
+
+      def col(index)
+        result = []
+        rows.times { |row| result << self[index, row] }
+        result
+      end
+
+      def row(index)
+        @cells.slice(index * cols, cols)
+      end
+    end
   end
 end
