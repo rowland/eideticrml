@@ -35,11 +35,30 @@ module EideticRML
     module_function :parse_measurement, :parse_measurement_pts
 
     class Grid
-      attr_reader :cols, :rows
+      attr_reader :cols
+      attr_accessor :rows
 
-      def initialize(cols, rows, value=nil)
+      def initialize(cols, rows)
         @cols, @rows = cols, rows
-        @cells = Array.new(cols * rows) { value }
+        @cells = Array.new(cols * rows)
+      end
+
+      def cols=(new_cols)
+        @new_cells = Array.new(new_cols * rows)
+        rows.times do |r|
+          @new_cells[r * new_cols, cols] = @cells[r * cols, cols]
+        end
+        @cells = @new_cells
+        @cols = new_cols
+      end
+
+      def rows=(value)
+        if value > rows
+          @cells.fill(nil, cols * rows, cols * (value - rows))
+        elsif value < rows
+          @cells.slice!(cols * value, cols * (rows - value))
+        end
+        @rows = value
       end
 
       def [](col, row)
@@ -47,6 +66,7 @@ module EideticRML
       end
 
       def []=(col, row, value)
+        @rows = row + 1 if row >= @rows
         @cells[row * cols + col] = value
       end
 
