@@ -3,6 +3,8 @@
 #  Created by Brent Rowland on 2008-01-06.
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
+require 'erml_support'
+
 module EideticRML
   module LayoutManagers
     class LayoutManager
@@ -98,25 +100,20 @@ module EideticRML
           widget.top(container.content_top, :pt)
         end
         left = container.content_left
-        # puts "left: #{left}"
         right = container.content_right
-        # puts "right: #{right}"
         lpanels.each do |widget|
           next unless widget.visible
           widget.left(left, :pt)
-          # puts "widget left: #{left}"
           left += (widget.width + @style.hpadding)
         end
         rpanels.reverse.each do |widget|
           next unless widget.visible
           widget.right(right, :pt)
-          # puts "widget right: #{right}"
           right -= (widget.width + @style.hpadding)
         end
         unaligned.each do |widget|
           next unless widget.visible
           widget.left(left, :pt)
-          # puts "unaligned left: #{left}"
           left += (widget.width + @style.hpadding)
         end
         if container.height.nil?
@@ -124,12 +121,6 @@ module EideticRML
           container.height(content_height + container.non_content_height, :pt)
         end
         container.children.each { |widget| widget.layout_widget(writer) }
-      end
-
-      def preferred_width(container, writer)
-      end
-
-      def preferred_height(container, writer)
       end
     end
 
@@ -147,22 +138,17 @@ module EideticRML
           widget.layout_widget(writer)
         end
         top = container.content_top
-        # puts "top: #{top}"
         bottom = container.content_bottom
-        # puts "bottom: #{bottom}"
         headers.each do |widget|
           widget.top(top, :pt)
-          # puts "widget top: #{top}"
           top += (widget.height + @style.vpadding)
         end
         footers.reverse.each do |widget|
           widget.bottom(bottom, :pt)
-          # puts "widget bottom: #{bottom}"
           bottom -= (widget.height + @style.vpadding)
         end
         unaligned.each do |widget|
           widget.top(top, :pt)
-          # puts "unaligned top: #{top}"
           top += (widget.height + @style.vpadding)
         end
       end
@@ -170,9 +156,196 @@ module EideticRML
 
     class TableLayout < LayoutManager
       register('table', self)
-      
+
+    private
+      def mark_grid(grid, a, b, c, d, value)
+        c.times do |aa|
+          d.times do |bb|
+            grid[a + aa, b + bb] = value if aa > 0 or bb > 0
+          end
+        end
+      end
+
+      def row_grid(container)
+        raise ArgumentError, "cols must be specified." if container.cols.nil?
+        static = container.children.select { |widget| widget.position == :static }
+        grid = Support::Grid.new(container.cols, 0)
+        row = col = 0
+        static.each do |widget|
+          while grid[col, row] == false
+            col += 1
+            if col >= container.cols then row += 1; col = 0 end
+          end
+          grid[col, row] = widget
+          mark_grid(grid, col, row, widget.colspan, widget.rowspan, false)
+          col += widget.colspan
+          if col >= container.cols then row += 1; col = 0 end
+          raise ArgumentError, "colspan causes number of columns to exceed table size." if col > container.cols
+        end
+        grid
+      end
+
+      def col_grid(container)
+        raise ArgumentError, "rows must be specified." if container.rows.nil?
+        static = container.children.select { |widget| widget.position == :static }
+        grid = Support::Grid.new(0, container.rows)
+        row = col = 0
+        static.each do |widget|
+          while grid[col, row] == false
+            row += 1
+            if row >= container.rows then col += 1; row = 0; end
+          end
+          if row >= container.rows then col += 1; row = 0; end
+          grid[col, row] = widget
+          mark_grid(grid, col, row, widget.colspan, widget.rowspan, false)
+          row += widget.rowspan
+          raise ArgumentError, "rowspan causes number of rows to exceed table size." if row > container.rows
+        end
+        grid
+      end
+
+      def layout_cols(container, writer)
+        grid = col_grid(container)
+        rows = grid.size
+        cols = grid.map { |row| row.size }.max
+
+        height_widgets = grid.map { |row| row.detect { |w| (w != false) and (w.rowspan == 1) and w.height } }
+        percents, others = height_widgets.partition { |widget| widget.respond_to?(:height_pct) and widget.height_pct }
+        specified, others = others.partition { |widget| widget.respond_to?(:height) and widget.height }
+      end
+
+      def detect_widths(grid)
+        widths = []
+        grid.cols.times do |c|
+          col = grid.col(c)
+          widget = col.detect { |w| w and (w.colspan == 1) and w.width }
+          if widget.respond_to?(:width_pct)
+            widths << [:percent, widget.width]
+          elsif widget.respond_to?(:width)
+            widths << [:specified, widget.width]
+          else
+            widths << [:unspecified, 0]
+          end
+        end
+        widths
+      end
+
+      def allocate_specified_widths(width_avail, specified)
+        specified.each do |w|
+          puts "specified width"
+          if width_avail < w[1]
+            puts "hiding specified width"
+            w[1] = 0
+          else
+            width_avail -= (w[1] + @style.hpadding)
+          end
+        end
+        width_avail
+      end
+
+      def allocate_percent_widths(width_avail, percents)
+        # allocate percent widths next, with a minimum width of 1 point
+        if width_avail - (percents.size - 1) * @style.hpadding >= percents.size
+          width_avail -= (percents.size - 1) * @style.hpadding
+          total_percents = percents.inject(0) { |total, w| total + w[1] }
+          ratio = width_avail.quo(total_percents)
+          percents.each do |w|
+            w[1] = w[1] * ratio if ratio < 1.0
+            width_avail -= w[1]
+          end
+        else
+          percents.each { |w| w[1] = 0 }
+        end
+        width_avail -= @style.hpadding
+        width_avail
+      end
+
+      def allocate_other_widths(width_avail, others)
+        # divide remaining width equally among widgets with unspecified widths
+        if width_avail - (others.size - 1) * @style.hpadding >= others.size
+          width_avail -= (others.size - 1) * @style.hpadding
+          others_width = width_avail.quo(others.size)
+          others.each { |w| w[1] = others_width }
+        else
+          others.each { |w| w[1] = 0 }
+        end
+        width_avail
+      end
+
+      def layout_rows(container, writer)
+        grid = row_grid(container)
+        # cols = grid.cols
+        # rows = grid.rows
+
+        widths = detect_widths(grid)
+        percents, others = widths.partition { |w| w[0] == :percent }
+        specified, others = others.partition { |w| w[0] == :specified }
+
+        width_avail = container.content_width
+        width_avail = allocate_specified_widths(width_avail, specified)
+        width_avail = allocate_percent_widths(width_avail, percents)
+        width_avail = allocate_other_widths(width_avail, others)
+
+        heights = Support::Grid.new(grid.cols, grid.rows)
+        grid.cols.times do |c|
+          grid.col(c).each_with_index do |widget, r|
+            next unless widget
+            if widths[c][1] > 0
+              width = (0...widget.colspan).inject(0) { |width, i| width + widths[c + i][1] }
+              widget.width(width + (widget.colspan - 1) * @style.hpadding, :pt)
+            else
+              widget.visible(false)
+              next
+            end
+            heights[c, r] = [widget.rowspan, widget.height || widget.preferred_height(writer)]
+          end
+        end
+
+        heights.rows.times do |r|
+          row_heights = (0...heights.cols).map { |c| heights[c,r] }.compact
+          min_rowspan = row_heights.map { |rowspan, height| rowspan }.min
+          min_rowspan_heights = row_heights.select { |rowspan, height| rowspan == min_rowspan }
+          max_height = min_rowspan_heights.map { |rowspan, height| height }.max
+          heights.cols.times do |c|
+            rh = heights[c,r]
+            next if rh.nil?
+            if rh[0] > min_rowspan
+              heights[c,r+1] = [rh[0] - 1, [rh[1] - max_height, 0].max]
+            end
+            rh[1] = max_height
+          end
+        end
+
+        top = container.content_top
+        grid.rows.times do |r|
+          max_height = 0
+          left = container.content_left
+          grid.cols.times do |c|
+            widget = grid[c, r]
+            next unless widget
+            rh = heights[c,r]
+            widget.top(top, :pt)
+            widget.left(left, :pt)
+            height = (0...rh[0]).inject((rh[0] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][1] }
+            widget.height(height, :pt)
+            left += widths[c][1] + @style.hpadding
+            max_height = [max_height, rh[1]].max if rh[0] == 1
+          end
+          top += max_height + @style.vpadding
+        end
+        if container.height.nil?
+          container.height(top - container.content_top + container.non_content_height - @style.vpadding, :pt)
+        end
+        container.children.each { |widget| widget.layout_widget(writer) }
+      end
+
+    public
       def layout(container, writer)
-        # TODO
+        if container.order == :rows
+          layout_rows(container, writer)
+        else # container.order == :cols
+          layout_cols(container, writer)
+        end
       end
     end
   end

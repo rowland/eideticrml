@@ -235,6 +235,18 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(0.5, @widget.width_pct)
     assert_equal(4.25, @widget.width(:in))
     assert_equal(306, @widget.width)
+
+    w = Widget.new(@widget)
+    w.width('50%')
+    assert_equal(0.5, w.width_pct)
+    assert_equal(2.125, w.width(:in))
+    assert_equal(153, w.width)
+
+    # child with percent width should resize along with parent
+    @widget.width('100%')
+    assert_equal(0.5, w.width_pct)
+    assert_equal(4.25, w.width(:in))
+    assert_equal(306, w.width)
   end
 
   def test_width_relative
@@ -263,6 +275,18 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(0.5, @widget.height_pct)
     assert_equal(5.5, @widget.height(:in))
     assert_equal(396, @widget.height)
+
+    w = Widget.new(@widget)
+    w.height('50%')
+    assert_equal(0.5, w.height_pct)
+    assert_equal(2.75, w.height(:in))
+    assert_equal(198, w.height)
+
+    # child with percent height should resize along with parent
+    @widget.height('100%')
+    assert_equal(0.5, w.height_pct)
+    assert_equal(5.5, w.height(:in))
+    assert_equal(396, w.height)
   end
 
   def test_height_relative
@@ -470,6 +494,26 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal([1,1,1,1], @widget.padding(:in))
     assert_equal([72,72,72,72], @widget.padding)
   end
+
+  def test_colspan
+    assert_equal(1, @widget.colspan)
+    @widget.colspan(0)
+    assert_equal(1, @widget.colspan) # unchanged
+    @widget.colspan(2)
+    assert_equal(2, @widget.colspan)
+    @widget.colspan('3')
+    assert_equal(3, @widget.colspan)
+  end
+
+  def test_rowspan
+    assert_equal(1, @widget.rowspan)
+    @widget.rowspan(0)
+    assert_equal(1, @widget.rowspan) # unchanged
+    @widget.rowspan(2)
+    assert_equal(2, @widget.rowspan)
+    @widget.rowspan('3')
+    assert_equal(3, @widget.rowspan)
+  end
 end
 
 class RectangleTestCases < Test::Unit::TestCase
@@ -638,8 +682,42 @@ class ContainerTestCases < Test::Unit::TestCase
     assert_equal([0, 0, 0, 0], @div.margin)
   end
 
+  def test_cols
+    assert_nil(@div.cols)
+    @div.cols(0)
+    assert_nil(@div.cols) # unchanged
+    @div.cols(3)
+    assert_equal(3, @div.cols)
+    @div.cols('5')
+    assert_equal(5, @div.cols)
+  end
+
+  def test_order
+    assert_equal(:rows, @div.order)
+    @div.order(:cols)
+    assert_equal(:cols, @div.order)
+    @div.order(:rows)
+    assert_equal(:rows, @div.order)
+    @div.order('cols')
+    assert_equal(:cols, @div.order)
+    @div.order('rows')
+    assert_equal(:rows, @div.order)
+    @div.order('bogus')
+    assert_equal(:rows, @div.order) # unchanged
+  end
+
   def test_paragraph_style
     assert_equal(:center, @div.paragraph_style.align)
+  end
+
+  def test_rows
+    assert_nil(@div.rows)
+    @div.rows(0)
+    assert_nil(@div.rows) # unchanged
+    @div.rows(3)
+    assert_equal(3, @div.rows)
+    @div.rows('5')
+    assert_equal(5, @div.rows)
   end
 end
 

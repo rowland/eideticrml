@@ -117,28 +117,32 @@ module EideticRML
       end
 
       def width(value=nil, units=nil)
-        return @width if value.nil?
-        return to_units(value, @width) if value.is_a?(Symbol)
+        return @width_pct ? @width_pct * parent.content_width : @width if value.nil?
+        return to_units(value, @width_pct ? @width_pct * parent.content_width : @width) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
           @width_pct = $1.to_f.quo(100)
           @width = @width_pct * parent.content_width
         elsif value.to_s =~ /^[+-]/
           @width = parent.content_width + parse_measurement_pts(value, units || self.units)
+          @width_pct = nil
         else
           @width = parse_measurement_pts(value, units || self.units)
+          @width_pct = nil
         end
       end
 
       def height(value=nil, units=nil)
-        return @height if value.nil?
-        return to_units(value, @height) if value.is_a?(Symbol)
+        return @height_pct ? @height_pct * parent.content_height : @height if value.nil?
+        return to_units(value, @height_pct ? @height_pct * parent.content_height : @height) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
           @height_pct = $1.to_f.quo(100)
           @height = @height_pct * parent.content_height
         elsif value.to_s =~ /^[+-]/
           @height = parent.content_height + parse_measurement_pts(value, units || self.units)
+          @height_pct = nil
         else
           @height = parse_measurement_pts(value, units || self.units)
+          @height_pct = nil
         end
       end
 
@@ -322,8 +326,7 @@ module EideticRML
       end
 
       def print(writer)
-        # puts "widget: print"
-        # $stderr.puts path
+        return unless visible
         draw_border(writer)
       end
 
@@ -334,6 +337,16 @@ module EideticRML
       def visible(value=nil)
         return @visible.nil? ? true : @visible if value.nil?
         @visible = !!value
+      end
+
+      def colspan(value=nil)
+        return @colspan || 1 if value.nil?
+        @colspan = value.to_i if value.to_i >= 1
+      end
+
+      def rowspan(value=nil)
+        return @rowspan || 1 if value.nil?
+        @rowspan = value.to_i if value.to_i >= 1
       end
 
     protected
@@ -548,6 +561,7 @@ module EideticRML
       end
 
       def print(writer)
+        return unless visible
         raise "left, top, width & height must be set" if [left, top, width, height].any? { |value| value.nil? }
         options = {}
         options[:corners] = @corners unless @corners.nil?
@@ -589,7 +603,6 @@ module EideticRML
 
     module Text
       def layout_widget(writer)
-        # puts "text: layout_widget"
         super(writer)
         font.apply(writer)
       end
@@ -653,6 +666,11 @@ module EideticRML
         @children = []
       end
 
+      def cols(value=nil)
+        return @cols if value.nil?
+        @cols = value.to_i if value.to_i > 0
+      end
+
       def layout(value=nil)
         return @layout_style if value.nil?
         @layout_style = layout_style_for(value)
@@ -664,9 +682,13 @@ module EideticRML
       end
 
       def layout_widget(writer)
-        # puts "container: layout_widget"
         super(writer)
         layout_container(writer)
+      end
+
+      def order(value=nil)
+        return @order || :rows if value.nil?
+        @order = value.to_sym if [:rows, :cols].include?(value.to_sym)
       end
 
       def paragraph_style(value=nil)
@@ -680,8 +702,14 @@ module EideticRML
       end
 
       def print(writer)
+        return unless visible
         super(writer)
         children.each { |child| child.print(writer) }
+      end
+
+      def rows(value=nil)
+        return @rows if value.nil?
+        @rows = value.to_i if value.to_i > 0
       end
 
     protected
@@ -725,13 +753,19 @@ module EideticRML
         to_units(units, @preferred_height)
       end
 
+      def layout_container(writer)
+        # suppress default behavior
+      end
+
       def layout_widget(writer)
         # puts "paragraph: layout_widget"
         super(writer)
-        @height = preferred_height(writer)
+        @height ||= preferred_height(writer)
       end
 
       def print(writer)
+        # puts @text_pieces.first.first unless @text_pieces.nil?
+        return unless visible
         super(writer)
         options = { :align => style.align, :underline => underline, :width => content_width }
         unless bullet.nil?
@@ -789,7 +823,7 @@ module EideticRML
             text, font = piece
             font.apply(writer)
             @rich_text.add(text, writer.font, :color => font.color, :underline => font.underline)
-          end
+          end unless @text_pieces.nil?
         end
         @rich_text
       end
@@ -926,7 +960,7 @@ module EideticRML
         styles.add('layout', :id => 'flow',     :manager => 'flow', :padding => 5)
         styles.add('layout', :id => 'hbox',     :manager => 'hbox')
         styles.add('layout', :id => 'vbox',     :manager => 'vbox')
-        styles.add('layout', :id => 'table',    :manager => 'table')
+        styles.add('layout', :id => 'table',    :manager => 'table', :padding => 5)
         styles.add('pen', :id => 'solid',  :pattern => 'solid',  :color => 'Black')
         styles.add('pen', :id => 'dotted', :pattern => 'dotted', :color => 'Black')
         styles.add('pen', :id => 'dashed', :pattern => 'dashed', :color => 'Black')
