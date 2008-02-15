@@ -213,9 +213,9 @@ module EideticRML
         @border_left = pen_style_for(value)
       end
 
-      def background(value=nil)
-        # inherited
-        # TODO
+      def fill(value=nil)
+        return @fill if value.nil?
+        @fill = brush_style_for(value)
       end
 
       def margin_top(value=nil)
@@ -327,6 +327,8 @@ module EideticRML
 
       def print(writer)
         return unless visible
+        paint_background(writer)
+        draw_content(writer)
         draw_border(writer)
       end
 
@@ -367,6 +369,12 @@ module EideticRML
         @attributes_last ||= %w(text).freeze
       end
 
+      def brush_style_for(id)
+        bs = root.styles.for_id(id)
+        raise ArgumentError, "Brush Style #{id} not found." unless bs.is_a?(Styles::BrushStyle)
+        bs
+      end
+
       def draw_border(writer)
         if [@border_top, @border_right, @border_bottom, @border_left].all? { |b| b.nil? }
           unless @border.nil?
@@ -398,10 +406,23 @@ module EideticRML
         end
       end
 
+      def draw_content(writer)
+        # override this method
+      end
+
       def font_style_for(id)
         fs = root.styles.for_id(id)
         raise ArgumentError, "Font Style #{id} not found." unless fs.is_a?(Styles::FontStyle)
         fs
+      end
+
+      def paint_background(writer)
+        unless @fill.nil?
+          @fill.apply(writer)
+          writer.rectangle(left + margin_left, top + margin_top,
+            width - margin_left - margin_right, height - margin_top - margin_bottom,
+            :fill => true, :border => false)
+        end
       end
 
       def pen_style_for(id)
@@ -411,7 +432,7 @@ module EideticRML
       end
     end
 
-    class Shape < Widget
+    module Shape
       def x(value=nil)
         # TODO
       end
@@ -424,14 +445,16 @@ module EideticRML
       def draw_border(writer)
         # suppress default behavior
       end
+
+      def paint_background(writer)
+        # suppress default behavior
+      end
     end
 
-    class Arc < Shape
+    class Arc < Widget
       StdWidgetFactory.instance.register_widget('arc', self)
 
-      def print(writer)
-        # TODO
-      end
+      include Shape
 
       def r(value=nil)
         # TODO
@@ -444,14 +467,15 @@ module EideticRML
       def end_angle(value=nil)
         # TODO
       end
+
+    protected
+      def draw_content(writer)
+        # TODO
+      end
     end
 
     class Arch < Arc
       StdWidgetFactory.instance.register_widget('arc', self)
-
-      def print(writer)
-        # TODO
-      end
 
       undef_method :r
 
@@ -462,16 +486,19 @@ module EideticRML
       def r2(value=nil)
         # TODO
       end
-    end
 
-    class Circle < Shape
-      StdWidgetFactory.instance.register_widget('circle', self)
-
-      def clip(value=nil)
+    protected
+      def draw_content(writer)
         # TODO
       end
+    end
 
-      def print(writer)
+    class Circle < Widget
+      StdWidgetFactory.instance.register_widget('circle', self)
+
+      include Shape
+
+      def clip(value=nil)
         # TODO
       end
 
@@ -482,14 +509,15 @@ module EideticRML
       def reverse(value=nil)
         # TODO
       end
+
+    protected
+      def draw_content(writer)
+        # TODO
+      end
     end
 
     class Ellipse < Circle
       StdWidgetFactory.instance.register_widget('ellipse', self)
-
-      def print(writer)
-        # TODO
-      end
 
       undef_method :r
 
@@ -504,16 +532,22 @@ module EideticRML
       def ry(value=nil)
         # TODO
       end
+
+    protected
+      def draw_content(writer)
+        # TODO
+      end
     end
 
     class Image < Widget
       StdWidgetFactory.instance.register_widget('image', self)
 
-      def print(writer)
+      def url(value=nil)
         # TODO
       end
 
-      def url(value=nil)
+    protected
+      def draw_content(writer)
         # TODO
       end
     end
@@ -521,17 +555,14 @@ module EideticRML
     class Pie < Arc
       StdWidgetFactory.instance.register_widget('pie', self)
 
-      def print(writer)
+    protected
+      def draw_content(writer)
         # TODO
       end
     end
 
     class Polygon < Circle
       StdWidgetFactory.instance.register_widget('polygon', self)
-
-      def print(writer)
-        # TODO
-      end
 
       def rotation(value=nil)
         # TODO
@@ -540,45 +571,17 @@ module EideticRML
       def sides(value=nil)
         # TODO
       end
-    end
 
-    class Rectangle < Shape
-      StdWidgetFactory.instance.register_widget('rect', self)
-
-      def clip(value=nil)
-        # TODO
-      end
-
-      def corners(value=nil)
-        return @corners if value.nil?
-        value = value.split(',') if value.respond_to?(:to_str)
-        value = Array(value)
-        @corners = value.map { |n| parse_measurement_pts(n, units) } if [1,2,4,8].include?(value.size)
-      end
-
-      def path(value=nil)
-        # TODO
-      end
-
-      def print(writer)
-        return unless visible
-        raise "left, top, width & height must be set" if [left, top, width, height].any? { |value| value.nil? }
-        options = {}
-        options[:corners] = @corners unless @corners.nil?
-        super(writer)
-        unless @border.nil?
-          @border.apply(writer)
-          writer.rectangle(left + margin_left, top + margin_top, content_width, content_height, options)
-        end
-      end
-
-      def reverse(value=nil)
+    protected
+      def draw_content(writer)
         # TODO
       end
     end
 
-    class Star < Shape
+    class Star < Widget
       StdWidgetFactory.instance.register_widget('star', self)
+
+      include Shape
 
       def reverse(value=nil)
         # TODO
@@ -596,18 +599,14 @@ module EideticRML
         # TODO
       end
 
-      def print(writer)
+    protected
+      def draw_content(writer)
         # TODO
       end
     end
 
     module Text
       def layout_widget(writer)
-        super(writer)
-        font.apply(writer)
-      end
-
-      def print(writer)
         super(writer)
         font.apply(writer)
       end
@@ -625,6 +624,11 @@ module EideticRML
       def underline(value=nil)
         return font.underline if value.nil?
         font(:copy).underline(value)
+      end
+
+    protected
+      def draw_content(writer)
+        font.apply(writer)
       end
     end
 
@@ -701,18 +705,17 @@ module EideticRML
         to_units(units, @preferred_width)
       end
 
-      def print(writer)
-        return unless visible
-        super(writer)
-        children.each { |child| child.print(writer) }
-      end
-
       def rows(value=nil)
         return @rows if value.nil?
         @rows = value.to_i if value.to_i > 0
       end
 
     protected
+      def draw_content(writer)
+        super(writer)
+        children.each { |child| child.print(writer) }
+      end
+
       def layout_style_for(id)
         ls = root.styles.for_id(id)
         raise ArgumentError, "Layout Style #{id} not found." unless ls.is_a?(Styles::LayoutStyle)
@@ -763,20 +766,6 @@ module EideticRML
         @height ||= preferred_height(writer)
       end
 
-      def print(writer)
-        # puts @text_pieces.first.first unless @text_pieces.nil?
-        return unless visible
-        super(writer)
-        options = { :align => style.align, :underline => underline, :width => content_width }
-        unless bullet.nil?
-          bullet.apply(writer)
-          options[:bullet] = bullet.id unless bullet.nil?
-        end
-        # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
-        raise "left & top must be set #{text.inspect}" if [left, top].any? { |value| value.nil? }
-        writer.paragraph_xy(content_left, content_top, rich_text(writer), options)
-      end
-
       def style(value=nil)
         # inherited
         return @style || parent.paragraph_style if value.nil?
@@ -808,6 +797,18 @@ module EideticRML
         bullet.nil? ? 0 : bullet.width
       end
 
+      def draw_content(writer)
+        super(writer)
+        options = { :align => style.align, :underline => underline, :width => content_width }
+        unless bullet.nil?
+          bullet.apply(writer)
+          options[:bullet] = bullet.id unless bullet.nil?
+        end
+        # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
+        raise "left & top must be set #{text.inspect}" if [left, top].any? { |value| value.nil? }
+        writer.paragraph_xy(content_left, content_top, rich_text(writer), options)
+      end
+
       def paragraph_style_for(id)
         ps = root.styles.for_id(id)
         raise ArgumentError, "Paragraph Style #{id} not found." unless ps.is_a?(Styles::ParagraphStyle)
@@ -826,6 +827,46 @@ module EideticRML
           end unless @text_pieces.nil?
         end
         @rich_text
+      end
+    end
+
+    class Rectangle < Container
+      StdWidgetFactory.instance.register_widget('rect', self)
+
+      include Shape
+
+      def clip(value=nil)
+        # TODO
+      end
+
+      def corners(value=nil)
+        return @corners if value.nil?
+        value = value.split(',') if value.respond_to?(:to_str)
+        value = Array(value)
+        @corners = value.map { |n| parse_measurement_pts(n, units) } if [1,2,4,8].include?(value.size)
+      end
+
+      def path(value=nil)
+        # TODO
+      end
+
+      def reverse(value=nil)
+        # TODO
+      end
+
+    protected
+      def draw_content(writer)
+        raise "left, top, width & height must be set" if [left, top, width, height].any? { |value| value.nil? }
+        options = {}
+        options[:corners] = @corners unless @corners.nil?
+        options[:border] = !!@border
+        options[:fill] = !!@fill
+        @border.apply(writer) unless @border.nil?
+        @fill.apply(writer) unless @fill.nil?
+        writer.rectangle(left + margin_left, top + margin_top, 
+          width - margin_left - margin_right, height - margin_top - margin_bottom, 
+          options)
+        super(writer)
       end
     end
 

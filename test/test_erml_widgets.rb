@@ -24,6 +24,7 @@ class WidgetTestCases < Test::Unit::TestCase
     @alt = @doc.styles.add('font', :id => 'alt', :name => 'Times', :size => 10, :style => 'Bold', :encoding => 'CP1252', :color => '0xFFFFFF')
     @blue_dash = @doc.styles.add('pen', :id => 'blue_dash', :color => 'Blue', :width => '4pt', :pattern => 'dashed')
     @dotted = @doc.styles.for_id('dotted')
+    @battleship = @doc.styles.add('brush', :id => 'battleship', :color => 'LightSteelBlue')
     @page = StdWidgetFactory.instance.make_widget('page', @doc)
     @widget = Widget.new(@page)
   end
@@ -513,6 +514,14 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(2, @widget.rowspan)
     @widget.rowspan('3')
     assert_equal(3, @widget.rowspan)
+  end
+
+  def test_fill
+    assert_nil(@widget.fill)
+    @widget.fill('battleship')
+    assert_not_nil(@widget.fill)
+    assert_equal('battleship', @widget.fill.id)
+    assert_equal('LightSteelBlue', @widget.fill.color)
   end
 end
 

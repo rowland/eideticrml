@@ -103,6 +103,7 @@ module EideticRML
       include HasColor
 
       def apply(writer)
+        writer.fill_color(color)
       end
     end
 
