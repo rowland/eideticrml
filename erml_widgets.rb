@@ -28,8 +28,8 @@ module EideticRML
       end
 
       def attributes(attrs)
-        attrs = attrs.inject({}) { |m, kv| m[kv.first.to_s] = kv.last; m }
-        pre_keys, post_keys = attrs.keys & attributes_first, attrs.keys & attributes_last
+        attrs = attrs.inject({}) { |m, kv| m[kv.first.to_s] = kv.last; m } # stringify keys
+        pre_keys, post_keys = attributes_first & attrs.keys, attributes_last & attrs.keys
         keys = attrs.keys - pre_keys - post_keys
         pre_keys.each { |key| attribute(key, attrs[key]) }
         keys.each { |key| attribute(key, attrs[key]) }
@@ -362,7 +362,11 @@ module EideticRML
       end
 
       def attributes_first
-        @attributes_first ||= %w(units).freeze
+        @attributes_first ||= %w(id tag units 
+          left top width height right bottom 
+          margin margin_top margin_right margin_bottom margin_left 
+          padding padding_top padding_right padding_bottom padding_left 
+          font border fill).freeze
       end
 
       def attributes_last
@@ -688,6 +692,8 @@ module EideticRML
         return to_units(value, @r) if value.is_a?(Symbol)
         @r = parse_measurement_pts(value, units || self.units)
         @r = [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min + @r if @r < 0
+        @width ||= @r * 2 + margin_left + margin_right
+        @height ||= @r * 2 + margin_top + margin_bottom
       end
 
       def reverse(value=nil)
@@ -724,6 +730,7 @@ module EideticRML
         return to_units(value, @rx) if value.is_a?(Symbol)
         @rx = parse_measurement_pts(value, units || self.units)
         @rx = (width - margin_left - margin_right).quo(2) + @rx if @rx < 0
+        @width ||= @rx * 2 + margin_left + margin_right
       end
 
       def ry(value=nil)
@@ -731,6 +738,7 @@ module EideticRML
         return to_units(value, @ry) if value.is_a?(Symbol)
         @ry = parse_measurement_pts(value, units || self.units)
         @ry = (height - margin_top - margin_bottom).quo(2) + @ry if @ry < 0
+        @height ||= @ry * 2 + margin_top + margin_bottom
       end
 
     protected
