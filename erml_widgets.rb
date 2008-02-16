@@ -374,7 +374,8 @@ module EideticRML
       end
 
       def brush_style_for(id)
-        bs = root.styles.for_id(id)
+        bs = root.styles.for_id(id) || root.styles.for_id("brush_#{id}")
+        bs = root.styles.add('brush', :id => "brush_#{id}", :color => id) if bs.nil? and EideticPDF::PdfK::NAMED_COLORS[id]
         raise ArgumentError, "Brush Style #{id} not found." unless bs.is_a?(Styles::BrushStyle)
         bs
       end
@@ -430,7 +431,8 @@ module EideticRML
       end
 
       def pen_style_for(id)
-        ps = root.styles.for_id(id)
+        ps = root.styles.for_id(id) || root.styles.for_id("pen_#{id}")
+        ps = root.styles.add('pen', :id => "pen_#{id}", :pattern => 'solid', :color => id) if ps.nil? and EideticPDF::PdfK::NAMED_COLORS[id]
         raise ArgumentError, "Pen Style #{id} not found." unless ps.is_a?(Styles::PenStyle)
         ps
       end
@@ -859,20 +861,52 @@ module EideticRML
       end
     end
 
-    class Polygon < Circle
+    class Polygon < Container
       StdWidgetFactory.instance.register_widget('polygon', self)
 
-      def rotation(value=nil)
+      include Shape
+
+      def clip(value=nil)
         # TODO
       end
 
-      def sides(value=nil)
+      def r(value=nil)
+        return @r if value.nil?
+        return to_units(value, @r) if value.is_a?(Symbol)
+        @r = parse_measurement_pts(value, units || self.units)
+        @r = [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min + @r if @r < 0
+        @width ||= @r * 2 + margin_left + margin_right
+        @height ||= @r * 2 + margin_top + margin_bottom
+      end
+
+      def reverse(value=nil)
         # TODO
+      end
+
+      def rotation(value=nil)
+        return @rotation if value.nil?
+        @rotation = value.to_f
+      end
+
+      def sides(value=nil)
+        return @sides || 3 if value.nil?
+        @sides = value.to_i if value.to_i >= 3
       end
 
     protected
       def draw_content(writer)
-        # TODO
+        @x ||= (content_left + content_right).quo(2)
+        @y ||= (content_top + content_bottom).quo(2)
+        @r ||= [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min
+        options = {}
+        options[:border] = !!@border
+        options[:fill] = !!@fill
+        options[:rotation] = @rotation
+        @border.apply(writer) unless @border.nil?
+        @fill.apply(writer) unless @fill.nil?
+        x_offset, y_offset = (position == :relative) ? [parent.content_left, parent.content_top] : [0, 0]
+        writer.polygon(@x + x_offset, @y + y_offset, @r, sides, options)
+        super(writer)
       end
     end
 

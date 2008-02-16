@@ -1,0 +1,28 @@
+<erml>
+	<styles>
+		<pen id="dotted" color="Red" />
+		<brush id="bg" color="LightSteelBlue" />
+		<brush id="fg" color="White" />
+		<layout id="flow" padding="0.5in" />
+		<layout id="table" padding="0.5in" />
+	</styles>
+	<pages>
+		<tag_alias id="table" tag="div" layout="table" />
+		<page units="in" margin="0.75">
+			<table order="rows" cols="3">
+				<polygon width="2" height="2" r="1" sides="3" border="solid" fill="bg" />
+				<polygon width="2" height="2" r="1" sides="4" border="Blue"        fill="bg" />
+				<polygon width="2" height="2" r="1" sides="5" border="ForestGreen" fill="bg" />
+				<polygon width="2" height="2" r="1" sides="6" border="Crimson"     fill="bg" />
+				<polygon width="2" height="2" r="1" sides="7" border="Gray"        fill="bg" />
+				<polygon width="2" height="2" r="1" sides="8" border="solid"       fill="bg" />
+				<polygon width="2" height="2" r="1" sides="3" border="solid" fill="DarkSlateGray" rotation="60" />
+				<polygon width="2" height="2" r="1" sides="4" border="solid" fill="DarkTurquoise" rotation="45" />
+				<polygon width="2" height="2" r="1" sides="5" border="solid" fill="DeepSkyBlue"   rotation="36" />
+				<polygon width="2" height="2" r="1" sides="6" border="solid" fill="ForestGreen"   rotation="30" />
+				<polygon width="2" height="2" r="1" sides="7" border="solid" fill="DarkSlateBlue" rotation="25.7" />
+				<polygon width="2" height="2" r="1" sides="8" border="solid" fill="bg"            rotation="22.2" />
+			</table>
+		</page>
+	</pages>
+</erml>
