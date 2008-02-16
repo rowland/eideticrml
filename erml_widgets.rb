@@ -493,52 +493,6 @@ module EideticRML
       end
     end
 
-    class Circle < Widget
-      StdWidgetFactory.instance.register_widget('circle', self)
-
-      include Shape
-
-      def clip(value=nil)
-        # TODO
-      end
-
-      def r(value=nil)
-        # TODO
-      end
-
-      def reverse(value=nil)
-        # TODO
-      end
-
-    protected
-      def draw_content(writer)
-        # TODO
-      end
-    end
-
-    class Ellipse < Circle
-      StdWidgetFactory.instance.register_widget('ellipse', self)
-
-      undef_method :r
-
-      def rotation(value=nil)
-        # TODO
-      end
-
-      def rx(value=nil)
-        # TODO
-      end
-
-      def ry(value=nil)
-        # TODO
-      end
-
-    protected
-      def draw_content(writer)
-        # TODO
-      end
-    end
-
     class Image < Widget
       StdWidgetFactory.instance.register_widget('image', self)
 
@@ -554,23 +508,6 @@ module EideticRML
 
     class Pie < Arc
       StdWidgetFactory.instance.register_widget('pie', self)
-
-    protected
-      def draw_content(writer)
-        # TODO
-      end
-    end
-
-    class Polygon < Circle
-      StdWidgetFactory.instance.register_widget('polygon', self)
-
-      def rotation(value=nil)
-        # TODO
-      end
-
-      def sides(value=nil)
-        # TODO
-      end
 
     protected
       def draw_content(writer)
@@ -729,6 +666,64 @@ module EideticRML
       end
     end
 
+    class Circle < Container
+      StdWidgetFactory.instance.register_widget('circle', self)
+
+      include Shape
+
+      def clip(value=nil)
+        # TODO
+      end
+
+      def r(value=nil)
+        return @r if value.nil?
+        return to_units(value, @r) if value.is_a?(Symbol)
+        @r = parse_measurement_pts(value, units || self.units)
+        @r = [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min + @r if @r < 0
+      end
+
+      def reverse(value=nil)
+        # TODO
+      end
+
+    protected
+      def draw_content(writer)
+        @x ||= (content_left + content_right).quo(2)
+        @y ||= (content_top + content_bottom).quo(2)
+        @r ||= [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min
+        options = {}
+        options[:border] = !!@border
+        options[:fill] = !!@fill
+        @border.apply(writer) unless @border.nil?
+        @fill.apply(writer) unless @fill.nil?
+        writer.circle(@x, @y, @r, options)
+        super(writer)
+      end
+    end
+
+    class Ellipse < Circle
+      StdWidgetFactory.instance.register_widget('ellipse', self)
+
+      undef_method :r
+
+      def rotation(value=nil)
+        # TODO
+      end
+
+      def rx(value=nil)
+        # TODO
+      end
+
+      def ry(value=nil)
+        # TODO
+      end
+
+    protected
+      def draw_content(writer)
+        # TODO
+      end
+    end
+
     class Paragraph < Container
       StdWidgetFactory.instance.register_widget('p', self)
 
@@ -827,6 +822,23 @@ module EideticRML
           end unless @text_pieces.nil?
         end
         @rich_text
+      end
+    end
+
+    class Polygon < Circle
+      StdWidgetFactory.instance.register_widget('polygon', self)
+
+      def rotation(value=nil)
+        # TODO
+      end
+
+      def sides(value=nil)
+        # TODO
+      end
+
+    protected
+      def draw_content(writer)
+        # TODO
       end
     end
 
