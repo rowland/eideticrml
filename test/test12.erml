@@ -21,6 +21,12 @@
 				<circle width="2" height="2" border="solid" fill="bg" padding="0.5">
 					<circle width="100%" height="100%" border="solid" fill="fg" />
 				</circle>
+				<ellipse width="2" height="2" rx="0.75" border="solid" />
+				<ellipse width="2" height="2" rx="0.75" border="solid" fill="bg" />
+				<ellipse width="2" height="2" rx="0.75"                fill="bg" />
+				<ellipse width="2" height="2" rx="0.75" border="solid" fill="bg" padding="0.5">
+					<ellipse width="100%" height="100%" rx="0.25" border="solid" fill="fg" />
+				</ellipse>
 			</table>
 		</page>
 	</pages>

@@ -79,7 +79,7 @@ module EideticRML
       def left(value=nil, units=nil)
         return @left || (@right.nil? ? nil : @right - width) if value.nil?
         return to_units(value, @left || @right - width) if value.is_a?(Symbol)
-        @position = :relative if position == :static
+        @position = :relative if position == :static and value.respond_to?(:to_str)
         @left = parse_measurement_pts(value, units || self.units)
         @left = parent.width + @left if @left < 0
       end
@@ -87,7 +87,7 @@ module EideticRML
       def top(value=nil, units=nil)
         return @top || (@bottom.nil? ? nil : @bottom - height) if value.nil?
         return to_units(value, @top || @bottom - height) if value.is_a?(Symbol)
-        @position = :relative if position == :static
+        @position = :relative if position == :static and value.respond_to?(:to_str)
         @top = parse_measurement_pts(value, units || self.units)
         @top = parent.height + @top if @top < 0
       end
@@ -95,7 +95,7 @@ module EideticRML
       def right(value=nil, units=nil)
         return @right || (@left.nil? ? nil : @left + width) if value.nil?
         return to_units(value, @right || @left + width) if value.is_a?(Symbol)
-        @position = :relative if position == :static
+        @position = :relative if position == :static and value.respond_to?(:to_str)
         @right = parse_measurement_pts(value, units || self.units)
         @right = parent.width + @right if @right < 0
       end
@@ -103,7 +103,7 @@ module EideticRML
       def bottom(value=nil, units=nil)
         return @bottom || (@top.nil? ? nil : @top + height) if value.nil?
         return to_units(value, @bottom || @top + height) if value.is_a?(Symbol)
-        @position = :relative if position == :static
+        @position = :relative if position == :static and value.respond_to?(:to_str)
         @bottom = parse_measurement_pts(value, units || self.units)
         @bottom = parent.height + @bottom if @bottom < 0
       end
@@ -434,11 +434,19 @@ module EideticRML
 
     module Shape
       def x(value=nil)
-        # TODO
+        return @x if value.nil?
+        return to_units(value, @x) if value.is_a?(Symbol)
+        @position = :relative if position == :static and value.respond_to?(:to_str)
+        @x = parse_measurement_pts(value, units || self.units)
+        @x = parent.width - parent.margin_right + @x if @x < 0
       end
 
       def y(value=nil)
-        # TODO
+        return @y if value.nil?
+        return to_units(value, @y) if value.is_a?(Symbol)
+        @position = :relative if position == :static and value.respond_to?(:to_str)
+        @y = parse_measurement_pts(value, units || self.units)
+        @y = parent.height - parent.margin_bottom + @y if @y < 0
       end
 
     protected
@@ -696,31 +704,49 @@ module EideticRML
         options[:fill] = !!@fill
         @border.apply(writer) unless @border.nil?
         @fill.apply(writer) unless @fill.nil?
-        writer.circle(@x, @y, @r, options)
+        x_offset, y_offset = (position == :relative) ? [parent.content_left, parent.content_top] : [0, 0]
+        writer.circle(@x + x_offset, @y + y_offset, @r, options)
         super(writer)
       end
     end
 
-    class Ellipse < Circle
+    class Ellipse < Container
       StdWidgetFactory.instance.register_widget('ellipse', self)
 
-      undef_method :r
+      include Shape
 
       def rotation(value=nil)
         # TODO
       end
 
       def rx(value=nil)
-        # TODO
+        return @rx if value.nil?
+        return to_units(value, @rx) if value.is_a?(Symbol)
+        @rx = parse_measurement_pts(value, units || self.units)
+        @rx = (width - margin_left - margin_right).quo(2) + @rx if @rx < 0
       end
 
       def ry(value=nil)
-        # TODO
+        return @ry if value.nil?
+        return to_units(value, @ry) if value.is_a?(Symbol)
+        @ry = parse_measurement_pts(value, units || self.units)
+        @ry = (height - margin_top - margin_bottom).quo(2) + @ry if @ry < 0
       end
 
     protected
       def draw_content(writer)
-        # TODO
+        @x ||= (content_left + content_right).quo(2)
+        @y ||= (content_top + content_bottom).quo(2)
+        @rx ||= (width - margin_left - margin_right).quo(2)
+        @ry ||= (height - margin_top - margin_bottom).quo(2)
+        options = {}
+        options[:border] = !!@border
+        options[:fill] = !!@fill
+        @border.apply(writer) unless @border.nil?
+        @fill.apply(writer) unless @fill.nil?
+        x_offset, y_offset = (position == :relative) ? [parent.content_left, parent.content_top] : [0, 0]
+        writer.ellipse(@x + x_offset, @y + y_offset, @rx, @ry, options)
+        super(writer)
       end
     end
 
