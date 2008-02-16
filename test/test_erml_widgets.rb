@@ -119,7 +119,7 @@ class WidgetTestCases < Test::Unit::TestCase
   def test_top
     assert_equal(:static, @widget.position)
 
-    @widget.top(18)
+    @widget.top("18")
     assert_equal(18, @widget.top)
     assert_equal(0.25, @widget.top(:in))
     assert_equal(:relative, @widget.position)
@@ -134,7 +134,7 @@ class WidgetTestCases < Test::Unit::TestCase
   def test_right
     assert_equal(:static, @widget.position)
 
-    @widget.right(36)
+    @widget.right("36")
     assert_equal(36, @widget.right)
     assert_equal(0.5, @widget.right(:in))
     assert_equal(:relative, @widget.position)
@@ -151,7 +151,7 @@ class WidgetTestCases < Test::Unit::TestCase
   def test_bottom
     assert_equal(:static, @widget.position)
 
-    @widget.bottom(54)
+    @widget.bottom("54")
     assert_equal(54, @widget.bottom)
     assert_equal(0.75, @widget.bottom(:in))
     assert_equal(:relative, @widget.position)
@@ -168,7 +168,7 @@ class WidgetTestCases < Test::Unit::TestCase
   def test_left
     assert_equal(:static, @widget.position)
 
-    @widget.left(72)
+    @widget.left("72")
     assert_equal(72, @widget.left)
     assert_equal(1, @widget.left(:in))
     assert_equal(:relative, @widget.position)
