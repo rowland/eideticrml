@@ -66,7 +66,8 @@ module EideticRML
       end
 
       def []=(col, row, value)
-        @rows = row + 1 if row >= @rows
+        self.rows = row + 1 if row >= rows
+        self.cols = col + 1 if col >= cols
         @cells[row * cols + col] = value
       end
 

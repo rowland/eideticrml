@@ -8,7 +8,7 @@
 	<pages>
 		<tag_alias id="table" tag="div" layout="table" />
 		<page units="in" margin="0.75">
-			<table order="rows" cols="3">
+			<table order="cols" rows="4">
 				<rect width="2" height="2" border="solid" />
 				<rect width="2" height="2" border="solid" fill="bg" />
 				<rect width="2" height="2"                fill="bg" />

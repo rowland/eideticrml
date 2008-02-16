@@ -193,25 +193,15 @@ module EideticRML
         static.each do |widget|
           while grid[col, row] == false
             row += 1
-            if row >= container.rows then col += 1; row = 0; end
+            if row >= container.rows then col += 1; row = 0 end
           end
-          if row >= container.rows then col += 1; row = 0; end
+          if row >= container.rows then col += 1; row = 0 end
           grid[col, row] = widget
           mark_grid(grid, col, row, widget.colspan, widget.rowspan, false)
           row += widget.rowspan
           raise ArgumentError, "rowspan causes number of rows to exceed table size." if row > container.rows
         end
         grid
-      end
-
-      def layout_cols(container, writer)
-        grid = col_grid(container)
-        rows = grid.size
-        cols = grid.map { |row| row.size }.max
-
-        height_widgets = grid.map { |row| row.detect { |w| (w != false) and (w.rowspan == 1) and w.height } }
-        percents, others = height_widgets.partition { |widget| widget.respond_to?(:height_pct) and widget.height_pct }
-        specified, others = others.partition { |widget| widget.respond_to?(:height) and widget.height }
       end
 
       def detect_widths(grid)
@@ -272,11 +262,7 @@ module EideticRML
         width_avail
       end
 
-      def layout_rows(container, writer)
-        grid = row_grid(container)
-        # cols = grid.cols
-        # rows = grid.rows
-
+      def layout_grid(grid, container, writer)
         widths = detect_widths(grid)
         percents, others = widths.partition { |w| w[0] == :percent }
         specified, others = others.partition { |w| w[0] == :specified }
@@ -342,10 +328,11 @@ module EideticRML
     public
       def layout(container, writer)
         if container.order == :rows
-          layout_rows(container, writer)
+          grid = row_grid(container)
         else # container.order == :cols
-          layout_cols(container, writer)
+          grid = col_grid(container)
         end
+        layout_grid(grid, container, writer)
       end
     end
   end
