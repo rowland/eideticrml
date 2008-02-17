@@ -179,8 +179,8 @@ module EideticRML
           grid[col, row] = widget
           mark_grid(grid, col, row, widget.colspan, widget.rowspan, false)
           col += widget.colspan
-          if col >= container.cols then row += 1; col = 0 end
           raise ArgumentError, "colspan causes number of columns to exceed table size." if col > container.cols
+          if col == container.cols then row += 1; col = 0 end
         end
         grid
       end
@@ -222,9 +222,7 @@ module EideticRML
 
       def allocate_specified_widths(width_avail, specified)
         specified.each do |w|
-          puts "specified width"
           if width_avail < w[1]
-            puts "hiding specified width"
             w[1] = 0
           else
             width_avail -= (w[1] + @style.hpadding)
@@ -314,7 +312,7 @@ module EideticRML
             widget.left(left, :pt)
             height = (0...rh[0]).inject((rh[0] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][1] }
             widget.height(height, :pt)
-            left += widths[c][1] + @style.hpadding
+            left += widget.width + @style.hpadding
             max_height = [max_height, rh[1]].max if rh[0] == 1
           end
           top += max_height + @style.vpadding
