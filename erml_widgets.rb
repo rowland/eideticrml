@@ -34,7 +34,6 @@ module EideticRML
         pre_keys.each { |key| attribute(key, attrs[key]) }
         keys.each { |key| attribute(key, attrs[key]) }
         post_keys.each { |key| attribute(key, attrs[key]) }
-        # attrs.each { |key, value| self.send(key, value) }
       end
 
       def align(value=nil)
@@ -510,13 +509,47 @@ module EideticRML
     class Image < Widget
       StdWidgetFactory.instance.register_widget('image', self)
 
+      def preferred_width(writer, units=:pt)
+        if @width.nil? and @height
+          w = @height * image(writer).width.quo(image(writer).height)
+        else
+          w = @width || image(writer).width
+        end
+        to_units(units, w)
+      end
+
+      def preferred_height(writer, units=:pt)
+        if @height.nil? and @width
+          h = @width * image(writer).height.quo(image(writer).width)
+        else
+          h = @height || image(writer).height
+        end
+        to_units(units, h)
+      end
+
       def url(value=nil)
-        # TODO
+        return @url if value.nil?
+        @url = value.to_s
       end
 
     protected
       def draw_content(writer)
-        # TODO
+        writer.print_image_file(load_image(writer), left, top, width, height)
+      end
+
+      def image(writer)
+        load_image(writer) if @image.nil?
+        @image
+      end
+
+      def load_image(writer)
+        raise ArgumentError, "Image url must be specified." if url.nil?
+        @image, @name = writer.load_image(url, stream) if @image.nil?
+        url
+      end
+
+      def stream
+        @stream ||= open(url) { |io| io.read }
       end
     end
 
