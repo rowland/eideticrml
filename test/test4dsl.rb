@@ -4,7 +4,6 @@ require 'erml'
 
 doc = EideticRML::Builder.new do
   pages :units => 'in', :margin => 1 do
-    tag_alias :h, :p, :font_style => 'Bold', :text_align => 'center'
     page do
       h "First Page"
     end

@@ -6,7 +6,6 @@
 		<layout id="table" padding="0.5in" />
 	</styles>
 	<pages>
-		<tag_alias id="table" tag="div" layout="table" />
 		<page units="in" margin="0.75">
 			<table order="cols" rows="4">
 				<rect width="2" height="2" border="solid" />

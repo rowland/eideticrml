@@ -9,11 +9,9 @@ doc = EideticRML::Builder.new do
     pen :id => 'red_dash',  :color => 'Red',  :width => 2, :pattern => 'dashed'
   end
   pages do
-    tag_alias :b,   :span, 'font.style' => 'Bold'
-		tag_alias :i,   :span, 'font.style' => "Oblique"
-		tag_alias :bi,  :span, 'font.style' => "BoldOblique"
-		tag_alias :u,   :span, :underline => true
-		tag_alias :red, :span, 'font.color' => "Red"
+		define :i,   :span, 'font.style' => "Oblique"
+		define :bi,  :span, 'font.style' => "BoldOblique"
+		define :red, :span, 'font.color' => "Red"
     page :units => 'in', :margin => 1 do
       p :underline => true, :text => "Rich Text"
       p :text_align => :justify do

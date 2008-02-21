@@ -7,6 +7,17 @@ require 'erml_support'
 require 'erml_widgets'
 
 module EideticRML
+  STANDARD_ALIASES = [
+    { 'id' => 'h', 'tag' => 'p', 'font.style' => 'Bold', 'text_align' => 'center' }.freeze,
+    { 'id' => 'b', 'tag' => 'span', 'font.style' => 'Bold' }.freeze,
+    { 'id' => 'i', 'tag' => 'span', 'font.style' => 'Italic' }.freeze,
+    { 'id' => 'u', 'tag' => 'span', 'underline' => 'true' }.freeze,
+    { 'id' => 'hbox', 'tag' => 'div', 'layout' => 'hbox' }.freeze,
+    { 'id' => 'vbox', 'tag' => 'div', 'layout' => 'vbox' }.freeze,
+    { 'id' => 'table', 'tag' => 'div', 'layout' => 'table' }.freeze,
+    { 'id' => 'layer', 'tag' => 'div', 'position' => 'relative', 'width' => '100%', 'height' => '100%' }.freeze
+  ]
+
   class StyleBuilder
     def initialize(styles)
       @styles = styles
@@ -28,6 +39,10 @@ module EideticRML
     def initialize(doc)
       @stack = [doc]
       @tag_aliases = {}
+      EideticRML::STANDARD_ALIASES.each do |a|
+        a = a.dup
+        define(a.delete('id'), a.delete('tag'), a)
+      end
     end
 
     def initialize_copy(other)
@@ -55,7 +70,7 @@ module EideticRML
       end
     end
 
-    def tag_alias(new_tag, old_tag, attrs)
+    def define(new_tag, old_tag, attrs)
       @tag_aliases[new_tag.to_s] = [old_tag.to_s, attrs.clone.freeze]
     end
 
@@ -151,6 +166,7 @@ module EideticRML
       @stack = stack
       @stack.push doc
       @tag_aliases = {}
+      STANDARD_ALIASES.each { |definition| define(definition) }
     end
 
     def method_missing(id, *args)
@@ -167,10 +183,11 @@ module EideticRML
       end
     end
 
-    def tag_alias(attrs)
+    def define(attrs)
+      attrs = attrs.dup
       id, tag = attrs.delete('id').to_s, attrs.delete('tag').to_s
-      raise ArgumentError, "Invalid id for tag_alias: #{id}." unless id =~ /^(\w+)$/
-      raise ArgumentError, "Invalid tag for tag_alias: #{tag}." unless tag =~ /^(\w+)$/
+      raise ArgumentError, "Invalid id for define: #{id}." unless id =~ /^(\w+)$/
+      raise ArgumentError, "Invalid tag for define: #{tag}." unless tag =~ /^(\w+)$/
       @tag_aliases[id] = [tag, attrs.freeze]
       @stack.push(current)
     end
@@ -252,6 +269,7 @@ module EideticRML
   end
 end
 
+# ARGV.unshift "test/test15.erml" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
   pdf = ARGV.shift || "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
   doc = File.open(erml) do |f|

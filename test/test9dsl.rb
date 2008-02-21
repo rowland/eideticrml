@@ -7,7 +7,6 @@ doc = EideticRML::Builder.new do
     layout :id => 'hbox', :padding => '18'
   end
   pages do
-    tag_alias :hbox, :div, :layout => 'hbox'
     page :units => 'in', :margin => '1' do
       p :underline => true, :align => 'top', :text => "HBox Layout"
       hbox :padding => '5pt', :border => 'solid' do

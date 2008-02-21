@@ -7,7 +7,7 @@
 		<layout id="table" padding="0.5in" />
 	</styles>
 	<pages>
-		<tag_alias id="table" tag="div" layout="table" />
+		<define id="table" tag="div" layout="table" />
 		<page units="in" margin="0.75">
 			<table order="rows" cols="3">
 				<polygon width="2" height="2" r="1" sides="3" border="solid" fill="bg" />

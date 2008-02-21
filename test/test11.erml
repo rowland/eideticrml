@@ -3,8 +3,8 @@
 		<pen id="dotted" color="Red" />
 	</styles>
 	<pages>
-		<tag_alias id="table" tag="div" layout="table" />
-		<tag_alias id="td" tag="p" border="solid" padding="3pt" />
+		<define id="table" tag="div" layout="table" />
+		<define id="td" tag="p" border="solid" padding="3pt" />
 		<page margin="1in">
 			<table order="rows" cols="3" border="dotted" padding="5pt">
 				<td>Lorem ipsum dolor sit amet,</td>
