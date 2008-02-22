@@ -41,7 +41,7 @@ module EideticRML
       @tag_aliases = {}
       EideticRML::STANDARD_ALIASES.each do |a|
         a = a.dup
-        define(a.delete('id'), a.delete('tag'), a)
+        define(a.delete('id'), a['tag'], a)
       end
     end
 
@@ -55,9 +55,11 @@ module EideticRML
         return current
       else
         tag, attrs = @tag_aliases[id.to_s] || [id.to_s, {}]
+        attrs = attrs.merge(fix_attrs(args.first))
+        attrs['tag'] = id unless tag == id
         factory = Widgets::StdWidgetFactory.instance # TODO: select factory by namespace
         raise ArgumentError, "Unknown tag: #{tag}." unless factory.has_widget?(tag)
-        widget = factory.make_widget(tag, current, attrs.merge(fix_attrs(args.first)))
+        widget = factory.make_widget(tag, current, attrs)
         @stack.push(widget)
         result = if block_given?
           yield
@@ -150,8 +152,8 @@ module EideticRML
     end
 
     def method_missing(id, *args)
-      # @klasses.add(id, *args)
-      @stack.push @klasses
+      @stack.push @klasses.add(id, *args)
+      # @stack.push @klasses
     end
 
     def text(text)
@@ -175,17 +177,19 @@ module EideticRML
         @stack.push(current)
       else
         tag, attrs = @tag_aliases[id.to_s] || [id.to_s, {}]
+        attrs = attrs.merge(args.first)
+        attrs['tag'] = id unless tag == id
         factory = Widgets::StdWidgetFactory.instance # TODO: select factory by namespace
         raise ArgumentError, "Unknown tag: #{tag}." unless factory.has_widget?(tag)
         # puts "Making #{tag} with parent #{current.class}."
-        widget = factory.make_widget(tag, current, attrs.merge(args.first))
+        widget = factory.make_widget(tag, current, attrs)
         @stack.push(widget)
       end
     end
 
     def define(attrs)
       attrs = attrs.dup
-      id, tag = attrs.delete('id').to_s, attrs.delete('tag').to_s
+      id, tag = attrs.delete('id').to_s, attrs['tag'].to_s
       raise ArgumentError, "Invalid id for define: #{id}." unless id =~ /^(\w+)$/
       raise ArgumentError, "Invalid tag for define: #{tag}." unless tag =~ /^(\w+)$/
       @tag_aliases[id] = [tag, attrs.freeze]
@@ -219,6 +223,7 @@ module EideticRML
     end
 
     def tag_start(name, attrs)
+      name = 'klass' if name == 'class'
       # puts "tag start: #{name}, #{attrs.inspect}"
       if @parser.nil?
         self.send(name, attrs)
@@ -258,7 +263,7 @@ module EideticRML
 
     def classes(attrs)
       # puts "classes"
-      @parser = XmlClassParser.new(@stack, nil)
+      @parser = XmlClassParser.new(@stack, @doc.classes)
     end
 
     def pages(attrs)
@@ -269,7 +274,7 @@ module EideticRML
   end
 end
 
-# ARGV.unshift "test/test15.erml" unless ARGV.size.nonzero?
+# ARGV.unshift "test/test16.erml" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
   pdf = ARGV.shift || "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
   doc = File.open(erml) do |f|

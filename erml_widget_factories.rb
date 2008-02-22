@@ -19,9 +19,9 @@ module EideticRML
       end
 
       def make_widget(tag, parent, attrs={})
-        widget = @klasses[tag].new(parent, attrs)
-        widget.tag(tag)
-        widget
+        attrs['tag'] = tag unless attrs['tag']
+        attrs['class'] = '' if attrs['class'].nil?
+        @klasses[tag].new(parent, attrs)
       end
 
       @@factories = {}

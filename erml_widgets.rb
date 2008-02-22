@@ -5,6 +5,7 @@
 
 require 'erml_support'
 require 'erml_styles'
+require 'erml_klasses'
 require 'singleton'
 require 'erml_widget_factories'
 
@@ -28,7 +29,7 @@ module EideticRML
       end
 
       def attributes(attrs)
-        attrs = attrs.inject({}) { |m, kv| m[kv.first.to_s] = kv.last; m } # stringify keys
+        attrs = attrs.inject({}) { |m, kv| m[kv.first.to_s.sub(/^class$/,'klass')] = kv.last; m } # stringify keys
         pre_keys, post_keys = attributes_first & attrs.keys, attributes_last & attrs.keys
         keys = attrs.keys - pre_keys - post_keys
         pre_keys.each { |key| attribute(key, attrs[key]) }
@@ -62,6 +63,8 @@ module EideticRML
         return @klass if value.nil?
         @klass = $1.freeze if value.to_s =~ /^\s*(\w+(\s+\w+)*)\s*$/
         @path = nil
+        return if parent.nil?
+        root.classes.matching(path).each { |klass| attributes(klass.attrs) }
       end
 
       def selector_tag
@@ -72,7 +75,7 @@ module EideticRML
       end
 
       def path
-        @path ||= (parent.nil? ? '/' << selector_tag : parent.path.dup << '/' << selector_tag).freeze
+        @path ||= (parent.nil? ? selector_tag : parent.path.dup << '/' << selector_tag).freeze
       end
 
       def left(value=nil, units=nil)
@@ -361,7 +364,7 @@ module EideticRML
       end
 
       def attributes_first
-        @attributes_first ||= %w(id tag units 
+        @@attributes_first ||= %w(id tag class units 
           left top width height right bottom 
           margin margin_top margin_right margin_bottom margin_left 
           padding padding_top padding_right padding_bottom padding_left 
@@ -369,7 +372,7 @@ module EideticRML
       end
 
       def attributes_last
-        @attributes_last ||= %w(text).freeze
+        @@attributes_last ||= %w(text).freeze
       end
 
       def brush_style_for(id)
@@ -959,6 +962,7 @@ module EideticRML
           bullet.apply(writer)
           options[:bullet] = bullet.id unless bullet.nil?
         end
+        pen_style_for('solid').apply(writer)
         # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
         raise "left & top must be set #{text.inspect}" if [left, top].any? { |value| value.nil? }
         writer.paragraph_xy(content_left, content_top, rich_text(writer), options)
@@ -1198,17 +1202,11 @@ module EideticRML
       def initialize(parent=nil, attrs={})
         super(parent, attrs)
         @default_margin = false
-        @page_style = styles.add('page', :id => 'page')
-        @font = styles.add('font', :id => 'font')
-        @paragraph_style = styles.add('para', :id => 'p')
-        styles.add('layout', :id => 'absolute', :manager => 'absolute')
-        styles.add('layout', :id => 'flow',     :manager => 'flow', :padding => 5)
-        styles.add('layout', :id => 'hbox',     :manager => 'hbox')
-        styles.add('layout', :id => 'vbox',     :manager => 'vbox')
-        styles.add('layout', :id => 'table',    :manager => 'table', :padding => 5)
-        styles.add('pen', :id => 'solid',  :pattern => 'solid',  :color => 'Black')
-        styles.add('pen', :id => 'dotted', :pattern => 'dotted', :color => 'Black')
-        styles.add('pen', :id => 'dashed', :pattern => 'dashed', :color => 'Black')
+        init_default_styles
+      end
+
+      def classes
+        @klasses ||= Klasses::KlassCollection.new
       end
 
       def page_style(value=nil)
@@ -1243,6 +1241,21 @@ module EideticRML
       def units(value=nil)
         return @units || :pt if value.nil?
         super(value)
+      end
+
+    private
+      def init_default_styles
+        @page_style = styles.add('page', :id => 'page')
+        @font = styles.add('font', :id => 'font')
+        @paragraph_style = styles.add('para', :id => 'p')
+        styles.add('layout', :id => 'absolute', :manager => 'absolute')
+        styles.add('layout', :id => 'flow',     :manager => 'flow', :padding => 5)
+        styles.add('layout', :id => 'hbox',     :manager => 'hbox')
+        styles.add('layout', :id => 'vbox',     :manager => 'vbox')
+        styles.add('layout', :id => 'table',    :manager => 'table', :padding => 5)
+        styles.add('pen', :id => 'solid',  :pattern => 'solid',  :color => 'Black')
+        styles.add('pen', :id => 'dotted', :pattern => 'dotted', :color => 'Black')
+        styles.add('pen', :id => 'dashed', :pattern => 'dashed', :color => 'Black')
       end
     end
   end

@@ -101,19 +101,19 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def test_path
-    assert_equal('/erml', @doc.path)
-    assert_equal('/erml/page', @page.path)
+    assert_equal('erml', @doc.path)
+    assert_equal('erml/page', @page.path)
 
     p1 = StdWidgetFactory.instance.make_widget('p', @page)
-    assert_equal('/erml/page/p', p1.path)
+    assert_equal('erml/page/p', p1.path)
     p1.id('id')
-    assert_equal('/erml/page/p#id', p1.path)
+    assert_equal('erml/page/p#id', p1.path)
     p1.klass('class')
-    assert_equal('/erml/page/p#id.class', p1.path)
+    assert_equal('erml/page/p#id.class', p1.path)
 
     p2 = StdWidgetFactory.instance.make_widget('p', @page)
     p2.klass('class')
-    assert_equal('/erml/page/p.class', p2.path)
+    assert_equal('erml/page/p.class', p2.path)
   end
 
   def test_top
