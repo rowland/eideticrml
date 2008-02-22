@@ -133,22 +133,29 @@ module EideticRML
         footers, unaligned = unaligned.partition { |widget| widget.align == :bottom }
         static.each do |widget|
           widget.width('100%') if widget.width.nil?
-          widget.layout_widget(writer)
           widget.left(container.content_left, :pt)
-          widget.layout_widget(writer)
         end
         top = container.content_top
-        bottom = container.content_bottom
         headers.each do |widget|
           widget.top(top, :pt)
+          widget.layout_widget(writer)
+          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
           top += (widget.height + @style.vpadding)
         end
-        footers.reverse.each do |widget|
-          widget.bottom(bottom, :pt)
-          bottom -= (widget.height + @style.vpadding)
+        unless footers.empty?
+          container.height('100%') if container.height.nil?
+          bottom = container.content_bottom
+          footers.reverse.each do |widget|
+            widget.bottom(bottom, :pt)
+            widget.layout_widget(writer)
+            widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
+            bottom -= (widget.height + @style.vpadding)
+          end
         end
         unaligned.each do |widget|
           widget.top(top, :pt)
+          widget.layout_widget(writer)
+          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
           top += (widget.height + @style.vpadding)
         end
       end

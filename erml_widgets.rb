@@ -77,7 +77,7 @@ module EideticRML
 
       def left(value=nil, units=nil)
         return @left || (@right.nil? ? nil : @right - width) if value.nil?
-        return to_units(value, @left || @right - width) if value.is_a?(Symbol)
+        return to_units(value, left) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @left = parse_measurement_pts(value, units || self.units)
         @left = parent.width + @left if @left < 0
@@ -85,7 +85,7 @@ module EideticRML
 
       def top(value=nil, units=nil)
         return @top || (@bottom.nil? ? nil : @bottom - height) if value.nil?
-        return to_units(value, @top || @bottom - height) if value.is_a?(Symbol)
+        return to_units(value, top) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @top = parse_measurement_pts(value, units || self.units)
         @top = parent.height + @top if @top < 0
@@ -93,7 +93,7 @@ module EideticRML
 
       def right(value=nil, units=nil)
         return @right || (@left.nil? ? nil : @left + width) if value.nil?
-        return to_units(value, @right || @left + width) if value.is_a?(Symbol)
+        return to_units(value, right) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @right = parse_measurement_pts(value, units || self.units)
         @right = parent.width + @right if @right < 0
@@ -101,7 +101,7 @@ module EideticRML
 
       def bottom(value=nil, units=nil)
         return @bottom || (@top.nil? ? nil : @top + height) if value.nil?
-        return to_units(value, @bottom || @top + height) if value.is_a?(Symbol)
+        return to_units(value, bottom) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @bottom = parse_measurement_pts(value, units || self.units)
         @bottom = parent.height + @bottom if @bottom < 0
@@ -117,7 +117,7 @@ module EideticRML
 
       def width(value=nil, units=nil)
         return @width_pct ? @width_pct * parent.content_width : @width if value.nil?
-        return to_units(value, @width_pct ? @width_pct * parent.content_width : @width) if value.is_a?(Symbol)
+        return to_units(value, width) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
           @width_pct = $1.to_f.quo(100)
           @width = @width_pct * parent.content_width
@@ -132,7 +132,7 @@ module EideticRML
 
       def height(value=nil, units=nil)
         return @height_pct ? @height_pct * parent.content_height : @height if value.nil?
-        return to_units(value, @height_pct ? @height_pct * parent.content_height : @height) if value.is_a?(Symbol)
+        return to_units(value, height) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
           @height_pct = $1.to_f.quo(100)
           @height = @height_pct * parent.content_height
@@ -219,25 +219,25 @@ module EideticRML
 
       def margin_top(value=nil)
         return @margin_top || 0 if value.nil?
-        return to_units(value, @margin_top) if value.is_a?(Symbol)
+        return to_units(value, margin_top) if value.is_a?(Symbol)
         @margin_top = parse_measurement_pts(value, units)
       end
 
       def margin_right(value=nil)
         return @margin_right || 0 if value.nil?
-        return to_units(value, @margin_right) if value.is_a?(Symbol)
+        return to_units(value, margin_right) if value.is_a?(Symbol)
         @margin_right = parse_measurement_pts(value, units)
       end
 
       def margin_bottom(value=nil)
         return @margin_bottom || 0 if value.nil?
-        return to_units(value, @margin_bottom) if value.is_a?(Symbol)
+        return to_units(value, margin_bottom) if value.is_a?(Symbol)
         @margin_bottom = parse_measurement_pts(value, units)
       end
 
       def margin_left(value=nil)
         return @margin_left || 0 if value.nil?
-        return to_units(value, @margin_left) if value.is_a?(Symbol)
+        return to_units(value, margin_left) if value.is_a?(Symbol)
         @margin_left = parse_measurement_pts(value, units)
       end
 
@@ -262,25 +262,25 @@ module EideticRML
 
       def padding_top(value=nil)
         return @padding_top || 0 if value.nil?
-        return to_units(value, @padding_top) if value.is_a?(Symbol)
+        return to_units(value, padding_top) if value.is_a?(Symbol)
         @padding_top = parse_measurement_pts(value, units)
       end
 
       def padding_right(value=nil)
         return @padding_right || 0 if value.nil?
-        return to_units(value, @padding_right) if value.is_a?(Symbol)
+        return to_units(value, padding_right) if value.is_a?(Symbol)
         @padding_right = parse_measurement_pts(value, units)
       end
 
       def padding_bottom(value=nil)
         return @padding_bottom || 0 if value.nil?
-        return to_units(value, @padding_bottom) if value.is_a?(Symbol)
+        return to_units(value, padding_bottom) if value.is_a?(Symbol)
         @padding_bottom = parse_measurement_pts(value, units)
       end
 
       def padding_left(value=nil)
         return @padding_left || 0 if value.nil?
-        return to_units(value, @padding_left) if value.is_a?(Symbol)
+        return to_units(value, padding_left) if value.is_a?(Symbol)
         @padding_left = parse_measurement_pts(value, units)
       end
 
@@ -442,7 +442,7 @@ module EideticRML
         return @x if value.nil?
         return to_units(value, @x) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
-        @x = parse_measurement_pts(value, units || self.units)
+        @x = parse_measurement_pts(value, units)
         @x = parent.width - parent.margin_right + @x if @x < 0
       end
 
@@ -450,7 +450,7 @@ module EideticRML
         return @y if value.nil?
         return to_units(value, @y) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
-        @y = parse_measurement_pts(value, units || self.units)
+        @y = parse_measurement_pts(value, units)
         @y = parent.height - parent.margin_bottom + @y if @y < 0
       end
 
@@ -550,6 +550,97 @@ module EideticRML
 
       def stream
         @stream ||= open(url) { |io| io.read }
+      end
+    end
+
+    class Line < Widget
+      StdWidgetFactory.instance.register_widget('line', self)
+
+      include Shape
+
+      def angle(value=nil)
+        return @angle || 0 if value.nil?
+        @angle = value.to_f
+      end
+
+      def length(value=nil)
+        # return @length || Math::sqrt(content_width ** 2 + content_height ** 2) if value.nil?
+        return @length || calc_length if value.nil?
+        return to_units(value, length) if value.is_a?(Symbol)
+        @length = parse_measurement_pts(value, units)
+      end
+
+      def preferred_width(writer, units=:pt)
+        w = @width || preferred_content_width + non_content_width
+        to_units(units, w)
+      end
+
+      def preferred_height(writer, units=:pt)
+        h = @height || preferred_content_height + non_content_height
+        to_units(units, h)
+      end
+
+      def style(value=nil)
+        return @style || pen_style_for('solid') if value.nil?
+        @style = pen_style_for(value)
+      end
+
+    protected
+      def calc_length
+        return 0 if width.nil? or height.nil?
+        l = Math::sqrt(content_width ** 2 + content_height ** 2)
+        w = Math::cos(angle.degrees) * l
+        h = Math::sin(angle.degrees) * l
+        if w > content_width
+          l *= content_width.quo(w)
+        elsif h > content_height
+          l *= content_height.quo(h)
+        end
+        l
+      end
+
+      def draw_content(writer)
+        # puts "cw: #{content_width}, ch: #{content_height}"
+        style.apply(writer)
+        if position == :absolute
+          raise Exception, "x and y must be set." unless @x and @y
+          writer.line(@x, @y, angle, length)
+        elsif position == :relative
+          raise Exception, "x and y must be set." unless @x and @y
+          writer.line(parent.content_left + @x, parent.content_top + @y, angle, length)
+        else
+          @x, @y = origin_for_quadrant(quadrant(angle))
+          writer.line(@x, @y, angle, length)
+        end
+      end
+
+      def origin_for_quadrant(quadrant)
+        x_offset = (content_width - preferred_content_width).quo(2)
+        y_offset = (content_height - preferred_content_height).quo(2)
+        # puts "x_offset: #{x_offset}, y_offset: #{y_offset}"
+        case quadrant
+        when 1: [content_left  + x_offset, content_bottom - y_offset]
+        when 2: [content_right - x_offset, content_bottom - y_offset]
+        when 3: [content_right - x_offset, content_top + y_offset]
+        else    [content_left  + x_offset, content_top + y_offset]
+        end
+      end
+
+      def preferred_content_width
+        Math::cos(angle.degrees) * length
+      end
+
+      def preferred_content_height
+        Math::sin(angle.degrees) * length
+      end
+
+      def quadrant(angle)
+        a = angle % 360
+        if a <= 90 then 1
+        elsif a <= 180 then 2
+        elsif a <= 270 then 3
+        else 4
+        end
       end
     end
 
