@@ -3,6 +3,12 @@
 		<layout id="flow" padding="0.5in" />
 		<layout id="vbox" padding="0.25in" />
 		<layout id="hbox" padding="0.25in" />
+		<pen id="solid3"  width="3" pattern="solid"  color="Orange" />
+		<pen id="dotted3" width="3" pattern="dotted" color="Orange" />
+		<pen id="dashed3" width="3" pattern="dashed" color="Orange" />
+		<pen id="solid5"  width="5" pattern="solid"  color="Teal" />
+		<pen id="dotted5" width="5" pattern="dotted" color="Teal" />
+		<pen id="dashed5" width="5" pattern="dashed" color="Teal" />
 	</styles>
 	<pages>
 		<define id="hline" tag="line" angle="3" width="100%" height="0.5in" />
@@ -17,6 +23,12 @@
 					<vline />
 					<p text_align="justify" border="dotted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 				</hbox>
+				<line width="100%" style="solid3" />
+				<line width="100%" style="dotted3" />
+				<line width="100%" style="dashed3" />
+				<line width="100%" style="solid5" />
+				<line width="100%" style="dotted5" />
+				<line width="100%" style="dashed5" />
 			</vbox>
 		</page>
 	</pages>
