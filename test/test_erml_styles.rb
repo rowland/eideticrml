@@ -236,17 +236,17 @@ class ParagraphStyleTestCases < Test::Unit::TestCase
   end
 
   def test_align
-    assert_equal(:left, @paragraph_style.align)
+    assert_equal(:left, @paragraph_style.text_align)
     [:left, :center, :right, :justify].each do |align|
-      @paragraph_style.align align
-      assert_equal(align, @paragraph_style.align)
+      @paragraph_style.text_align align
+      assert_equal(align, @paragraph_style.text_align)
     end
     ['left', 'center', 'right', 'justify'].each do |align|
-      @paragraph_style.align align
-      assert_equal(align.to_sym, @paragraph_style.align)
+      @paragraph_style.text_align align
+      assert_equal(align.to_sym, @paragraph_style.text_align)
     end
-    @paragraph_style.align 'bogus'
-    assert_equal(:justify, @paragraph_style.align) # last style successfully set
+    @paragraph_style.text_align 'bogus'
+    assert_equal(:justify, @paragraph_style.text_align) # last style successfully set
   end
 
   def test_bullet

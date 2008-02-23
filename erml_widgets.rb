@@ -939,9 +939,9 @@ module EideticRML
       end
 
       def text_align(value=nil)
-        return @style.nil? ? parent.paragraph_style : @style.align if value.nil?
+        return style.text_align if value.nil?
         @style = style.clone
-        @style.align(value)
+        @style.text_align(value)
       end
 
     protected
@@ -957,7 +957,7 @@ module EideticRML
 
       def draw_content(writer)
         super(writer)
-        options = { :align => style.align, :underline => underline, :width => content_width }
+        options = { :align => style.text_align, :underline => underline, :width => content_width }
         unless bullet.nil?
           bullet.apply(writer)
           options[:bullet] = bullet.id unless bullet.nil?

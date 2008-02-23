@@ -190,9 +190,9 @@ module EideticRML
 
       include HasColor
 
-      def align(value=nil)
-        return @align || :left if value.nil?
-        @align = [:left, :center, :right, :justify].include?(value.to_sym) ? value.to_sym : @align
+      def text_align(value=nil)
+        return @text_align || :left if value.nil?
+        @text_align = [:left, :center, :right, :justify].include?(value.to_sym) ? value.to_sym : @text_align
       end
 
       def apply(writer)

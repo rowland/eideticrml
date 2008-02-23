@@ -574,7 +574,7 @@ class ParagraphTestCases < Test::Unit::TestCase
 
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
-    @centered = @doc.styles.add('para', :id => 'centered', :align => :center)
+    @centered = @doc.styles.add('para', :id => 'centered', :text_align => :center)
     @zapf = @doc.styles.add('font', :id => 'zapf', :name => 'ZapfDingbats', :size => 12)
     @bullet = @doc.styles.add('bullet', :id => 'bstar', :font => 'zapf', :text => "&#x4E;")
     @page = StdWidgetFactory.instance.make_widget('page', @doc)
@@ -602,13 +602,14 @@ class ParagraphTestCases < Test::Unit::TestCase
   end
 
   def assert_paragraph_defaults(ps)
-    assert_equal(:left, ps.align)
+    assert_equal(:left, ps.text_align)
     assert_nil(ps.bullet)
   end
 
   def test_style
     assert_paragraph_defaults(@doc.paragraph_style)
     assert_paragraph_defaults(@p.style)
+    assert_equal(:left, @p.text_align)
     @p.style('centered')
     assert_equal(@centered, @p.style)
     assert_equal(:center, @p.text_align)
@@ -618,7 +619,7 @@ class ParagraphTestCases < Test::Unit::TestCase
   def test_style_copy
     assert_paragraph_defaults(@doc.paragraph_style)
     assert_paragraph_defaults(@p.style)
-    @p.style(:copy).align('right')
+    @p.style(:copy).text_align('right')
     assert_not_equal(@centered, @p.style)
     assert_equal(:right, @p.text_align)
     assert_paragraph_defaults(@doc.paragraph_style)
@@ -681,7 +682,7 @@ class ContainerTestCases < Test::Unit::TestCase
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @page = StdWidgetFactory.instance.make_widget('page', @doc)
-    @centered = @doc.styles.add('para', :id => 'centered', :align => :center)
+    @centered = @doc.styles.add('para', :id => 'centered', :text_align => :center)
     @page.paragraph_style('centered')
     @div = StdWidgetFactory.instance.make_widget('div', @page)
   end
@@ -716,7 +717,7 @@ class ContainerTestCases < Test::Unit::TestCase
   end
 
   def test_paragraph_style
-    assert_equal(:center, @div.paragraph_style.align)
+    assert_equal(:center, @div.paragraph_style.text_align)
   end
 
   def test_rows
