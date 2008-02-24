@@ -185,9 +185,7 @@ module EideticRML
       end
     end
 
-    class ParagraphStyle < Style
-      register('para', self)
-
+    class TextStyle < Style
       include HasColor
 
       def text_align(value=nil)
@@ -196,8 +194,25 @@ module EideticRML
       end
 
       def apply(writer)
-        @bullet.apply(writer) unless @bullet.nil?
         writer.font_color(color)
+      end
+    end
+
+    class LabelStyle < TextStyle
+      register('label', self)
+
+      def angle(value=nil)
+        return @angle || 0 if value.nil?
+        @angle = value.to_f
+      end
+    end
+
+    class ParagraphStyle < TextStyle
+      register('para', self)
+
+      def apply(writer)
+        super(writer)
+        @bullet.apply(writer) unless @bullet.nil?
       end
 
       def bullet(value=nil)

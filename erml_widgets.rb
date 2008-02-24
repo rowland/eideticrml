@@ -440,7 +440,7 @@ module EideticRML
       end
     end
 
-    module Shape
+    module HasLocation
       def x(value=nil)
         return @x if value.nil?
         return to_units(value, @x) if value.is_a?(Symbol)
@@ -456,6 +456,10 @@ module EideticRML
         @y = parse_measurement_pts(value, units)
         @y = parent.height - parent.margin_bottom + @y if @y < 0
       end
+    end
+
+    module Shape
+      include HasLocation
 
     protected
       def draw_border(writer)
@@ -694,11 +698,6 @@ module EideticRML
         font(:copy).strikeout(value)
       end
 
-      def text(value=nil)
-        return @text || '' if value.nil?
-        @text = value
-      end
-
       def underline(value=nil)
         return font.underline if value.nil?
         font(:copy).underline(value)
@@ -722,7 +721,6 @@ module EideticRML
 
       def text(value=nil, font=nil)
         return super if value.nil?
-        super(value)
         parent.text(value, font || self.font)
       end
     end
@@ -730,11 +728,63 @@ module EideticRML
     class Label < Widget
       StdWidgetFactory.instance.register_widget('label', self)
 
+      include HasLocation
       include Text
 
       def angle(value=nil)
-        return @angle || 0 if value.nil?
-        @angle = value
+        return style.angle if value.nil?
+        style(:copy).angle(value)
+      end
+
+      def preferred_width(writer, units=:pt)
+        font.apply(writer)
+        to_units(units, writer.width(text) + non_content_width)
+      end
+
+      def preferred_height(writer, units=:pt)
+        font.apply(writer)
+        to_units(units, writer.text_height + non_content_height)
+      end
+
+      def style(value=nil)
+        return @style ||= label_style_for('label') if value.nil?
+        return @style = style.clone if value == :copy
+        @style = label_style_for(value)
+      end
+
+      def text(value=nil)
+        return @text || '' if value.nil?
+        @text ||= ''
+        value.lstrip! if @text.empty?
+        @text << value
+      end
+
+      def text_align(value=nil)
+        return style.text_align if value.nil?
+        style(:copy).text_align(value)
+      end
+
+    protected
+      def draw_content(writer)
+        options = { :angle => angle, :underline => underline }
+        @y ||= content_top
+        case text_align
+        when :left
+          @x ||= content_left
+        when :center
+          @x ||= (content_left + content_right).quo(2)
+          options[:align] = :center
+        when :right
+          @x ||= content_right
+          options[:align] = :right
+        end
+        writer.print_xy(@x, @y, text, options)
+      end
+
+      def label_style_for(id)
+        ls = root.styles.for_id(id)
+        raise ArgumentError, "Label Style #{id} not found." unless ls.is_a?(Styles::LabelStyle)
+        ls
       end
     end
 
@@ -898,7 +948,6 @@ module EideticRML
       end
 
       def preferred_width(writer, units=:pt)
-        # @preferred_width = @width || rich_text(writer).width(parent.content_width - bullet_width - non_content_width) + bullet_width + non_content_width
         @preferred_width = @width || parent.content_width
         to_units(units, @preferred_width)
       end
@@ -1247,6 +1296,7 @@ module EideticRML
       def init_default_styles
         @page_style = styles.add('page', :id => 'page')
         @font = styles.add('font', :id => 'font')
+        @label_style = styles.add('label', :id => 'label')
         @paragraph_style = styles.add('para', :id => 'p')
         styles.add('layout', :id => 'absolute', :manager => 'absolute')
         styles.add('layout', :id => 'flow',     :manager => 'flow', :padding => 5)

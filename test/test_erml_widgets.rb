@@ -548,7 +548,8 @@ end
 
 class LabelTestCases < Test::Unit::TestCase
   def setup
-    @label = StdWidgetFactory.instance.make_widget('label', nil)
+    @doc = StdWidgetFactory.instance.make_widget('erml', nil)
+    @label = StdWidgetFactory.instance.make_widget('label', @doc)
   end
 
   def test_make_widget
