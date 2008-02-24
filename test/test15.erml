@@ -9,6 +9,7 @@
 		<pen id="solid5"  width="5" pattern="solid"  color="Teal" />
 		<pen id="dotted5" width="5" pattern="dotted" color="Teal" />
 		<pen id="dashed5" width="5" pattern="dashed" color="Teal" />
+		<pen id="custom"  width="2" pattern="[2 2 4 4 6 6 8 8] 0" color="Black" />
 	</styles>
 	<pages>
 		<define id="hline" tag="line" angle="3" width="100%" height="0.5in" />
@@ -29,6 +30,7 @@
 				<line width="100%" style="solid5" />
 				<line width="100%" style="dotted5" />
 				<line width="100%" style="dashed5" />
+				<line width="100%" style="custom" />
 			</vbox>
 		</page>
 	</pages>
