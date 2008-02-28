@@ -221,6 +221,18 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_font_defaults(@doc.font) # unchanged
   end
 
+  def test_font_color
+    @widget.font_color('Orange')
+    assert_equal('Orange', @widget.font.color)
+    assert_font_defaults(@doc.font) # unchanged
+  end
+
+  def test_font_size
+    @widget.font_size(13)
+    assert_equal(13, @widget.font.size)
+    assert_font_defaults(@doc.font) # unchanged
+  end
+
   def test_width_fixed
     @page.units(:in)
     assert_nil(@widget.width)
@@ -522,6 +534,34 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_not_nil(@widget.fill)
     assert_equal('battleship', @widget.fill.id)
     assert_equal('LightSteelBlue', @widget.fill.color)
+  end
+
+  def test_rotate
+    assert_nil(@widget.rotate)
+    @widget.rotate("45")
+    assert_equal(45, @widget.rotate)
+  end
+
+  def test_origin_x
+    assert_nil(@widget.origin_x)
+    @widget.left(15)
+    @widget.width(10)
+    assert_equal(15, @widget.origin_x)
+    @widget.origin_x('center')
+    assert_equal(20, @widget.origin_x)
+    @widget.origin_x('right')
+    assert_equal(25, @widget.origin_x)
+  end
+
+  def test_origin_y
+    assert_nil(@widget.origin_y)
+    @widget.top(15)
+    @widget.height(10)
+    assert_equal(15, @widget.origin_y)
+    @widget.origin_y('middle')
+    assert_equal(20, @widget.origin_y)
+    @widget.origin_y('bottom')
+    assert_equal(25, @widget.origin_y)
   end
 end
 

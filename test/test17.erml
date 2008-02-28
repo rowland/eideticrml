@@ -1,10 +1,16 @@
 <erml>
 	<styles>
 		<font id="lbl20" name="Courier" size="20" />
+		<font id="lbl12" name="Helvetica" size="12" />
 	</styles>
-	<classes>
+	<classes url="test17.erls">
 		<table selector="label" border="solid" padding="2pt" />
-		<_ selector=".reverse" font.style="Bold" font.color="Gray" />
+		<_ selector=".reverse" font_style="Bold" font_color="White" fill="DimGray" padding="3pt,10pt" />
+		<_ selector=".rotated" rotate="270" origin_y="bottom" />
+		<!--
+			table label { border: solid; padding: 2pt }
+			.reverse { font.style: Bold; font.color: Gray }
+		-->
 	</classes>
 	<pages>
 		<page units="in" margin="1">
@@ -14,13 +20,13 @@
 				<label text_align="center">Top Center</label>
 				<label text_align="right">Top Right</label>
 				<label text_align="left">Middle Left</label>
-				<label text_align="center">Middle Center</label>
+				<label text_align="center" rotate="30" origin_x="center" origin_y="middle">Middle Center</label>
 				<label text_align="right">Middle Right</label>
 				<label text_align="left">Bottom Left</label>
 				<label text_align="center">Bottom Center</label>
 				<label text_align="right">Bottom Right</label>
 			</table>
-			<label class="reverse" x="0.3" y="1.25" angle="270" font="lbl20">Label</label>
+			<label class="reverse rotated" left="0" bottom="1.25" font="lbl20">Label</label>
 		</page>
 	</pages>
 </erml>

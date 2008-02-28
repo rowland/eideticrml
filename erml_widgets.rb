@@ -309,16 +309,18 @@ module EideticRML
       def font(value=nil)
         # inherited
         return @font || parent.font if value.nil?
-        return @font || @font = parent.font.clone if value == :copy
+        return @font || (@font = parent.font.clone) if value == :copy
         @font = font_style_for(value)
       end
 
       def font_color(value=nil)
-        # TODO
+        return font.color if value.nil?
+        font(:copy).color(value)
       end
 
       def font_size(value=nil)
-        # TODO
+        return font.size if value.nil?
+        font(:copy).size(value)
       end
 
       def font_style(value=nil)
@@ -329,9 +331,18 @@ module EideticRML
 
       def print(writer)
         return unless visible
-        paint_background(writer)
-        draw_content(writer)
-        draw_border(writer)
+        before_print(writer)
+        if @rotate.nil?
+          paint_background(writer)
+          draw_content(writer)
+          draw_border(writer)
+        else
+          writer.rotate(rotate, origin_x, origin_y) do
+            paint_background(writer)
+            draw_content(writer)
+            draw_border(writer)
+          end
+        end
       end
 
       def root
@@ -351,6 +362,37 @@ module EideticRML
       def rowspan(value=nil)
         return @rowspan || 1 if value.nil?
         @rowspan = value.to_i if value.to_i >= 1
+      end
+
+      def origin_x(value=nil)
+        if value.nil?
+          case @origin_x
+          when 'left': left
+          when 'center': (left + right).quo(2)
+          when 'right': right
+          else left
+          end
+        else
+          @origin_x = value.strip
+        end
+      end
+
+      def origin_y(value=nil)
+        if value.nil?
+          case @origin_y
+          when 'top': top
+          when 'middle': (top + bottom).quo(2)
+          when 'bottom': bottom
+          else top
+          end
+        else
+          @origin_y = value.strip
+        end
+      end
+
+      def rotate(value=nil)
+        return @rotate if value.nil?
+        @rotate = value.to_f
       end
 
     protected
@@ -373,6 +415,9 @@ module EideticRML
 
       def attributes_last
         @@attributes_last ||= %w(text).freeze
+      end
+
+      def before_print(writer)
       end
 
       def brush_style_for(id)
@@ -455,6 +500,13 @@ module EideticRML
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @y = parse_measurement_pts(value, units)
         @y = parent.height - parent.margin_bottom + @y if @y < 0
+      end
+
+    protected
+      def before_print(writer)
+        super(writer)
+        left(x - margin_left - padding_left, :pt) if left.nil?
+        top(y - margin_top - padding_top, :pt) if top.nil?
       end
     end
 
@@ -765,7 +817,14 @@ module EideticRML
       end
 
     protected
+      def before_print(writer)
+        @width ||= preferred_width(writer)
+        @height ||= preferred_height(writer)
+        super(writer)
+      end
+
       def draw_content(writer)
+        super(writer)
         options = { :angle => angle, :underline => underline }
         @y ||= content_top
         case text_align

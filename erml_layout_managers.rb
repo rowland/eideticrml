@@ -50,6 +50,7 @@ module EideticRML
           cx += widget.width + @style.hpadding
           max_y = [max_y, widget.height].max
         end
+        container.children.select { |child| child.position != :static }.each { |widget| widget.layout_widget(writer) }
       end
     end
 
@@ -158,6 +159,7 @@ module EideticRML
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
           top += (widget.height + @style.vpadding)
         end
+        relative.each { |widget| widget.layout_widget(writer) }
       end
     end
 
