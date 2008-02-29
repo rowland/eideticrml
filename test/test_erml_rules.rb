@@ -6,29 +6,29 @@
 $: << File.dirname(__FILE__) + '/../'
 require 'test/unit'
 require 'erml'
-require 'erml_klasses'
+require 'erml_rules'
 
-include EideticRML::Klasses
+include EideticRML::Rules
 
-class KlassTestCases < Test::Unit::TestCase
+class RuleTestCases < Test::Unit::TestCase
   def test_item_re_s
-    assert_equal('foo(#\\w+)?(\\.\\w+)*',                 Klass.item_re_s('foo'))
-    assert_equal('foo#bar(\\.\\w+)*',                     Klass.item_re_s('foo#bar'))
-    assert_equal('foo(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*', Klass.item_re_s('foo.bar'))
-    assert_equal('\w+#bar(\\.\\w+)*',                     Klass.item_re_s('#bar'))
-    assert_equal('\w+(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*', Klass.item_re_s('.bar'))
+    assert_equal('foo(#\\w+)?(\\.\\w+)*',                 Rule.item_re_s('foo'))
+    assert_equal('foo#bar(\\.\\w+)*',                     Rule.item_re_s('foo#bar'))
+    assert_equal('foo(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*', Rule.item_re_s('foo.bar'))
+    assert_equal('\w+#bar(\\.\\w+)*',                     Rule.item_re_s('#bar'))
+    assert_equal('\w+(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*', Rule.item_re_s('.bar'))
   end
 
   def test_group_re_s
-    assert_equal('foo#bar(\\.\\w+)*\\/foo(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*', Klass.group_re_s('foo#bar>foo.bar'))
+    assert_equal('foo#bar(\\.\\w+)*\\/foo(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*', Rule.group_re_s('foo#bar>foo.bar'))
   end
 
   def test_selector_re_s
-    assert_equal('foo#bar(\\.\\w+)*\\/([^\\/]+\\/)*foo(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*$', Klass.selector_re_s('foo#bar foo.bar'))
+    assert_equal('foo#bar(\\.\\w+)*\\/([^\\/]+\\/)*foo(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*$', Rule.selector_re_s('foo#bar foo.bar'))
   end
 
   def test_foo
-    re = Regexp.compile Klass.selector_re_s('foo')
+    re = Regexp.compile Rule.selector_re_s('foo')
     assert re =~ 'foo'
     assert re =~ 'foo#bar'
     assert re =~ 'foo.bar'
@@ -36,7 +36,7 @@ class KlassTestCases < Test::Unit::TestCase
   end
 
   def test_pound_bar
-    re = Regexp.compile Klass.selector_re_s('#bar')
+    re = Regexp.compile Rule.selector_re_s('#bar')
     assert re !~ 'foo'
     assert re =~ 'foo#bar'
     assert re !~ 'foo.bar'
@@ -44,7 +44,7 @@ class KlassTestCases < Test::Unit::TestCase
   end
 
   def test_dot_bar
-    re = Regexp.compile Klass.selector_re_s('.bar')
+    re = Regexp.compile Rule.selector_re_s('.bar')
     assert re !~ 'foo'
     assert re !~ 'foo#bar'
     assert re =~ 'foo.bar'
@@ -52,7 +52,7 @@ class KlassTestCases < Test::Unit::TestCase
   end
 
   def test_dot_baz
-    re = Regexp.compile Klass.selector_re_s('.baz')
+    re = Regexp.compile Rule.selector_re_s('.baz')
     assert re !~ 'foo'
     assert re !~ 'foo#bar'
     assert re !~ 'foo.bar'
@@ -60,7 +60,7 @@ class KlassTestCases < Test::Unit::TestCase
   end
 
   def test_direct_child
-    re = Regexp.compile Klass.selector_re_s('foo#bar>foo.bar')
+    re = Regexp.compile Rule.selector_re_s('foo#bar>foo.bar')
     assert re =~ 'foo#bar/foo.bar'
     assert re !~ 'foo.bar/foo#bar'
     assert re !~ 'foo#bar/foo#bar'
@@ -71,7 +71,7 @@ class KlassTestCases < Test::Unit::TestCase
   end
 
   def test_indirect_child
-    re = Regexp.compile Klass.selector_re_s('foo#bar foo.bar')
+    re = Regexp.compile Rule.selector_re_s('foo#bar foo.bar')
     assert re =~ 'foo#bar/foo.bar'
     assert re !~ 'foo.bar/foo#bar'
     assert re !~ 'foo#bar/foo#bar'

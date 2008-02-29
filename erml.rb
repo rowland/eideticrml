@@ -28,7 +28,7 @@ module EideticRML
     end
   end
 
-  class ClassBuilder
+  class RuleBuilder
     def initialize
     end
   end
@@ -106,9 +106,9 @@ module EideticRML
       @styles
     end
 
-    def classes(&block)
-      @classes ||= ClassBuilder.new
-      @classes.instance_eval(&block)
+    def rules(&block)
+      @rules ||= RuleBuilder.new
+      @rules.instance_eval(&block)
     end
 
     def pages(attrs={}, &block)
@@ -143,21 +143,21 @@ module EideticRML
     end
   end
 
-  class XmlClassParser
+  class XmlRuleParser
     undef_method :p
+    undef_method :rule if self.private_methods.include?('rule')
 
-    def initialize(stack, klasses)
-      @stack, @klasses = stack, klasses
-      @stack.push klasses
+    def initialize(stack, rules)
+      @stack, @rules = stack, rules
+      @stack.push rules
     end
 
     def method_missing(id, *args)
-      @stack.push @klasses.add(id, *args)
-      # @stack.push @klasses
+      @stack.push @rules.add(id, *args)
     end
 
     def text(text)
-      # no meaningful text in classes section
+      # no meaningful text in rules section
     end
   end
 
@@ -223,17 +223,17 @@ module EideticRML
     end
 
     def tag_start(name, attrs)
-      name = 'klass' if name == 'class'
-      # puts "tag start: #{name}, #{attrs.inspect}"
       if @parser.nil?
         self.send(name, attrs)
       else
         @parser.send(name, attrs)
       end
+    rescue Exception => e
+      raise ArgumentError,
+        "Error processing <%s>\n%s" % [attrs.inject(name) { |tag, (k, v)| tag << " #{k}=\"#{v}\"" }, e.message], e.backtrace
     end
 
     def tag_end(name)
-      # puts "tag end: #{name}"
       @stack.pop
       @parser = nil if @stack.empty?
     end
@@ -261,9 +261,9 @@ module EideticRML
       @parser = XmlStyleParser.new(@stack, @doc.styles)
     end
 
-    def classes(attrs)
-      # puts "classes"
-      @parser = XmlClassParser.new(@stack, @doc.classes)
+    def rules(attrs)
+      # puts "rules"
+      @parser = XmlRuleParser.new(@stack, @doc.rules)
     end
 
     def pages(attrs)
@@ -274,11 +274,15 @@ module EideticRML
   end
 end
 
-# ARGV.unshift "test/test16.erml" unless ARGV.size.nonzero?
+ARGV.unshift "test/test16.erml" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
   pdf = ARGV.shift || "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
   doc = File.open(erml) do |f|
-    EideticRML::XmlParser.parse(f)
+    begin
+      EideticRML::XmlParser.parse(f)
+    rescue Exception => e
+      puts "Error in %s: %s\n%s" % [erml, e.message, e.backtrace.join("\n")]
+    end
   end
   File.open(pdf, 'w') { |f| f.write(doc) }
   `open #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)

@@ -52,7 +52,11 @@ task :ermls do
   Dir["test/*.erml"].each do |erml|
     pdf = "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
     doc = File.open(erml) do |f|
-      EideticRML::XmlParser.parse(f)
+      begin
+        EideticRML::XmlParser.parse(f)
+      rescue Exception => e
+        puts "Error in %s: %s\n%s" % [erml, e.message, e.backtrace.join("\n")]
+      end
     end
     File.open(pdf, 'w') { |f| f.write(doc) }
     `open #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)

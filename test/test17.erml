@@ -3,7 +3,7 @@
 		<font id="lbl20" name="Courier" size="20" />
 		<font id="lbl12" name="Helvetica" size="12" />
 	</styles>
-	<classes url="test17.erls">
+	<rules url="test17.erls">
 		<table selector="label" border="solid" padding="2pt" />
 		<_ selector=".reverse" font_style="Bold" font_color="White" fill="DimGray" padding="3pt,10pt" />
 		<_ selector=".rotated" rotate="270" origin_y="bottom" />
@@ -11,7 +11,7 @@
 			table label { border: solid; padding: 2pt }
 			.reverse { font.style: Bold; font.color: Gray }
 		-->
-	</classes>
+	</rules>
 	<pages>
 		<page units="in" margin="1">
 			<label underline="true">Labels</label>

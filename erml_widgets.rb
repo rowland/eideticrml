@@ -5,7 +5,7 @@
 
 require 'erml_support'
 require 'erml_styles'
-require 'erml_klasses'
+require 'erml_rules'
 require 'singleton'
 require 'erml_widget_factories'
 
@@ -64,7 +64,7 @@ module EideticRML
         @klass = $1.freeze if value.to_s =~ /^\s*(\w+(\s+\w+)*)\s*$/
         @path = nil
         return if parent.nil?
-        root.classes.matching(path).each { |klass| attributes(klass.attrs) }
+        root.rules.matching(path).each { |rule| attributes(rule.attrs) }
       end
 
       def selector_tag
@@ -1313,8 +1313,8 @@ module EideticRML
         init_default_styles
       end
 
-      def classes
-        @klasses ||= Klasses::KlassCollection.new
+      def rules
+        @rules ||= Rules::RuleCollection.new
       end
 
       def page_style(value=nil)

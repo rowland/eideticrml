@@ -4,20 +4,20 @@
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
 module EideticRML
-  module Klasses
-    class Klass
+  module Rules
+    class Rule
       attr_reader :parent
       attr_reader :selector
       attr_reader :attrs
 
-      def initialize(klasses, selector, attrs={}, parent=nil)
-        @klasses, @parent = klasses, parent
+      def initialize(rules, selector, attrs={}, parent=nil)
+        @rules, @parent = rules, parent
         @selector = parent.nil? ? selector : parent.selector.dup << ' ' << selector
         @attrs = attrs.dup
       end
 
-      def klass(tag, attrs={})
-        @klasses << Klass.new(@klasses, Klass.selector_for(tag.to_s, attrs.delete('selector')), attrs, self)
+      def rule(tag, attrs={})
+        @rules << Rule.new(@rules, Rule.selector_for(tag.to_s, attrs.delete('selector')), attrs, self)
         self
       end
 
@@ -26,7 +26,7 @@ module EideticRML
       end
 
       def self.selector_for(tag, selector)
-        tag = '' if tag =~ /^(_|[ck]lass)$/
+        tag = '' if tag =~ /^(_|rule)$/
         sel = tag.gsub(/^_(\w)/,'#\1')
         sel << ' ' if selector =~ /^\w/
         # sel << ' ' << selector unless selector.nil?
@@ -49,11 +49,11 @@ module EideticRML
       SPACE_RE = GT_RE + '([^\\/]+\\/)*'
       TAG_RE = '\\w+'
       ID_RE = '(#\\w+)?'
-      MISC_KLASS_RE = '(\\.\\w+)*'
-      SPEC_KLASS_RE = '(\\.\\w+)*\\.%s(\\.\\w+)*'
+      MISC_CLASS_RE = '(\\.\\w+)*'
+      SPEC_CLASS_RE = '(\\.\\w+)*\\.%s(\\.\\w+)*'
 
       def selector_re
-        @selector_re ||= Regexp.compile(Klass.selector_re_s(@selector))
+        @selector_re ||= Regexp.compile(Rule.selector_re_s(@selector))
       end
 
       def self.selector_re_s(selector)
@@ -74,33 +74,33 @@ module EideticRML
           t << ID_RE
         end
         if k.nil? or k.empty?
-          k = MISC_KLASS_RE
+          k = MISC_CLASS_RE
         else
-          k = SPEC_KLASS_RE % k
+          k = SPEC_CLASS_RE % k
         end
         t + k
       end
     end
 
-    class KlassCollection < Array
+    class RuleCollection < Array
       def add(tag, attrs={})
-        selector = Klass.selector_for(tag.to_s, attrs.delete('selector'))
-        klass = for_selector(selector)
-        if klass.nil?
-          klass = Klass.new(self, selector, attrs)
-          self << klass
+        selector = Rule.selector_for(tag.to_s, attrs.delete('selector'))
+        rule = for_selector(selector)
+        if rule.nil?
+          rule = Rule.new(self, selector, attrs)
+          self << rule
         else
-          klass.update(attrs)
+          rule.update(attrs)
         end
-        klass
+        rule
       end
 
       def for_selector(selector)
-        find { |klass| klass.selector == selector }
+        find { |rule| rule.selector == selector }
       end
 
       def matching(path)
-        select { |klass| klass === path }
+        select { |rule| rule === path }
       end
     end
   end

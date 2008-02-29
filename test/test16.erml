@@ -7,15 +7,15 @@
 		<layout id="flow" padding="10" />
 		<layout id="hbox" padding="10" />
 	</styles>
-	<classes>
+	<rules>
 		<p selector=".hi" font="helv12" border="blue_dash" padding="5pt" />
 		<p selector=".lo" font="co14" border="gray_dot" padding="5pt" />
-		<class selector=".hi em" font.color="BlueViolet" />
-		<class selector=".lo em" font.color="Maroon" />
 		<_howdy selector="em" underline="true" />
 		<_howdy selector=">strong" underline="true" />
 		<_howdy selector="p" text_align="justify" />
-	</classes>
+		<rule selector=".hi em" font.color="BlueViolet" />
+		<rule selector=".lo em" font.color="Maroon" />
+	</rules>
 	<pages>
 		<define id="em" tag="span" font.style="Bold" />
 		<define id="strong" tag="span" font.style="Bold" />
