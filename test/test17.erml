@@ -3,13 +3,7 @@
 		<font id="lbl20" name="Courier" size="20" />
 		<font id="lbl12" name="Helvetica" size="12" />
 	</styles>
-	<rules url="test17.erls">
-		<!--
-			table label { border: solid; padding: 2pt }
-			.reverse { font.style: Bold; font.color: White; fill: DimGray; padding: 3pt, 10pt }
-			.rotated { rotate: 270; origin_y: bottom; }
-		-->
-	</rules>
+	<rules url="test/test17.erls" />
 	<pages>
 		<page units="in" margin="1">
 			<label underline="true">Labels</label>
@@ -18,7 +12,7 @@
 				<label text_align="center">Top Center</label>
 				<label text_align="right">Top Right</label>
 				<label text_align="left">Middle Left</label>
-				<label text_align="center" rotate="30" origin_x="center" origin_y="middle">Middle Center</label>
+				<label text_align="center" class="trouble">Middle Center</label>
 				<label text_align="right">Middle Right</label>
 				<label text_align="left">Bottom Left</label>
 				<label text_align="center">Bottom Center</label>

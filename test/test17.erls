@@ -1,0 +1,5 @@
+table { border-bottom: solid; padding-bottom: 0.3 }
+table label { border: solid; padding: 3pt }
+.reverse { font.style: Bold; font.color: White; fill: DimGray; padding: 3pt, 10pt }
+.rotated { rotate: 270; origin-y: bottom; }
+.trouble { rotate: 30; origin-x: center; origin-y: middle; fill: White }

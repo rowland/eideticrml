@@ -16,25 +16,25 @@ module EideticRML
         @attrs = attrs.dup
       end
 
-      def rule(tag, attrs={})
-        @rules << Rule.new(@rules, Rule.selector_for(tag.to_s, attrs.delete('selector')), attrs, self)
-        self
-      end
+      # def rule(tag, attrs={})
+      #   @rules << Rule.new(@rules, Rule.selector_for(tag.to_s, attrs.delete('selector')), attrs, self)
+      #   self
+      # end
 
       def root
         parent.nil? ? self : parent.root
       end
 
-      def self.selector_for(tag, selector)
-        tag = '' if tag =~ /^(_|rule)$/
-        sel = tag.gsub(/^_(\w)/,'#\1')
-        sel << ' ' if selector =~ /^\w/
-        # sel << ' ' << selector unless selector.nil?
-        sel << selector unless selector.nil?
-        sel.gsub!(/\s{2,}/,' ') # collapse whitespace
-        sel.gsub!(/\s*>\s*/,'>') # strip whitespace from right angle brackets
-        sel
-      end
+      # def self.selector_for(tag, selector)
+      #   tag = '' if tag =~ /^(_|rule)$/
+      #   sel = tag.gsub(/^_(\w)/,'#\1')
+      #   sel << ' ' if selector =~ /^\w/
+      #   # sel << ' ' << selector unless selector.nil?
+      #   sel << selector unless selector.nil?
+      #   sel.gsub!(/\s{2,}/,' ') # collapse whitespace
+      #   sel.gsub!(/\s*>\s*/,'>') # strip whitespace from right angle brackets
+      #   sel
+      # end
 
       def update(attrs)
         @attrs.update(attrs)
@@ -86,7 +86,7 @@ module EideticRML
           selector.strip!
           selector.gsub!(/\s{2,}/,' ') # collapse whitespace
           selector.gsub!(/\s*>\s*/,'>') # strip whitespace from right angle brackets
-          attrs = rule.scan(/\s*([^:]+)\s*:\s*([^;]+)\s*;?/).inject({}) { |attrs, (k, v)| attrs[k] = v.strip; attrs }
+          attrs = rule.scan(/\s*([^:]+)\s*:\s*([^;]+)\s*;?/).inject({}) { |attrs, (k, v)| attrs[k.gsub('-', '_')] = v.strip; attrs }
           [selector, attrs]
         end
       end

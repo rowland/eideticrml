@@ -277,6 +277,10 @@ module EideticRML
     def rules(attrs)
       # puts "rules"
       @parser = XmlRuleParser.new(@stack, @doc.rules)
+      if url = attrs['url']
+        text = open(url) { |f| f.read }
+        @parser.comment(text)
+      end
     end
 
     def pages(attrs)
@@ -287,7 +291,7 @@ module EideticRML
   end
 end
 
-ARGV.unshift "test/test16.erml" unless ARGV.size.nonzero?
+ARGV.unshift "test/test17.erml" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
   pdf = ARGV.shift || "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
   doc = File.open(erml) do |f|

@@ -92,10 +92,14 @@ class RuleTestCases < Test::Unit::TestCase
     rules_text = <<-END
   		table label { border: solid; padding: 2pt }
   		.reverse { font.style: Bold; font.color: Gray; }
+      .rotated { rotate: 270; origin-y: bottom; }
+      .trouble { rotate: 30; origin-x: center; origin-y: middle; fill: White }
     END
     expected = [
       ["table label", {"border"=>"solid", "padding"=>"2pt"}],
-      [".reverse", {"font.style"=>"Bold", "font.color"=>"Gray"}]
+      [".reverse", {"font.style"=>"Bold", "font.color"=>"Gray"}],
+      [".rotated", {"rotate"=>"270", "origin_y"=>"bottom"}],
+      [".trouble", {"rotate"=>"30", "origin_x"=>"center", "origin_y"=>"middle", "fill"=>"White"}]
     ]
     assert_equal(expected, Rule.parse(rules_text))
   end
