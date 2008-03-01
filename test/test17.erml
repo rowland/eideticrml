@@ -4,12 +4,10 @@
 		<font id="lbl12" name="Helvetica" size="12" />
 	</styles>
 	<rules url="test17.erls">
-		<table selector="label" border="solid" padding="2pt" />
-		<_ selector=".reverse" font_style="Bold" font_color="White" fill="DimGray" padding="3pt,10pt" />
-		<_ selector=".rotated" rotate="270" origin_y="bottom" />
 		<!--
 			table label { border: solid; padding: 2pt }
-			.reverse { font.style: Bold; font.color: Gray }
+			.reverse { font.style: Bold; font.color: White; fill: DimGray; padding: 3pt, 10pt }
+			.rotated { rotate: 270; origin_y: bottom; }
 		-->
 	</rules>
 	<pages>

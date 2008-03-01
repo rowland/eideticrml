@@ -152,6 +152,11 @@ module EideticRML
       @stack.push rules
     end
 
+    def comment(text)
+      # puts "rule comment: #{text}"
+      Rules::Rule.parse(text).each { |rule| @rules.add(rule[0], rule[1]) }
+    end
+
     def method_missing(id, *args)
       @stack.push @rules.add(id, *args)
     end
@@ -172,6 +177,7 @@ module EideticRML
     end
 
     def method_missing(id, *args)
+      # puts "page method_missing: #{id}"
       if current.respond_to?(id)
         current.send(id, *args)
         @stack.push(current)
@@ -222,7 +228,13 @@ module EideticRML
       parser.doc
     end
 
+    def comment(text)
+      # puts "base comment: #{text}"
+      @parser.comment(text) if @parser.respond_to?(:comment)
+    end
+
     def tag_start(name, attrs)
+      # puts "tag_start: #{name}"
       if @parser.nil?
         self.send(name, attrs)
       else
@@ -234,6 +246,7 @@ module EideticRML
     end
 
     def tag_end(name)
+      # puts "tag_end: #{name}"
       @stack.pop
       @parser = nil if @stack.empty?
     end

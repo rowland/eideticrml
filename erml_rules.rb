@@ -80,11 +80,20 @@ module EideticRML
         end
         t + k
       end
+
+      def self.parse(text)
+        text.scan(/\s*([^\{]+)\s*\{([^\}]+)\}/).map do |selector, rule|
+          selector.strip!
+          selector.gsub!(/\s{2,}/,' ') # collapse whitespace
+          selector.gsub!(/\s*>\s*/,'>') # strip whitespace from right angle brackets
+          attrs = rule.scan(/\s*([^:]+)\s*:\s*([^;]+)\s*;?/).inject({}) { |attrs, (k, v)| attrs[k] = v.strip; attrs }
+          [selector, attrs]
+        end
+      end
     end
 
     class RuleCollection < Array
-      def add(tag, attrs={})
-        selector = Rule.selector_for(tag.to_s, attrs.delete('selector'))
+      def add(selector, attrs={})
         rule = for_selector(selector)
         if rule.nil?
           rule = Rule.new(self, selector, attrs)

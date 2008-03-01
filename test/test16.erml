@@ -8,13 +8,15 @@
 		<layout id="hbox" padding="10" />
 	</styles>
 	<rules>
-		<p selector=".hi" font="helv12" border="blue_dash" padding="5pt" />
-		<p selector=".lo" font="co14" border="gray_dot" padding="5pt" />
-		<_howdy selector="em" underline="true" />
-		<_howdy selector=">strong" underline="true" />
-		<_howdy selector="p" text_align="justify" />
-		<rule selector=".hi em" font.color="BlueViolet" />
-		<rule selector=".lo em" font.color="Maroon" />
+		<!--
+			p.hi { font: helv12; border: blue_dash; padding: 5pt; }
+			p.lo { font: co14; border: gray_dot; padding: 5pt; }
+			#howdy em { underline: true }
+			#howdy>strong { underline: true }
+			#howdy p { text_align: justify }
+			.hi em { font.color: BlueViolet }
+			.lo em { font.color: Maroon }
+		-->
 	</rules>
 	<pages>
 		<define id="em" tag="span" font.style="Bold" />

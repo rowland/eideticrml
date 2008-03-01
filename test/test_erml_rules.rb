@@ -87,4 +87,16 @@ class RuleTestCases < Test::Unit::TestCase
     assert re =~ 'foo#bar.baz/#b/foo.bar.baz'
     assert re =~ 'foo#bar.baz/.c/foo.bar.baz'
   end
+
+  def test_parse
+    rules_text = <<-END
+  		table label { border: solid; padding: 2pt }
+  		.reverse { font.style: Bold; font.color: Gray; }
+    END
+    expected = [
+      ["table label", {"border"=>"solid", "padding"=>"2pt"}],
+      [".reverse", {"font.style"=>"Bold", "font.color"=>"Gray"}]
+    ]
+    assert_equal(expected, Rule.parse(rules_text))
+  end
 end
