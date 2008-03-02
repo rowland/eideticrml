@@ -15,7 +15,8 @@ module EideticRML
     { 'id' => 'hbox', 'tag' => 'div', 'layout' => 'hbox' }.freeze,
     { 'id' => 'vbox', 'tag' => 'div', 'layout' => 'vbox' }.freeze,
     { 'id' => 'table', 'tag' => 'div', 'layout' => 'table' }.freeze,
-    { 'id' => 'layer', 'tag' => 'div', 'position' => 'relative', 'width' => '100%', 'height' => '100%' }.freeze
+    { 'id' => 'layer', 'tag' => 'div', 'position' => 'relative', 'width' => '100%', 'height' => '100%' }.freeze,
+    { 'id' => 'br', 'tag' => 'label' }.freeze
   ]
 
   class StyleBuilder
@@ -291,7 +292,7 @@ module EideticRML
   end
 end
 
-ARGV.unshift "test/test17.erml" unless ARGV.size.nonzero?
+ARGV.unshift "test/test18.erml" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
   pdf = ARGV.shift || "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
   doc = File.open(erml) do |f|

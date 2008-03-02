@@ -1,0 +1,16 @@
+<erml>
+	<pages>
+		<page units="in" margin="1" layout="vbox">
+			<label underline="true">Preformatted Text</label>
+			<br />
+			<pre border="Gray" padding="5pt">
+The quick red fox
+jumps over the lazy
+brown dog.
+The quick red fox
+jumps over the lazy
+brown dog.
+			</pre>
+		</page>
+	</pages>
+</erml>

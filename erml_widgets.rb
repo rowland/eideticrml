@@ -847,6 +847,48 @@ module EideticRML
       end
     end
 
+    class PreformattedText < Widget
+      StdWidgetFactory.instance.register_widget('pre', self)
+
+      def initialize(parent, attrs={})
+        super(parent, attrs)
+        @lines = []
+        font('fixed') if @font.nil?
+      end
+
+      def text(value=nil)
+        return @lines if value.nil?
+        value.lstrip! if @lines.empty?
+        @lines.concat(value.split("\n")) unless value.empty?
+      end
+
+      def layout_widget(writer)
+        super(writer)
+        @lines.pop while @lines.last.strip.empty?
+        @height ||= preferred_height(writer)
+      end
+
+      def preferred_width(writer, units=:pt)
+        font.apply(writer)
+        @preferred_width = @width || @lines.map { |line| writer.width(line) }.max + non_content_width
+        to_units(units, @preferred_width)
+      end
+
+      def preferred_height(writer, units=:pt)
+        font.apply(writer)
+        @preferred_height = writer.height(@lines) + non_content_height - (writer.height - writer.height.quo(writer.line_height))
+        to_units(units, @preferred_height)
+      end
+
+    protected
+      def draw_content(writer)
+        raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
+        font.apply(writer)
+        writer.indent(content_left, true)
+        writer.puts_xy(content_left, content_top, @lines)
+      end
+    end
+
     class Container < Widget
       StdWidgetFactory.instance.register_widget('div', self)
 
@@ -1071,8 +1113,7 @@ module EideticRML
           options[:bullet] = bullet.id unless bullet.nil?
         end
         pen_style_for('solid').apply(writer)
-        # puts "paragraph_xy(#{left}, #{top}, options: #{options.inspect}"
-        raise "left & top must be set #{text.inspect}" if [left, top].any? { |value| value.nil? }
+        raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
         writer.paragraph_xy(content_left, content_top, rich_text(writer), options)
       end
 
@@ -1365,6 +1406,7 @@ module EideticRML
         styles.add('pen', :id => 'solid',  :pattern => 'solid',  :color => 'Black')
         styles.add('pen', :id => 'dotted', :pattern => 'dotted', :color => 'Black')
         styles.add('pen', :id => 'dashed', :pattern => 'dashed', :color => 'Black')
+        styles.add('font', :id => 'fixed', :name => 'Courier', :size => 10)
       end
     end
   end
