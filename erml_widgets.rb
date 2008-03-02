@@ -851,8 +851,8 @@ module EideticRML
       StdWidgetFactory.instance.register_widget('pre', self)
 
       def initialize(parent, attrs={})
-        super(parent, attrs)
         @lines = []
+        super(parent, attrs)
         font('fixed') if @font.nil?
       end
 
@@ -880,12 +880,24 @@ module EideticRML
         to_units(units, @preferred_height)
       end
 
+      def url(value=nil)
+        return @url if value.nil?
+        @url = value
+        text(text_for(@url))
+      end
+
     protected
       def draw_content(writer)
         raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
         font.apply(writer)
         writer.indent(content_left, true)
         writer.puts_xy(content_left, content_top, @lines)
+      end
+
+      def text_for(url)
+        open(url) { |f| f.read }
+      rescue Exception => e
+        raise ArgumentError, "Error opening #{url}", e.backtrace
       end
     end
 
