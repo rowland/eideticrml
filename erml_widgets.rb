@@ -395,6 +395,11 @@ module EideticRML
         @rotate = value.to_f
       end
 
+      def z_index(value=nil)
+        return @z_index || 0 if value.nil?
+        @z_index = value.to_i
+      end
+
     protected
       def attribute(id, value)
         keys = id.to_s.split('.', 2)
@@ -953,7 +958,7 @@ module EideticRML
     protected
       def draw_content(writer)
         super(writer)
-        children.each { |child| child.print(writer) }
+        children.sort { |a, b| a.z_index <=> b.z_index }.each { |child| child.print(writer) }
       end
 
       def layout_style_for(id)
