@@ -890,7 +890,6 @@ module EideticRML
       def draw_content(writer)
         raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
         font.apply(writer)
-        writer.indent(content_left, true)
         writer.puts_xy(content_left, content_top, @lines)
       end
 
