@@ -9,8 +9,8 @@ doc = EideticRML::Builder.new do
     pen :id => 'red_dash',  :color => 'Red',  :width => 2, :pattern => 'dashed'
   end
   pages do
-		define :i,   :span, 'font.style' => "Oblique"
-		define :bi,  :span, 'font.style' => "BoldOblique"
+		define :i,   :span, 'font.style' => "Italic"
+		define :bi,  :span, 'font.weight' => "Bold", 'font.style' => "Italic"
 		define :red, :span, 'font.color' => "Red"
     page :units => 'in', :margin => 1 do
       p :underline => true, :text => "Rich Text"

@@ -216,8 +216,8 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def test_font_style
-    @widget.font_style('Bold')
-    assert_equal('Bold', @widget.font.style)
+    @widget.font_style('Italic')
+    assert_equal('Italic', @widget.font.style)
     assert_font_defaults(@doc.font) # unchanged
   end
 
@@ -230,6 +230,12 @@ class WidgetTestCases < Test::Unit::TestCase
   def test_font_size
     @widget.font_size(13)
     assert_equal(13, @widget.font.size)
+    assert_font_defaults(@doc.font) # unchanged
+  end
+
+  def test_font_weight
+    @widget.font_weight('Bold')
+    assert_equal('Bold', @widget.font_weight)
     assert_font_defaults(@doc.font) # unchanged
   end
 

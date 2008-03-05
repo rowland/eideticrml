@@ -113,7 +113,7 @@ module EideticRML
       include HasColor
 
       def apply(writer)
-        writer.font(name, size, :style => style, :color => color, :encoding => encoding, :sub_type => sub_type)
+        writer.font(name, size, :style => style, :weight => weight, :color => color, :encoding => encoding, :sub_type => sub_type)
       end
 
       def name(value=nil)
@@ -149,6 +149,11 @@ module EideticRML
       def underline(value=nil)
         return @underline if value.nil?
         @underline = (value == true) || (value == 'true')
+      end
+
+      def weight(value=nil)
+        return @weight if value.nil?
+        @weight = value
       end
     end
 

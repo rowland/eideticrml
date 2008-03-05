@@ -148,16 +148,16 @@ class FontStyleTestCases < Test::Unit::TestCase
 
   def test_style
     assert_equal('', @font_style.style)
-    @font_style.style 'Bold'
-    assert_equal('Bold', @font_style.style)
+    @font_style.style 'Italic'
+    assert_equal('Italic', @font_style.style)
   end
-  
+
   def test_encoding
     assert_equal('WinAnsiEncoding', @font_style.encoding)
     @font_style.encoding 'StandardEncoding'
     assert_equal('StandardEncoding', @font_style.encoding)
   end
-  
+
   def test_sub_type
     assert_equal('Type1', @font_style.sub_type)
     @font_style.sub_type 'TrueType'
@@ -174,6 +174,12 @@ class FontStyleTestCases < Test::Unit::TestCase
     assert(@font_style.underline)
     @font_style.underline("false")
     assert(!@font_style.underline)
+  end
+
+  def test_weight
+    assert_nil(@font_style.weight)
+    @font_style.weight('Bold')
+    assert_equal('Bold', @font_style.weight)
   end
 end
 

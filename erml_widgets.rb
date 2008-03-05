@@ -329,6 +329,12 @@ module EideticRML
         @font.style(value)
       end
 
+      def font_weight(value=nil)
+        return font.weight if value.nil?
+        @font = font.clone
+        @font.weight(value)
+      end
+
       def print(writer)
         return unless visible
         before_print(writer)
