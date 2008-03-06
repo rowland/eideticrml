@@ -292,10 +292,23 @@ module EideticRML
   end
 end
 
-ARGV.unshift "test/test18.erml" unless ARGV.size.nonzero?
+def open_erml(erml, &block)
+  if erml =~ /\.erb$/
+    require 'erb'
+    require 'stringio'
+    source = open(erml) { |f| f.read }
+    result = ERB.new(source).result
+    sio = StringIO.new(result)
+    yield(sio)
+  else
+    File.open(erml, &block)
+  end
+end
+
+ARGV.unshift "test/test19.erml.erb" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
-  pdf = ARGV.shift || "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
-  doc = File.open(erml) do |f|
+  pdf = erml.sub(/\.erml(\.erb)?$/, '') << '.pdf'
+  doc = open_erml(erml) do |f|
     begin
       EideticRML::XmlParser.parse(f)
     rescue Exception => e

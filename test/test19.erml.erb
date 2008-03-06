@@ -1,0 +1,26 @@
+<erml>
+	<styles>
+		<layout id="table" padding="0" />
+		<pen id="solid" color="Gray" />
+	</styles>
+	<rules>
+		<!--
+			td { border: solid; padding: 3pt; }
+		-->
+	</rules>
+	<pages>
+		<define id="td" tag="p" text_align="right" />
+		<page units="in" margin="1" layout="vbox">
+			<hbox>
+				<label underline="true">ERB Table</label>
+				<label text_align="right"><%= Time.now.strftime('%Y.%m.%d %H:%M:%S') %></label>
+			</hbox>
+			<br />
+			<table order="cols" rows="25">
+				<% 1.upto(100) do |i| %>
+				<td><%= i %></td>
+				<% end %>
+			</table>
+		</page>
+	</pages>
+</erml>
