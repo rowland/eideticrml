@@ -300,14 +300,21 @@ def open_erml(erml, &block)
     result = ERB.new(source).result
     sio = StringIO.new(result)
     yield(sio)
+  elsif erml =~ /\.haml$/
+    require 'haml'
+    require 'stringio'
+    source = open(erml) { |f| f.read }
+    result = Haml::Engine.new(source).render
+    sio = StringIO.new(result)
+    yield(sio)
   else
     File.open(erml, &block)
   end
 end
 
-ARGV.unshift "test/test19.erml.erb" unless ARGV.size.nonzero?
+ARGV.unshift "test/test20.erml.haml" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
-  pdf = erml.sub(/\.erml(\.erb)?$/, '') << '.pdf'
+  pdf = erml.sub(/\.erml(\.erb|\.haml)?$/, '') << '.pdf'
   doc = open_erml(erml) do |f|
     begin
       EideticRML::XmlParser.parse(f)
