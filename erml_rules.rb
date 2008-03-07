@@ -16,25 +16,9 @@ module EideticRML
         @attrs = attrs.dup
       end
 
-      # def rule(tag, attrs={})
-      #   @rules << Rule.new(@rules, Rule.selector_for(tag.to_s, attrs.delete('selector')), attrs, self)
-      #   self
-      # end
-
       def root
         parent.nil? ? self : parent.root
       end
-
-      # def self.selector_for(tag, selector)
-      #   tag = '' if tag =~ /^(_|rule)$/
-      #   sel = tag.gsub(/^_(\w)/,'#\1')
-      #   sel << ' ' if selector =~ /^\w/
-      #   # sel << ' ' << selector unless selector.nil?
-      #   sel << selector unless selector.nil?
-      #   sel.gsub!(/\s{2,}/,' ') # collapse whitespace
-      #   sel.gsub!(/\s*>\s*/,'>') # strip whitespace from right angle brackets
-      #   sel
-      # end
 
       def update(attrs)
         @attrs.update(attrs)
