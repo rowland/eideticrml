@@ -64,7 +64,7 @@ module EideticRML
         @klass = $1.freeze if value.to_s =~ /^\s*(\w+(\s+\w+)*)\s*$/
         @path = nil
         return if parent.nil?
-        root.rules.matching(path).each { |rule| attributes(rule.attrs) }
+        attributes(root.rules.matching(path).inject({}) { |attrs, rule| attrs.update(rule.attrs) })
       end
 
       def selector_tag
