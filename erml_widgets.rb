@@ -79,7 +79,7 @@ module EideticRML
       end
 
       def left(value=nil, units=nil)
-        return @left || (@right.nil? ? nil : @right - width) if value.nil?
+        return shifted_x(@left || ((@right.nil? or width.nil?) ? nil : @right - width)) if value.nil?
         return to_units(value, left) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @left = parse_measurement_pts(value, units || self.units)
@@ -87,7 +87,7 @@ module EideticRML
       end
 
       def top(value=nil, units=nil)
-        return @top || (@bottom.nil? ? nil : @bottom - height) if value.nil?
+        return shifted_y(@top || ((@bottom.nil? or height.nil?) ? nil : (@bottom - height))) if value.nil?
         return to_units(value, top) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @top = parse_measurement_pts(value, units || self.units)
@@ -95,7 +95,7 @@ module EideticRML
       end
 
       def right(value=nil, units=nil)
-        return @right || (@left.nil? ? nil : @left + width) if value.nil?
+        return shifted_x(@right || ((@left.nil? or width.nil?) ? nil : @left + width)) if value.nil?
         return to_units(value, right) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @right = parse_measurement_pts(value, units || self.units)
@@ -103,11 +103,17 @@ module EideticRML
       end
 
       def bottom(value=nil, units=nil)
-        return @bottom || (@top.nil? ? nil : @top + height) if value.nil?
+        return shifted_y(@bottom || ((@top.nil? or height.nil?) ? nil : @top + height)) if value.nil?
         return to_units(value, bottom) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @bottom = parse_measurement_pts(value, units || self.units)
         @bottom = parent.height + @bottom if @bottom < 0
+      end
+
+      def shift(value=nil, units=nil)
+        return [shift_x(units || :pt), shift_y(units || :pt)] if value.nil?
+        x, y = value.to_s.split(',', 2)
+        @shift_x, @shift_y = parse_measurement_pts(x, units || self.units), parse_measurement_pts(y, units || self.units)
       end
 
       def preferred_width(writer, units=:pt)
@@ -349,6 +355,8 @@ module EideticRML
             draw_border(writer)
           end
         end
+      rescue Exception => e
+        raise RuntimeError, e.message + "\nError printing #{path}.", e.backtrace
       end
 
       def root
@@ -417,7 +425,7 @@ module EideticRML
       end
 
       def attributes_first
-        @@attributes_first ||= %w(id tag class units 
+        @@attributes_first ||= %w(id tag class units position 
           left top width height right bottom 
           margin margin_top margin_right margin_bottom margin_left 
           padding padding_top padding_right padding_bottom padding_left 
@@ -494,6 +502,22 @@ module EideticRML
         raise ArgumentError, "Pen Style #{id} not found." unless ps.is_a?(Styles::PenStyle)
         ps
       end
+
+      def shift_x(units=:pt)
+        to_units(units, @shift_x || 0)
+      end
+
+      def shift_y(units=:pt)
+        to_units(units, @shift_y || 0)
+      end
+
+      def shifted_x(value)
+        value.nil? ? nil : shift_x + value
+      end
+
+      def shifted_y(value)
+        value.nil? ? nil : shift_y + value
+      end
     end
 
     module HasLocation
@@ -511,13 +535,6 @@ module EideticRML
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @y = parse_measurement_pts(value, units)
         @y = parent.height - parent.margin_bottom + @y if @y < 0
-      end
-
-    protected
-      def before_print(writer)
-        super(writer)
-        left(x - margin_left - padding_left, :pt) if left.nil?
-        top(y - margin_top - padding_top, :pt) if top.nil?
       end
     end
 
@@ -989,7 +1006,16 @@ module EideticRML
         # TODO
       end
 
-      def r(value=nil)
+      def preferred_height(writer, units=:pt)
+        if @height.nil? and @width
+          h = @width
+        else
+          h = preferred_width(writer)
+        end
+        to_units(units, h)
+      end
+
+      def r(value=nil, units=nil)
         return @r if value.nil?
         return to_units(value, @r) if value.is_a?(Symbol)
         @r = parse_measurement_pts(value, units || self.units)
@@ -1003,17 +1029,21 @@ module EideticRML
       end
 
     protected
-      def draw_content(writer)
+      def before_print(writer)
         @x ||= (content_left + content_right).quo(2)
         @y ||= (content_top + content_bottom).quo(2)
         @r ||= [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min
+        super(writer)
+      end
+
+      def draw_content(writer)
         options = {}
         options[:border] = !!@border
         options[:fill] = !!@fill
         @border.apply(writer) unless @border.nil?
         @fill.apply(writer) unless @fill.nil?
         x_offset, y_offset = (position == :relative) ? [parent.content_left, parent.content_top] : [0, 0]
-        writer.circle(@x + x_offset, @y + y_offset, @r, options)
+        writer.circle(@x + x_offset, @y + y_offset, r, options)
         super(writer)
       end
     end
@@ -1225,9 +1255,9 @@ module EideticRML
         @corners = value.map { |n| parse_measurement_pts(n, units) } if [1,2,4,8].include?(value.size)
       end
 
-      def path(value=nil)
-        # TODO
-      end
+      # def path(value=nil)
+      #   # TODO
+      # end
 
       def reverse(value=nil)
         # TODO

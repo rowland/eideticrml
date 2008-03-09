@@ -50,6 +50,7 @@ desc "Render test erml files to pdf."
 task :ermls do
   require 'erml'
   Dir["test/*.erml"].each do |erml|
+    puts erml
     pdf = "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
     doc = File.open(erml) do |f|
       begin

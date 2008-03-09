@@ -1,0 +1,47 @@
+<erml>
+  <styles>
+    <layout id="table" padding="0.5in" />
+  </styles>
+  <rules>
+    <!--
+      rect { width: 2.5; height: 1.5; border: Black }
+      rect.green { fill: MediumSeaGreen }
+      rect.gold { fill: Gold }
+      .relative { position: relative; width: 100%; height: 100%; }
+      circle { border: Black; width: 1 }
+      circle.red { fill: Crimson }
+      circle.gold { fill: Gold }
+    -->
+  </rules>
+	<pages>
+		<page units="in" layout="absolute">
+			<label underline="true" left="1" top="1">Preformatted Text</label>
+			<rect class="green" left="1" top="1.5" />
+			<rect class="gold" left="1" top="1.5" shift="0.25,0.25" z_index="-1" />
+			<div left="1" top="4" width="5" height="5">
+  			<table cols="3" class="relative">
+  			  <circle class="red" />
+  			  <circle class="red" />
+  			  <circle class="red" />
+  			  <circle class="red" />
+  			  <circle class="red" />
+  			  <circle class="red" />
+  			  <circle class="red" />
+  			  <circle class="red" />
+  			  <circle class="red" />
+  		  </table>
+  			<table cols="3" class="relative" shift="0.1,0.1" z_index="-1">
+  			  <circle class="gold" />
+  			  <circle class="gold" />
+  			  <circle class="gold" />
+  			  <circle class="gold" />
+  			  <circle class="gold" />
+  			  <circle class="gold" />
+  			  <circle class="gold" />
+  			  <circle class="gold" />
+  			  <circle class="gold" />
+  		  </table>
+  	  </div>
+		</page>
+	</pages>
+</erml>
