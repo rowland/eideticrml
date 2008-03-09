@@ -1,7 +1,6 @@
 <erml>
 	<styles>
 		<font id="lbl20" name="Courier" size="20" />
-		<font id="lbl12" name="Helvetica" size="12" />
 	</styles>
 	<rules url="test/test17.erls" />
 	<pages>
