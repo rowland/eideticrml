@@ -89,6 +89,12 @@ module EideticRML
         writer.line_color(color)
         writer.line_width([width, 1].max, units)
         writer.line_dash_pattern(pattern)
+        writer.line_cap_style(cap)
+      end
+
+      def cap(value=nil)
+        return @cap || :butt_cap if value.nil?
+        @cap = value.to_sym if EideticPDF::LINE_CAP_STYLES.include?(value.to_sym)
       end
 
       def pattern(value=nil)

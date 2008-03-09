@@ -6,9 +6,9 @@
 		<pen id="solid3"  width="3" pattern="solid"  color="Orange" />
 		<pen id="dotted3" width="3" pattern="dotted" color="Orange" />
 		<pen id="dashed3" width="3" pattern="dashed" color="Orange" />
-		<pen id="solid5"  width="5" pattern="solid"  color="Teal" />
-		<pen id="dotted5" width="5" pattern="dotted" color="Teal" />
-		<pen id="dashed5" width="5" pattern="dashed" color="Teal" />
+		<pen id="solid5"  width="5" pattern="solid"  color="Teal" cap="round_cap" />
+		<pen id="dotted5" width="5" pattern="dotted" color="Teal" cap="round_cap" />
+		<pen id="dashed5" width="5" pattern="dashed" color="Teal" cap="round_cap" />
 		<pen id="custom"  width="2" pattern="[2 2 4 4 6 6 8 8] 0" color="Black" />
 	</styles>
 	<pages>

@@ -85,6 +85,18 @@ class PenStyleTestCases < Test::Unit::TestCase
     @pen_style.color 0xFF0000
     assert_equal(0xFF0000, @pen_style.color)
   end
+
+  def test_cap
+    assert_equal(:butt_cap, @pen_style.cap)
+    @pen_style.cap 'round_cap'
+    assert_equal(:round_cap, @pen_style.cap)
+    @pen_style.cap 'projecting_square_cap'
+    assert_equal(:projecting_square_cap, @pen_style.cap)
+    @pen_style.cap 'butt_cap'
+    assert_equal(:butt_cap, @pen_style.cap)
+    @pen_style.cap 'bogus_cap_style'
+    assert_equal(:butt_cap, @pen_style.cap) # unchanged
+  end
 end
 
 class BrushStyleTestCases < Test::Unit::TestCase
