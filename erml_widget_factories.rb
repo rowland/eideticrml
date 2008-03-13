@@ -20,7 +20,7 @@ module EideticRML
 
       def make_widget(tag, parent, attrs={})
         attrs['tag'] = tag unless attrs['tag']
-        attrs['class'] = '' if attrs['class'].nil?
+        attrs['class'] = '' if attrs['class'].nil? and attrs[:class].nil?
         @klasses[tag].new(parent, attrs)
       end
 

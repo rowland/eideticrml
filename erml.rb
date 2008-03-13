@@ -30,7 +30,12 @@ module EideticRML
   end
 
   class RuleBuilder
-    def initialize
+    def initialize(rules)
+      @rules = rules
+    end
+
+    def rule(selector, attrs={})
+      @rules.add(selector, attrs)
     end
   end
 
@@ -108,7 +113,7 @@ module EideticRML
     end
 
     def rules(&block)
-      @rules ||= RuleBuilder.new
+      @rules ||= RuleBuilder.new(@doc.rules)
       @rules.instance_eval(&block)
     end
 

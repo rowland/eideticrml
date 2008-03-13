@@ -112,7 +112,11 @@ module EideticRML
 
       def shift(value=nil, units=nil)
         return [shift_x(units || :pt), shift_y(units || :pt)] if value.nil?
-        x, y = value.to_s.split(',', 2)
+        if value.respond_to?(:to_str)
+          x, y = value.to_s.split(',', 2)
+        else
+          x, y = Array(value)
+        end
         @shift_x, @shift_y = parse_measurement_pts(x, units || self.units), parse_measurement_pts(y, units || self.units)
       end
 
