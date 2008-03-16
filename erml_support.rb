@@ -4,8 +4,8 @@
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
 require 'rubygems'
-require_gem 'eideticpdf'
-require 'epdfpw'
+gem 'eideticpdf'
+require 'epdfdw'
 
 module EideticRML
   module Support
