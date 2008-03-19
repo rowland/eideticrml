@@ -265,9 +265,9 @@ module EideticRML
           value = Array(value).map { |m| from_units(units, m) }
         end
         m = case value.size
-          when 4: value
-          when 2: value * 2
-          when 1: value * 4
+          when 4 then value
+          when 2 then value * 2
+          when 1 then value * 4
         else nil
         end
         @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
@@ -308,9 +308,9 @@ module EideticRML
           value = Array(value).map { |p| from_units(units, p) }
         end
         p = case value.size
-          when 4: value
-          when 2: value * 2
-          when 1: value * 4
+          when 4 then value
+          when 2 then value * 2
+          when 1 then value * 4
         else nil
         end
         @padding_top, @padding_right, @padding_bottom, @padding_left = p unless p.nil?
@@ -385,9 +385,9 @@ module EideticRML
       def origin_x(value=nil)
         if value.nil?
           case @origin_x
-          when 'left': left
-          when 'center': (left + right).quo(2)
-          when 'right': right
+          when 'left'   then left
+          when 'center' then (left + right).quo(2)
+          when 'right'  then right
           else left
           end
         else
@@ -398,9 +398,9 @@ module EideticRML
       def origin_y(value=nil)
         if value.nil?
           case @origin_y
-          when 'top': top
-          when 'middle': (top + bottom).quo(2)
-          when 'bottom': bottom
+          when 'top'    then top
+          when 'middle' then (top + bottom).quo(2)
+          when 'bottom' then bottom
           else top
           end
         else
@@ -710,10 +710,10 @@ module EideticRML
         y_offset = (content_height - preferred_content_height).quo(2)
         # puts "x_offset: #{x_offset}, y_offset: #{y_offset}"
         case quadrant
-        when 1: [content_left  + x_offset, content_bottom - y_offset]
-        when 2: [content_right - x_offset, content_bottom - y_offset]
-        when 3: [content_right - x_offset, content_top + y_offset]
-        else    [content_left  + x_offset, content_top + y_offset]
+        when 1 then [content_left  + x_offset, content_bottom - y_offset]
+        when 2 then [content_right - x_offset, content_bottom - y_offset]
+        when 3 then [content_right - x_offset, content_top + y_offset]
+        else        [content_left  + x_offset, content_top + y_offset]
         end
       end
 

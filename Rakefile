@@ -48,6 +48,7 @@ end
 
 desc "Render test erml files to pdf."
 task :ermls do
+  start = Time.now
   require 'erml'
   Dir["test/*.erml"].each do |erml|
     puts erml
@@ -62,4 +63,6 @@ task :ermls do
     File.open(pdf, 'w') { |f| f.write(doc) }
     `open #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
   end
+  elapsed = Time.now - start
+  puts "Elapsed: #{(elapsed * 1000).round} ms"
 end
