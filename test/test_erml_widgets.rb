@@ -569,6 +569,15 @@ class WidgetTestCases < Test::Unit::TestCase
     @widget.origin_y('bottom')
     assert_equal(25, @widget.origin_y)
   end
+
+  def test_printed
+    @writer = EideticPDF::DocumentWriter.new
+    @writer.open
+    assert(!@widget.printed)
+    @widget.print(@writer)
+    assert(@widget.printed)
+    @writer.close
+  end
 end
 
 class RectangleTestCases < Test::Unit::TestCase
@@ -775,6 +784,36 @@ class ContainerTestCases < Test::Unit::TestCase
     assert_equal(3, @div.rows)
     @div.rows('5')
     assert_equal(5, @div.rows)
+  end
+
+  def test_overflow
+    assert(!@div.overflow)
+    @div.overflow(true)
+    assert(@div.overflow)
+    @div.overflow(false)
+    assert(!@div.overflow)
+    @div.overflow("true")
+    assert(@div.overflow)
+    @div.overflow("false")
+    assert(!@div.overflow)
+  end
+
+  def test_printed
+    @writer = EideticPDF::DocumentWriter.new
+    @writer.open
+    assert(!@div.printed)
+    @doc.to_s
+    assert(@div.printed)
+    @writer.close
+  end
+
+  def test_printed2
+    @p = StdWidgetFactory.instance.make_widget('p', @div)
+    assert(!@div.printed)
+    assert(!@p.printed)
+    @doc.to_s
+    assert(@div.printed)
+    assert(@p.printed)
   end
 end
 

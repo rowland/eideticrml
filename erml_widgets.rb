@@ -20,7 +20,7 @@ module EideticRML
     class Widget
       include Support
 
-      attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel
+      attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel, :printed
 
       def initialize(parent, attrs={})
         @parent = parent
@@ -359,6 +359,7 @@ module EideticRML
             draw_border(writer)
           end
         end
+        @printed = true
       rescue Exception => e
         raise RuntimeError, e.message + "\nError printing #{path}.", e.backtrace
       end
@@ -369,7 +370,7 @@ module EideticRML
 
       def visible(value=nil)
         return @visible.nil? ? true : @visible if value.nil?
-        @visible = !!value
+        @visible = (value == true) || (value == 'true')
       end
 
       def colspan(value=nil)
@@ -967,6 +968,11 @@ module EideticRML
         @order = value.to_sym if [:rows, :cols].include?(value.to_sym)
       end
 
+      def overflow(value=nil)
+        return @overflow if value.nil?
+        @overflow = (value == true) || (value == 'true')
+      end
+
       def paragraph_style(value=nil)
         return @paragraph_style || parent.paragraph_style if value.nil?
         @paragraph_style = paragraph_style_for(value)
@@ -975,6 +981,10 @@ module EideticRML
       def preferred_width(writer, units=:pt)
         @preferred_width = @width || parent.content_width
         to_units(units, @preferred_width)
+      end
+
+      def printed
+        super and children.all? { |widget| widget.printed }
       end
 
       def rows(value=nil)
@@ -1125,7 +1135,6 @@ module EideticRML
       end
 
       def layout_widget(writer)
-        # puts "paragraph: layout_widget"
         super(writer)
         @height ||= preferred_height(writer)
       end
