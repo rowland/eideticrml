@@ -5,12 +5,12 @@
 	<pages>
 		<page units="in" margin="0.75">
 			<p underline="true">Images</p>
-			<image url="test/testimg.jpg" />
-			<image url="test/testimg.jpg" />
-			<image url="test/testimg.jpg" width="7">
+			<image url="samples/testimg.jpg" />
+			<image url="samples/testimg.jpg" />
+			<image url="samples/testimg.jpg" width="7">
 				<p>Rose</p>
 			</image>
-			<image url="test/testimg.jpg" height="1" />
+			<image url="samples/testimg.jpg" height="1" />
 		</page>
 	</pages>
 </erml>

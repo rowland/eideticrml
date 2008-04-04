@@ -2,7 +2,7 @@
 	<styles>
 		<font id="lbl20" name="Courier" size="20" />
 	</styles>
-	<rules url="test/test17.erls" />
+	<rules url="samples/test17.erls" />
 	<pages>
 		<page units="in" margin="1">
 			<label underline="true">Labels</label>
