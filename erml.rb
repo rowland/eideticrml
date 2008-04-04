@@ -317,7 +317,7 @@ def open_erml(erml, &block)
   end
 end
 
-ARGV.unshift "test/test21.erml" unless ARGV.size.nonzero?
+ARGV.unshift "test/test22.erml" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
   pdf = erml.sub(/\.erml(\.erb|\.haml)?$/, '') << '.pdf'
   doc = open_erml(erml) do |f|

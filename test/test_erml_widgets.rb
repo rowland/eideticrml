@@ -799,21 +799,21 @@ class ContainerTestCases < Test::Unit::TestCase
   end
 
   def test_printed
-    @writer = EideticPDF::DocumentWriter.new
-    @writer.open
     assert(!@div.printed)
     @doc.to_s
     assert(@div.printed)
-    @writer.close
   end
 
   def test_printed2
-    @p = StdWidgetFactory.instance.make_widget('p', @div)
+    p = StdWidgetFactory.instance.make_widget('p', @div)
+    p.text "Hello"
+    s = StdWidgetFactory.instance.make_widget('span', p)
+    s.text "World"
     assert(!@div.printed)
-    assert(!@p.printed)
+    assert(!p.printed)
     @doc.to_s
     assert(@div.printed)
-    assert(@p.printed)
+    assert(p.printed)
   end
 end
 

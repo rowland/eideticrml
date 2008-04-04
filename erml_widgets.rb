@@ -346,7 +346,8 @@ module EideticRML
       end
 
       def print(writer)
-        return unless visible
+        return if visible == false
+        return if printed
         before_print(writer)
         if @rotate.nil?
           paint_background(writer)
@@ -802,6 +803,10 @@ module EideticRML
       def initialize(parent, attrs={})
         raise ArgumentError, "Span must be child of Paragraph or another Span." unless parent.is_a?(Span) or parent.is_a?(Paragraph)
         super(parent, attrs)
+      end
+
+      def printed
+        true
       end
 
       def text(value=nil, font=nil)
@@ -1365,10 +1370,12 @@ module EideticRML
       end
 
       def print(writer)
-        writer.open_page
-        layout_widget(writer)
-        super(writer)
-        writer.close_page
+        while !printed
+          writer.open_page
+          layout_widget(writer)
+          super(writer)
+          writer.close_page
+        end
       end
 
       def right(units=:pt)

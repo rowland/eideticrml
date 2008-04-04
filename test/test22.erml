@@ -1,0 +1,40 @@
+<erml>
+  <styles>
+    <layout id="flow" padding="0.5in" />
+  </styles>
+  <rules>
+    <!--
+      rect { width: 2.5; height: 1.5; border: Black }
+      rect.green { fill: MediumSeaGreen }
+      rect.gold { fill: Gold }
+      circle { border: Black; width: 1.5 }
+      circle.red { fill: Crimson }
+      circle.gold { fill: Gold }
+    -->
+  </rules>
+	<pages>
+		<page units="in" margin="1">
+			<label underline="true">Multi-Page Flow Layout</label>
+			<rect class="green" />
+			<rect class="gold" />
+		  <circle class="red" />
+		  <circle class="red" />
+		  <circle class="red" />
+		  <circle class="red" />
+		  <circle class="red" />
+		  <circle class="red" />
+		  <circle class="red" />
+		  <circle class="red" />
+		  <circle class="red" />
+		  <circle class="gold" />
+		  <circle class="gold" />
+		  <circle class="gold" />
+		  <circle class="gold" />
+		  <circle class="gold" />
+		  <circle class="gold" />
+		  <circle class="gold" />
+		  <circle class="gold" />
+		  <circle class="gold" />
+		</page>
+	</pages>
+</erml>
