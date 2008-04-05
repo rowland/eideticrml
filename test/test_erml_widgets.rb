@@ -578,6 +578,20 @@ class WidgetTestCases < Test::Unit::TestCase
     assert(@widget.printed)
     @writer.close
   end
+
+  def test_display
+    assert_equal(:once, @widget.display)
+    [:always, :first, :succeeding, :even, :odd, :once].each do |v|
+      @widget.display(v)
+      assert_equal(v, @widget.display)
+    end
+    [:always, :first, :succeeding, :even, :odd, :once].each do |v|
+      @widget.display(v.to_s)
+      assert_equal(v, @widget.display)
+    end
+    @widget.display('bogus')
+    assert_equal(:once, @widget.display) # unchanged
+  end
 end
 
 class RectangleTestCases < Test::Unit::TestCase

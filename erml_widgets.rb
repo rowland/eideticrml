@@ -21,11 +21,13 @@ module EideticRML
       include Support
 
       attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel, :printed
+      attr_accessor :visible
 
       def initialize(parent, attrs={})
         @parent = parent
         parent.children << self if parent.respond_to?(:children)
         attributes(attrs)
+        @visible = true
       end
 
       def attributes(attrs)
@@ -369,9 +371,9 @@ module EideticRML
         parent.nil? ? self : parent.root
       end
 
-      def visible(value=nil)
-        return @visible.nil? ? true : @visible if value.nil?
-        @visible = (value == true) || (value == 'true')
+      def display(value=nil)
+        return @display || :once if value.nil?
+        @display = value.to_sym if [:once, :always, :first, :succeeding, :even, :odd].include?(value.to_sym)
       end
 
       def colspan(value=nil)
@@ -443,6 +445,7 @@ module EideticRML
       end
 
       def before_print(writer)
+        # override this method
       end
 
       def brush_style_for(id)
