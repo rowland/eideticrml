@@ -61,12 +61,12 @@ module EideticRML
 
       def layout(container, writer)
         cx = cy = max_y = 0
-        full = false
+        container_full = false
         # container.children.each { |child| child.visible = true if child.visible == false and !child.printed }
         container.children.select { |child| child.position == :static and !child.printed }.each do |widget|
           # puts "layout: #{widget.path}"
-          widget.visible(!full)
-          next if full
+          widget.visible(!container_full)
+          next if container_full
           widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?
           if cx != 0 and cx + widget.width > container.content_width
             cy += max_y + @style.vpadding
@@ -78,7 +78,7 @@ module EideticRML
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
           # puts "widget bottom: #{widget.bottom}, container bottom: #{container.bottom}"
           if widget.bottom > container.bottom
-            full = true
+            container_full = true
             widget.visible(false)
             next
           end
