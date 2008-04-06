@@ -21,6 +21,7 @@ module EideticRML
 
       def layout_absolute(container, writer, widgets)
         widgets.each do |widget|
+          widget.before_layout
           widget.left(0, :pt) if widget.left.nil? and widget.right.nil?
           widget.top(0, :pt) if widget.top.nil? and widget.bottom.nil?
           widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?
@@ -31,6 +32,7 @@ module EideticRML
 
       def layout_relative(container, writer, widgets)
         widgets.each do |widget|
+          widget.before_layout
           widget.left(container.content_left, :pt) if widget.left.nil?
           widget.top(container.content_top, :pt) if widget.top.nil?
           widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?
@@ -158,7 +160,6 @@ module EideticRML
           content_height = static.map { |widget| widget.height }.max || 0
           container.height(content_height + container.non_content_height, :pt)
         end
-        # container.children.each { |widget| widget.layout_widget(writer) }
         static.each { |widget| widget.layout_widget(writer) }
         super(container, writer)
       end
@@ -172,6 +173,7 @@ module EideticRML
         headers, unaligned = static.partition { |widget| widget.align == :top }
         footers, unaligned = unaligned.partition { |widget| widget.align == :bottom }
         static.each do |widget|
+          widget.before_layout
           widget.width('100%') if widget.width.nil?
           widget.left(container.content_left, :pt)
         end
@@ -199,7 +201,6 @@ module EideticRML
           top += (widget.height + @style.vpadding)
         end
         super(container, writer)
-        # layout_relative(container, writer, relative)
       end
     end
 

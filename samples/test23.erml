@@ -3,12 +3,12 @@
 		<page>
 			<h>Page <pageno /></h>
 		</page>
-		<page layout="vbox">
-			<h>Page <pageno /></h>
-			<label align="bottom" angle="45">This is page <pageno /></label>
-		</page>
 		<page>
+			<h>Page <pageno /></h>
+		</page>
+		<page layout="vbox">
 			<h>Page <pageno>10</pageno></h>
+			<label align="bottom" angle="45">This is page <pageno /></label>
 		</page>
 		<page>
 			<h>Page <pageno /></h>
