@@ -15,7 +15,7 @@
   </rules>
 	<pages>
 		<page units="in" layout="absolute">
-			<label underline="true" left="1" top="1">Preformatted Text</label>
+			<label underline="true" left="1" top="1">Shift Widgets</label>
 			<rect class="green" left="1" top="1.5" />
 			<rect class="gold" left="1" top="1.5" shift="0.25,0.25" z_index="-1" />
 			<div left="1" top="4" width="5" height="5">
