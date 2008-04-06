@@ -809,7 +809,7 @@ module EideticRML
       include Text
 
       def initialize(parent, attrs={})
-        raise ArgumentError, "Span must be child of Paragraph or another Span." unless parent.is_a?(Span) or parent.is_a?(Paragraph)
+        raise ArgumentError, "Span must be child of Paragraph, Label or another Span." unless valid_parent?(parent)
         super(parent, attrs)
       end
 
@@ -821,89 +821,33 @@ module EideticRML
         return super if value.nil?
         parent.text(value, font || self.font)
       end
-    end
 
-    class Label < Widget
-      StdWidgetFactory.instance.register_widget('label', self)
-
-      include HasLocation
-      include Text
-
-      def angle(value=nil)
-        return style.angle if value.nil?
-        style(:copy).angle(value)
-      end
-
-      def preferred_width(writer, units=:pt)
-        font.apply(writer)
-        to_units(units, writer.width(text) + non_content_width)
-      end
-
-      def preferred_height(writer, units=:pt)
-        font.apply(writer)
-        to_units(units, writer.text_height + non_content_height)
-      end
-
-      def style(value=nil)
-        return @style ||= label_style_for('label') if value.nil?
-        return @style = style.clone if value == :copy
-        @style = label_style_for(value)
-      end
-
-      def text(value=nil)
-        return @text || '' if value.nil?
-        @text ||= ''
-        value.lstrip! if @text.empty?
-        @text << value
-      end
-
-      def text_align(value=nil)
-        return style.text_align if value.nil?
-        style(:copy).text_align(value)
-      end
-
-    protected
-      def before_print(writer)
-        @width ||= preferred_width(writer)
-        @height ||= preferred_height(writer)
-        super(writer)
-      end
-
-      def draw_content(writer)
-        super(writer)
-        options = { :angle => angle, :underline => underline }
-        @y ||= content_top
-        case text_align
-        when :left
-          @x ||= content_left
-        when :center
-          @x ||= (content_left + content_right).quo(2)
-          options[:align] = :center
-        when :right
-          @x ||= content_right
-          options[:align] = :right
-        end
-        writer.print_xy(@x, @y, text, options)
-      end
-
-      def label_style_for(id)
-        ls = root.styles.for_id(id)
-        raise ArgumentError, "Label Style #{id} not found." unless ls.is_a?(Styles::LabelStyle)
-        ls
+    private
+      def valid_parent?(parent)
+        parent.is_a?(Span) or parent.is_a?(Paragraph) or parent.is_a?(Label)
       end
     end
 
-    class PageNo < Label
+    class PageNo < Span
       StdWidgetFactory.instance.register_widget('pageno', self)
 
-      def text(value=nil)
-        return root.document_page_no if value.nil?
-        @new_page_no = value.to_i
+      def initialize(parent, attrs={})
+        super(parent, attrs)
+        parent.text(self)
       end
 
       def before_layout
         super
         root.document_page_no = @new_page_no if @new_page_no
+      end
+
+      def text(value=nil)
+        return root.document_page_no.to_s if value.nil?
+        @new_page_no = value.to_i
+      end
+
+      def to_s
+        text
       end
     end
 
@@ -1131,14 +1075,105 @@ module EideticRML
       end
     end
 
+    class Label < Container
+      StdWidgetFactory.instance.register_widget('label', self)
+
+      include HasLocation
+      include Text
+
+      def angle(value=nil)
+        return style.angle if value.nil?
+        style(:copy).angle(value)
+      end
+
+      def before_layout
+        children.each { |child| child.before_layout }
+      end
+
+      def layout_container(writer)
+        # suppress default behavior
+      end
+
+      def preferred_width(writer, units=:pt)
+        font.apply(writer)
+        to_units(units, writer.width(text) + non_content_width)
+      end
+
+      def preferred_height(writer, units=:pt)
+        font.apply(writer)
+        to_units(units, writer.text_height + non_content_height)
+      end
+
+      def style(value=nil)
+        return @style ||= label_style_for('label') if value.nil?
+        return @style = style.clone if value == :copy
+        @style = label_style_for(value)
+      end
+
+      def text(value=nil)
+        @text_pieces ||= []
+        return @text_pieces.join if value.nil?
+        value.lstrip! if @text_pieces.empty? and value.respond_to?(:lstrip!)
+        @text_pieces << value unless value.respond_to?(:empty?) and value.empty?
+      end
+
+      def text_align(value=nil)
+        return style.text_align if value.nil?
+        style(:copy).text_align(value)
+      end
+
+    protected
+      def before_print(writer)
+        @width ||= preferred_width(writer)
+        @height ||= preferred_height(writer)
+        super(writer)
+      end
+
+      def draw_content(writer)
+        super(writer)
+        options = { :angle => angle, :underline => underline }
+        @y ||= content_top
+        case text_align
+        when :left
+          @x ||= content_left
+        when :center
+          @x ||= (content_left + content_right).quo(2)
+          options[:align] = :center
+        when :right
+          @x ||= content_right
+          options[:align] = :right
+        end
+        writer.print_xy(@x, @y, text, options)
+      end
+
+      def label_style_for(id)
+        ls = root.styles.for_id(id)
+        raise ArgumentError, "Label Style #{id} not found." unless ls.is_a?(Styles::LabelStyle)
+        ls
+      end
+    end
+
     class Paragraph < Container
       StdWidgetFactory.instance.register_widget('p', self)
 
       include Text
 
+      def before_layout
+        children.each { |child| child.before_layout }
+      end
+
       def bullet(value=nil)
         return @bullet.nil? ? style.bullet : @bullet if value.nil?
         @bullet = bullet_style_for(value)
+      end
+
+      def layout_container(writer)
+        # suppress default behavior
+      end
+
+      def layout_widget(writer)
+        super(writer)
+        @height ||= preferred_height(writer)
       end
 
       def preferred_width(writer, units=:pt)
@@ -1157,15 +1192,6 @@ module EideticRML
         to_units(units, @preferred_height)
       end
 
-      def layout_container(writer)
-        # suppress default behavior
-      end
-
-      def layout_widget(writer)
-        super(writer)
-        @height ||= preferred_height(writer)
-      end
-
       def style(value=nil)
         # inherited
         return @style || parent.paragraph_style if value.nil?
@@ -1176,8 +1202,8 @@ module EideticRML
       def text(value=nil, font=nil)
         return @text_pieces if value.nil?
         @text_pieces ||= []
-        value.lstrip! if @text_pieces.empty?
-        @text_pieces << [value, font || self.font] unless value.empty?
+        value.lstrip! if @text_pieces.empty? and value.respond_to?(:lstrip!)
+        @text_pieces << [value, font || self.font] unless value.respond_to?(:empty?) and value.empty?
       end
 
       def text_align(value=nil)
@@ -1223,7 +1249,7 @@ module EideticRML
           @text_pieces.each do |piece|
             text, font = piece
             font.apply(writer)
-            @rich_text.add(text, writer.font, :color => font.color, :underline => font.underline)
+            @rich_text.add(text.to_s, writer.font, :color => font.color, :underline => font.underline)
           end unless @text_pieces.nil?
         end
         @rich_text
