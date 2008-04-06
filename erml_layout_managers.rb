@@ -67,6 +67,7 @@ module EideticRML
           # puts "layout: #{widget.path}"
           widget.visible = !container_full
           next if container_full
+          widget.before_layout
           widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?
           if cx != 0 and cx + widget.width > container.content_width
             cy += max_y + @style.vpadding

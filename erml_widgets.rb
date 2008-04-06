@@ -192,7 +192,12 @@ module EideticRML
         margin_left + padding_left + padding_right + margin_right
       end
 
+      def before_layout
+        # override this method
+      end
+
       def layout_widget(writer)
+        # override this method
       end
 
       def units(value=nil)
@@ -888,6 +893,20 @@ module EideticRML
       end
     end
 
+    class PageNo < Label
+      StdWidgetFactory.instance.register_widget('pageno', self)
+
+      def text(value=nil)
+        return root.document_page_no if value.nil?
+        @new_page_no = value.to_i
+      end
+
+      def before_layout
+        super
+        root.document_page_no = @new_page_no if @new_page_no
+      end
+    end
+
     class PreformattedText < Widget
       StdWidgetFactory.instance.register_widget('pre', self)
 
@@ -1373,8 +1392,11 @@ module EideticRML
       end
 
       def print(writer)
+        root.section_page_no = 0
         while !printed
           writer.open_page
+          root.document_page_no += 1
+          root.section_page_no += 1
           layout_widget(writer)
           super(writer)
           writer.close_page
@@ -1422,6 +1444,7 @@ module EideticRML
       StdWidgetFactory.instance.register_widget('erml', self)
 
       alias :pages :children
+      attr_accessor :document_page_no, :section_page_no
 
       def initialize(parent=nil, attrs={})
         super(parent, attrs)
@@ -1447,8 +1470,11 @@ module EideticRML
       end
 
       def print(writer)
+        @document_page_no = 0
         writer.open
-        pages.each { |page| page.print(writer) }
+        pages.each do |page|
+          page.print(writer)
+        end
         writer.close
       end
 
