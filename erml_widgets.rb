@@ -20,8 +20,8 @@ module EideticRML
     class Widget
       include Support
 
-      attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel, :printed
-      attr_accessor :visible
+      attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel
+      attr_accessor :visible, :printed
 
       def initialize(parent, attrs={})
         @parent = parent
@@ -948,6 +948,11 @@ module EideticRML
         return @paragraph_style || parent.paragraph_style if value.nil?
         @paragraph_style = paragraph_style_for(value)
       end
+
+      # def preferred_height(writer, units=:pt)
+      #   @preferred_height = @height || children.map { |child| child.bottom }.max + padding_bottom + margin_bottom
+      #   to_units(units, @preferred_height)
+      # end
 
       def preferred_width(writer, units=:pt)
         @preferred_width = @width || parent.content_width

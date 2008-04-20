@@ -108,7 +108,7 @@ module EideticRML
         # allocate specified widths first
         specified.each do |widget|
           width_avail -= widget.width
-          widget.visible(false) if width_avail < 0
+          widget.printed = true if width_avail < 0
           width_avail -= @style.hpadding
         end
 
@@ -122,37 +122,47 @@ module EideticRML
             width_avail -= widget.width
           end
         else
-          percents.each { |widget| widget.visible(false) }
+          percents.each { |widget| widget.printed = true }
         end
         width_avail -= @style.hpadding
 
         # divide remaining width equally among widgets with unspecified widths
         if width_avail - (others.size - 1) * @style.hpadding >= others.size
           width_avail -= (others.size - 1) * @style.hpadding
-          others_width = width_avail.quo(others.size)
-          others.each { |widget| widget.width(others_width, :pt) }
+          # others_preferred_widths = others.map { |widget| widget.preferred_width(writer) }.extend(EideticPDF::Statistics)
+          # if others_preferred_widths.sum <= width_avail
+          #   # don't wrap due to rounding
+          #   others.each_with_index { |widget, index| widget.width(others_preferred_widths[index] + 1, :pt) }
+          # else
+            others_width = width_avail.quo(others.size)
+            others.each { |widget| widget.width(others_width, :pt) }
+          # end
         else
-          others.each { |widget| widget.visible(false) }
+          others.each { |widget| widget.printed = true }
         end
 
         static.each do |widget|
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
-          widget.top(container.content_top, :pt)
+          if container.align == :bottom
+            widget.bottom(container.content_bottom, :pt)
+          else
+            widget.top(container.content_top, :pt)
+          end
         end
         left = container.content_left
         right = container.content_right
         lpanels.each do |widget|
-          next unless widget.visible
+          next if widget.printed
           widget.left(left, :pt)
           left += (widget.width + @style.hpadding)
         end
         rpanels.reverse.each do |widget|
-          next unless widget.visible
+          next if widget.printed
           widget.right(right, :pt)
           right -= (widget.width + @style.hpadding)
         end
         unaligned.each do |widget|
-          next unless widget.visible
+          next if widget.printed
           widget.left(left, :pt)
           left += (widget.width + @style.hpadding)
         end
@@ -160,7 +170,7 @@ module EideticRML
           content_height = static.map { |widget| widget.height }.max || 0
           container.height(content_height + container.non_content_height, :pt)
         end
-        static.each { |widget| widget.layout_widget(writer) }
+        static.each { |widget| widget.layout_widget(writer) if widget.visible and !widget.printed }
         super(container, writer)
       end
     end
@@ -330,7 +340,8 @@ module EideticRML
               width = (0...widget.colspan).inject(0) { |width, i| width + widths[c + i][1] }
               widget.width(width + (widget.colspan - 1) * @style.hpadding, :pt)
             else
-              widget.visible(false)
+              # widget.visible = false
+              widget.printed = true
               next
             end
             heights[c, r] = [widget.rowspan, widget.height || widget.preferred_height(writer)]

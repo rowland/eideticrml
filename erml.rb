@@ -317,7 +317,7 @@ def open_erml(erml, &block)
   end
 end
 
-ARGV.unshift "samples/test23.erml" unless ARGV.size.nonzero?
+ARGV.unshift "samples/test24.erml.erb" unless ARGV.size.nonzero?
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
   pdf = erml.sub(/\.erml(\.erb|\.haml)?$/, '') << '.pdf'
   doc = open_erml(erml) do |f|
@@ -328,7 +328,11 @@ if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
     end
   end
   unless doc.nil?
-    File.open(pdf, 'w') { |f| f.write(doc) }
-    `open #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+    begin
+      File.open(pdf, 'w') { |f| f.write(doc) }
+      `open #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+    rescue Exception => e
+      puts e.message, e.backtrace.join("\n")
+    end
   end
 end
