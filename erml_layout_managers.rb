@@ -258,10 +258,12 @@ module EideticRML
         widths = []
         grid.cols.times do |c|
           col = grid.col(c)
-          widget = col.detect { |w| w and (w.colspan == 1) and w.width }
-          if widget.respond_to?(:width_pct)
+          widget = col.detect { |w| w and (w.colspan == 1) }
+          if widget.nil?
+            widths << [:unspecified, 0]
+          elsif widget.width_pct
             widths << [:percent, widget.width]
-          elsif widget.respond_to?(:width)
+          elsif widget.width
             widths << [:specified, widget.width]
           else
             widths << [:unspecified, 0]
