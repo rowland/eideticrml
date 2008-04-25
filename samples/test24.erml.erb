@@ -8,11 +8,14 @@
 	</rules>
 	<pages>
 		<page units="in" margin="1" layout="vbox">
-		  <div>
+		  <div align="top">
 		    <h>Some Title</h>
 		    <p text_align="center">The sub-title would go here.</p>
 	    </div>
-      <hbox align="bottom">
+<% 10.times do |i| %>
+	    <p><%= i + 1 %>. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<% end %>
+      <hbox align="bottom" display="always">
         <p>Copyright (c) 2008 Eidetic Software. All rights reserved.</p>
         <p width="10%" text_align="right">Page <pageno /></p>
       </hbox>

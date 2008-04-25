@@ -21,7 +21,8 @@ module EideticRML
       include Support
 
       attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel
-      attr_accessor :visible, :printed
+      attr_accessor :visible, :disabled
+      attr_writer :printed
 
       def initialize(parent, attrs={})
         @parent = parent
@@ -354,7 +355,7 @@ module EideticRML
 
       def print(writer)
         return if visible == false
-        return if printed
+        return if printed or disabled
         before_print(writer)
         if @rotate.nil?
           paint_background(writer)
@@ -372,6 +373,10 @@ module EideticRML
         raise RuntimeError, e.message + "\nError printing #{path}.", e.backtrace
       end
 
+      def printed
+        @printed or @disabled
+      end
+
       def root
         parent.nil? ? self : parent.root
       end
@@ -379,6 +384,18 @@ module EideticRML
       def display(value=nil)
         return @display || :once if value.nil?
         @display = value.to_sym if [:once, :always, :first, :succeeding, :even, :odd].include?(value.to_sym)
+      end
+
+      def display_for_page(document_page_no, section_page_no)
+        # puts "display_for_page: #{display.inspect}"
+        case display
+        when :always then true
+        when :first then section_page_no == 1
+        when :succeeding then section_page_no > 1
+        when :even then document_page_no.even?
+        when :odd then document_page_no.odd?
+        else false
+        end
       end
 
       def colspan(value=nil)
@@ -960,7 +977,8 @@ module EideticRML
       end
 
       def printed
-        super and children.all? { |widget| widget.printed }
+        # $stdout.puts "Container#printed: #{super and children.all? { |widget| widget.printed }}"
+        disabled or (super and children.all? { |widget| widget.printed })
       end
 
       def rows(value=nil)

@@ -88,6 +88,8 @@ module EideticRML
           cx += widget.width + @style.hpadding
           max_y = [max_y, widget.height].max
         end
+        # puts "cy: #{cy}, max_y: #{max_y}, height: #{container.height.inspect}"
+        container.height(cy + max_y + container.non_content_height, :pt) if container.height.nil? and max_y > 0
         super(container, writer)
         # layout_relative(container, writer, container.children.select { |child| child.position != :static })
       end
@@ -108,7 +110,7 @@ module EideticRML
         # allocate specified widths first
         specified.each do |widget|
           width_avail -= widget.width
-          widget.printed = true if width_avail < 0
+          widget.disabled = true if width_avail < 0
           width_avail -= @style.hpadding
         end
 
@@ -122,7 +124,7 @@ module EideticRML
             width_avail -= widget.width
           end
         else
-          percents.each { |widget| widget.printed = true }
+          percents.each { |widget| widget.disabled = true }
         end
         width_avail -= @style.hpadding
 
@@ -138,7 +140,7 @@ module EideticRML
             others.each { |widget| widget.width(others_width, :pt) }
           # end
         else
-          others.each { |widget| widget.printed = true }
+          others.each { |widget| widget.disabled = true }
         end
 
         static.each do |widget|
@@ -179,7 +181,12 @@ module EideticRML
       register('vbox', self)
 
       def layout(container, writer)
-        static, relative = container.children.partition { |widget| widget.position == :static }
+        container_full = false
+        widgets = container.children.select do |child|
+          (child.position == :static) and
+          (!child.printed or child.display_for_page(container.root.document_page_no, container.root.section_page_no))
+        end
+        static, relative = widgets.partition { |widget| widget.position == :static }
         headers, unaligned = static.partition { |widget| widget.align == :top }
         footers, unaligned = unaligned.partition { |widget| widget.align == :bottom }
         static.each do |widget|
@@ -188,26 +195,53 @@ module EideticRML
           widget.left(container.content_left, :pt)
         end
         top = container.content_top
+        bottom = footers.empty? ? nil : container.content_bottom
         headers.each do |widget|
+          # puts "header"
+          widget.visible = !container_full
+          next if container_full
           widget.top(top, :pt)
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
+          if bottom and widget.bottom > bottom
+            container_full = true
+            widget.visible = false
+            # widget.disabled = true
+            next
+          end
           top += (widget.height + @style.vpadding)
         end
         unless footers.empty?
           container.height('100%') if container.height.nil?
-          bottom = container.content_bottom
           footers.reverse.each do |widget|
+            # puts "footer"
+            widget.visible = !container_full
+            next if container_full
             widget.bottom(bottom, :pt)
             widget.layout_widget(writer)
             widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
+            if widget.top < top
+              container_full = true
+              widget.visible = false
+              # widget.disabled = true
+              next
+            end
             bottom -= (widget.height + @style.vpadding)
           end
         end
         unaligned.each do |widget|
+          # puts "unaligned"
+          widget.visible = !container_full
+          next if container_full
           widget.top(top, :pt)
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
+          if bottom and widget.bottom > bottom
+            container_full = true
+            widget.visible = false
+            # widget.disabled = true
+            next
+          end
           top += (widget.height + @style.vpadding)
         end
         super(container, writer)
@@ -341,7 +375,7 @@ module EideticRML
               widget.width(width + (widget.colspan - 1) * @style.hpadding, :pt)
             else
               # widget.visible = false
-              widget.printed = true
+              widget.disabled = true
               next
             end
             heights[c, r] = [widget.rowspan, widget.height || widget.preferred_height(writer)]
