@@ -26,6 +26,7 @@ module EideticRML
 
       def initialize(parent, attrs={})
         @parent = parent
+        @display = parent.display
         parent.children << self if parent.respond_to?(:children)
         attributes(attrs)
         @visible = true
@@ -194,7 +195,7 @@ module EideticRML
       end
 
       def before_layout
-        # override this method
+        @orig_width, @orig_height = @width, @height
       end
 
       def layout_widget(writer)
@@ -355,7 +356,7 @@ module EideticRML
 
       def print(writer)
         return if visible == false
-        return if printed or disabled
+        return if disabled
         before_print(writer)
         if @rotate.nil?
           paint_background(writer)
@@ -369,6 +370,7 @@ module EideticRML
           end
         end
         @printed = true
+        @width, @height = @orig_width, @orig_height
       rescue Exception => e
         raise RuntimeError, e.message + "\nError printing #{path}.", e.backtrace
       end
@@ -951,6 +953,10 @@ module EideticRML
         layout_container(writer)
       end
 
+      def more(flag=nil)
+        parent.more(flag)
+      end
+
       def order(value=nil)
         return @order || :rows if value.nil?
         @order = value.to_sym if [:rows, :cols].include?(value.to_sym)
@@ -977,7 +983,6 @@ module EideticRML
       end
 
       def printed
-        # $stdout.puts "Container#printed: #{super and children.all? { |widget| widget.printed }}"
         disabled or (super and children.all? { |widget| widget.printed })
       end
 
@@ -1256,6 +1261,7 @@ module EideticRML
         pen_style_for('solid').apply(writer)
         raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
         writer.paragraph_xy(content_left, content_top, rich_text(writer), options)
+        @rich_text = nil
       end
 
       def paragraph_style_for(id)
@@ -1266,8 +1272,6 @@ module EideticRML
 
       def rich_text(writer)
         if @rich_text.nil?
-          # font.apply(writer)
-          # @rich_text = EideticPDF::PdfText::RichText.new(@text, writer.font, :color => font_color, :underline => underline)
           @rich_text = EideticPDF::PdfText::RichText.new
           @text_pieces.each do |piece|
             text, font = piece
@@ -1373,6 +1377,7 @@ module EideticRML
 
       def initialize(parent, attrs={})
         @default_margin = true
+        @more = 1
         super(parent, attrs)
       end
 
@@ -1435,6 +1440,11 @@ module EideticRML
         @default_margin = false
       end
 
+      def more(flag=nil)
+        return @more if flag.nil?
+        @more = flag
+      end
+
       def orientation(value=nil)
         # inherited
         # TODO
@@ -1442,7 +1452,8 @@ module EideticRML
 
       def print(writer)
         root.section_page_no = 0
-        while !printed
+        while more
+          more(false)
           writer.open_page
           root.document_page_no += 1
           root.section_page_no += 1
