@@ -454,6 +454,8 @@ module EideticRML
         else
           self.send(keys[0], :copy).send(keys[1], value)
         end
+      rescue NoMethodError => e
+        raise RuntimeError, "Unknown attribute #{id}", e.backtrace
       end
 
       def attributes_first
@@ -964,7 +966,11 @@ module EideticRML
 
       def overflow(value=nil)
         return @overflow if value.nil?
-        @overflow = (value == true) || (value == 'true')
+        @overflow = case value
+          when true, 'true' then true
+          when false, 'false' then false
+          else value.to_s
+        end
       end
 
       def paragraph_style(value=nil)

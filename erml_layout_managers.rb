@@ -92,7 +92,7 @@ module EideticRML
           cx += widget.width + @style.hpadding
           max_y = [max_y, widget.height].max
         end
-        container.more(true) if container_full
+        container.more(true) if container_full and container.overflow
         # puts "cy: #{cy}, max_y: #{max_y}, height: #{container.height.inspect}"
         container.height(cy + max_y + container.non_content_height, :pt) if container.height.nil? and max_y > 0
         super(container, writer)
@@ -253,7 +253,7 @@ module EideticRML
           end
           top += (widget.height + @style.vpadding)
         end
-        container.more(true) if container_full
+        container.more(true) if container_full and container.overflow
         super(container, writer)
       end
     end
