@@ -59,7 +59,10 @@ module EideticRML
 
       def id(value=nil)
         return @id if value.nil?
-        @id = $1.freeze if value.to_s =~ /^(\w+)$/
+        if value.to_s =~ /^(\w+)$/
+          @id = $1.freeze
+          root.widgets[@id] = self
+        end
         @path = nil
       end
 
@@ -553,6 +556,10 @@ module EideticRML
       def shifted_y(value)
         value.nil? ? nil : shift_y + value
       end
+
+      def widget_for(id)
+        root.widgets[id]
+      end
     end
 
     module HasLocation
@@ -995,6 +1002,11 @@ module EideticRML
       def rows(value=nil)
         return @rows if value.nil?
         @rows = value.to_i if value.to_i > 0
+      end
+
+      def source(id=nil)
+        return children if id.nil?
+        @children = widget_for(id).children
       end
 
     protected
@@ -1557,6 +1569,10 @@ module EideticRML
       def units(value=nil)
         return @units || :pt if value.nil?
         super(value)
+      end
+
+      def widgets
+        @widgets ||= {}
       end
 
     private

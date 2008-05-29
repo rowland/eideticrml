@@ -70,7 +70,6 @@ module EideticRML
         end
         remaining.each { |widget| widget.visible = false }
         widgets.each do |widget|
-          # puts "layout: #{widget.path}"
           widget.visible = !container_full
           next if container_full
           widget.before_layout
@@ -83,7 +82,6 @@ module EideticRML
           widget.top(container.content_top + cy, :pt)
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
-          # puts "widget bottom: #{widget.bottom}, container bottom: #{container.bottom}"
           if container.bottom and widget.bottom > container.bottom
             container_full = true
             widget.visible = false
@@ -93,10 +91,8 @@ module EideticRML
           max_y = [max_y, widget.height].max
         end
         container.more(true) if container_full and container.overflow
-        # puts "cy: #{cy}, max_y: #{max_y}, height: #{container.height.inspect}"
         container.height(cy + max_y + container.non_content_height, :pt) if container.height.nil? and max_y > 0
         super(container, writer)
-        # layout_relative(container, writer, container.children.select { |child| child.position != :static })
       end
     end
 
@@ -207,7 +203,6 @@ module EideticRML
         top = container.content_top
         bottom = footers.empty? ? nil : container.content_bottom
         headers.each do |widget|
-          # puts "header"
           widget.visible = !container_full
           next if container_full
           widget.top(top, :pt)
@@ -216,7 +211,6 @@ module EideticRML
           if bottom and widget.bottom > bottom
             container_full = true
             widget.visible = false
-            # widget.disabled = true
             next
           end
           top += (widget.height + @style.vpadding)
@@ -232,14 +226,12 @@ module EideticRML
             if widget.top < top
               container_full = true
               widget.visible = false
-              # widget.disabled = true
               next
             end
             bottom -= (widget.height + @style.vpadding)
           end
         end
         unaligned.each do |widget|
-          # puts "unaligned"
           widget.visible = !container_full
           next if container_full
           widget.top(top, :pt)
@@ -248,7 +240,6 @@ module EideticRML
           if bottom and widget.bottom > bottom
             container_full = true
             widget.visible = false
-            # widget.disabled = true
             next
           end
           top += (widget.height + @style.vpadding)
@@ -338,7 +329,7 @@ module EideticRML
       end
 
       def allocate_percent_widths(width_avail, percents)
-        # allocate percent widths next, with a minimum width of 1 point
+        # allocate percent widths with a minimum width of 1 point
         if width_avail - (percents.size - 1) * @style.hpadding >= percents.size
           width_avail -= (percents.size - 1) * @style.hpadding
           total_percents = percents.inject(0) { |total, w| total + w[1] }

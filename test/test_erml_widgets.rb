@@ -592,6 +592,16 @@ class WidgetTestCases < Test::Unit::TestCase
     @widget.display('bogus')
     assert_equal(:once, @widget.display) # unchanged
   end
+
+  def test_widget_for
+    w1 = Widget.new(@page)
+    w1.id('w1')
+    w2 = Widget.new(@page)
+    w2.id('w2')
+    assert_nil(@widget.send(:widget_for, 'bogus'))
+    assert_equal(w1, @widget.send(:widget_for, 'w1'))
+    assert_equal(w2, @widget.send(:widget_for, 'w2'))
+  end
 end
 
 class RectangleTestCases < Test::Unit::TestCase
@@ -828,6 +838,15 @@ class ContainerTestCases < Test::Unit::TestCase
     @doc.to_s
     assert(@div.printed)
     assert(p.printed)
+  end
+
+  def test_source
+    l1 = StdWidgetFactory.instance.make_widget('label', @div)
+    l2 = StdWidgetFactory.instance.make_widget('label', @div)
+    @div.id('d1')
+    d2 = StdWidgetFactory.instance.make_widget('div', @page)
+    d2.source('d1')
+    assert_equal(@div.children, d2.children)
   end
 end
 
