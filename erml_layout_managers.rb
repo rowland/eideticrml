@@ -68,7 +68,7 @@ module EideticRML
         widgets, remaining = container.children.partition do |child|
           (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
         end
-        remaining.each { |widget| widget.visible = false }
+        remaining.each { |widget| widget.visible = false if widget.printed; }
         widgets.each do |widget|
           widget.visible = !container_full
           next if container_full
