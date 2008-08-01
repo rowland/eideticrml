@@ -5,21 +5,21 @@ require 'rcov/rcovtask'
 
 spec = Gem::Specification.new do |s|
   s.name = "eideticrml"
-  s.version = "0.1.1"
-  s.date = "2008-04-04"
+  s.version = "0.1.2"
+  s.date = "2008-07-19"
   s.summary = "Report Markup Language"
   s.requirements = "Ruby 1.8.x, eideticpdf"
   s.require_path = '.'
-  s.autorequire = 'erml'
+  # s.autorequire = 'erml'
   s.email = "brent.rowland@eideticsoftware.com"
   s.homepage = "http://www.eideticsoftware.com"
+  s.author = "Brent Rowland, Eidetic Software, LLC"
   # s.rubyforge_project = "eideticrml"
   # s.test_file = "test/pdf_tests.rb"
   s.has_rdoc = false
   # s.extra_rdoc_files = ['README']
   # s.rdoc_options << '--title' << 'Eidetic RML' << '--main' << 'README' << '-x' << 'test'
-  s.files = ['erml.rb', 'erml_layout_managers.rb', 'erml_styles.rb', 'erml_support.rb', 'erml_widgets.rb', 'Rakefile'] + 
-    FileList["test/test*.rb"] + FileList["samples/test*.erml"] + ['samples/testimg.jpg']
+  s.files = FileList["*.rb"] + ['Rakefile'] + FileList["test/test*.rb"] + FileList["samples/test*.erml"] + ['samples/testimg.jpg']
   s.platform = Gem::Platform::RUBY
 end
 
