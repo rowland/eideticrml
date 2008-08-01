@@ -245,6 +245,7 @@ module EideticRML
           top += (widget.height + @style.vpadding)
         end
         container.more(true) if container_full and container.overflow
+        container.height(top - container.content_top, :pt) if container.height.nil?
         super(container, writer)
       end
     end
