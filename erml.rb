@@ -3,6 +3,7 @@
 #  Created by Brent Rowland on 2008-01-06.
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
+$:.unshift File.expand_path(File.dirname(__FILE__))
 require 'erml_support'
 require 'erml_widgets'
 
@@ -174,6 +175,7 @@ module EideticRML
 
   class XmlPageParser
     undef_method :p
+    undef_method :method
 
     def initialize(stack, doc)
       @stack = stack
@@ -317,22 +319,27 @@ def open_erml(erml, &block)
   end
 end
 
-ARGV.unshift "samples/test24.erml.erb" unless ARGV.size.nonzero?
-if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
-  pdf = erml.sub(/\.erml(\.erb|\.haml)?$/, '') << '.pdf'
+def render_erml(erml)
   doc = open_erml(erml) do |f|
     begin
       EideticRML::XmlParser.parse(f)
     rescue Exception => e
-      puts "Error in %s: %s\n%s" % [erml, e.message, e.backtrace.join("\n")]
+      $stderr.puts "Error in %s: %s\n%s" % [erml, e.message, e.backtrace.join("\n")]
     end
   end
   unless doc.nil?
-    begin
-      File.open(pdf, 'w') { |f| f.write(doc) }
-      `open #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
-    rescue Exception => e
-      puts e.message, e.backtrace.join("\n")
-    end
+    pdf = erml.sub(/\.erml(\.erb|\.haml)?$/, '') << '.pdf'
+    File.open(pdf, 'w') { |f| f.write(doc) }
+    return pdf
+  end
+end
+
+# ARGV.unshift "samples/test24.erml.erb" unless ARGV.size.nonzero?
+if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
+  begin
+    pdf = render_erml(erml)
+    `open #{pdf}` if pdf and (RUBY_PLATFORM =~ /darwin/) and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+  rescue Exception => e
+    $stderr.puts e.message, e.backtrace.join("\n")
   end
 end
