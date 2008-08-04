@@ -887,6 +887,8 @@ module EideticRML
     class PreformattedText < Widget
       StdWidgetFactory.instance.register_widget('pre', self)
 
+      include Text
+
       def initialize(parent, attrs={})
         @lines = []
         super(parent, attrs)
@@ -913,6 +915,7 @@ module EideticRML
 
       def preferred_height(writer, units=:pt)
         font.apply(writer)
+        # @preferred_height = writer.height(@lines) + non_content_height - writer.height * (1 - writer.line_height)
         @preferred_height = writer.height(@lines) + non_content_height - (writer.height - writer.height.quo(writer.line_height))
         to_units(units, @preferred_height)
       end
@@ -1233,13 +1236,12 @@ module EideticRML
       end
 
       def preferred_height(writer, units=:pt)
-        @preferred_height = if width.nil?
-          rich_text(writer).height(parent.content_width - bullet_width - non_content_width) * writer.line_height + 
-            non_content_height - rich_text(writer).height.quo(writer.line_height)
+        ph = if width.nil?
+          rich_text(writer).height(parent.content_width - bullet_width - non_content_width) * line_height
         else
-          rich_text(writer).height(content_width - bullet_width) * writer.line_height + 
-            non_content_height - rich_text(writer).height.quo(writer.line_height)
+          rich_text(writer).height(content_width - bullet_width) * line_height
         end
+        @preferred_height = ph + non_content_height - rich_text(writer).height * (line_height - 1)
         to_units(units, @preferred_height)
       end
 
@@ -1295,6 +1297,10 @@ module EideticRML
 
       def rich_text(writer)
         if @rich_text.nil?
+          # Trim trailing whitespace.
+          while !@text_pieces.empty? and @text_pieces.last[0].respond_to?(:to_str) and @text_pieces.last[0].rstrip!
+            @text_pieces.pop if @text_pieces.last[0].empty?
+          end
           @rich_text = EideticPDF::PdfText::RichText.new
           @text_pieces.each do |piece|
             text, font = piece
