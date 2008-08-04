@@ -34,7 +34,7 @@ module EideticRML
 
       def attributes(attrs)
         attrs = attrs.inject({}) { |m, kv| m[kv.first.to_s.sub(/^class$/,'klass')] = kv.last; m } # stringify keys
-        pre_keys, post_keys = attributes_first & attrs.keys, attributes_last & attrs.keys
+        pre_keys, post_keys = attributes_first & attrs.keys, attributes_last & attrs.keys # keys are sorted same as attributes_first
         keys = attrs.keys - pre_keys - post_keys
         pre_keys.each { |key| attribute(key, attrs[key]) }
         keys.each { |key| attribute(key, attrs[key]) }
@@ -331,7 +331,7 @@ module EideticRML
       def font(value=nil)
         # inherited
         return @font || parent.font if value.nil?
-        return @font || (@font = parent.font.clone) if value == :copy
+        return @font = font.clone if value == :copy
         @font = font_style_for(value)
       end
 
@@ -823,6 +823,11 @@ module EideticRML
       def underline(value=nil)
         return font.underline if value.nil?
         font(:copy).underline(value)
+      end
+
+      def line_height(value=nil)
+        return font.line_height if value.nil?
+        font(:copy).line_height(value)
       end
 
     protected

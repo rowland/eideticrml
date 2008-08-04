@@ -119,6 +119,7 @@ module EideticRML
       include HasColor
 
       def apply(writer)
+        writer.line_height(line_height)
         writer.font(name, size, :style => style, :weight => weight, :color => color, :encoding => encoding, :sub_type => sub_type)
       end
 
@@ -160,6 +161,11 @@ module EideticRML
       def weight(value=nil)
         return @weight if value.nil?
         @weight = value
+      end
+
+      def line_height(value=nil)
+        return @line_height || 1.7 if value.nil?
+        @line_height = value.to_f
       end
     end
 
