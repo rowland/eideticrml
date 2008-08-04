@@ -174,8 +174,8 @@ module EideticRML
   end
 
   class XmlPageParser
-    undef_method :p
-    undef_method :method
+    COLLISIONS = [:p, :method]
+    COLLISIONS.each { |symbol| undef_method(symbol) }
 
     def initialize(stack, doc)
       @stack = stack
@@ -185,8 +185,8 @@ module EideticRML
     end
 
     def method_missing(id, *args)
-      # puts "page method_missing: #{id}"
-      if current.respond_to?(id)
+      # puts "page method_missing: #{id}, #{args.inspect}"
+      if current.respond_to?(id) and !COLLISIONS.include?(id)
         current.send(id, *args)
         @stack.push(current)
       else
