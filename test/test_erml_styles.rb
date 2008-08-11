@@ -115,6 +115,10 @@ class BrushStyleTestCases < Test::Unit::TestCase
     assert_equal('Blue', @brush_style.color)
     @brush_style.color 0xFF0000
     assert_equal(0xFF0000, @brush_style.color)
+    @brush_style.color "#EEEEEE"
+    assert_equal(0xEEEEEE, @brush_style.color)
+    @brush_style.color "#999"
+    assert_equal(0x090909, @brush_style.color)
   end
 end
 
