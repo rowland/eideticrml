@@ -723,7 +723,7 @@ class ParagraphTestCases < Test::Unit::TestCase
     @page.margin("1in")
     @p.text(Lorem)
     ph = @p.preferred_height(@writer)
-    assert_in_delta(107, ph, 1)
+    assert_in_delta(105.45, ph, 1)
   end
 
   def test_strikeout
