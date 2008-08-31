@@ -930,7 +930,7 @@ module EideticRML
       def draw_content(writer)
         raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
         font.apply(writer)
-        writer.puts_xy(content_left, content_top, @lines)
+        writer.puts_xy(content_left, content_top + writer.text_ascent, @lines)
       end
 
       def text_for(url)
@@ -1197,7 +1197,7 @@ module EideticRML
           @x ||= content_right
           options[:align] = :right
         end
-        writer.print_xy(@x, @y, text, options)
+        writer.print_xy(@x, @y + writer.text_ascent, text, options)
       end
 
       def label_style_for(id)
@@ -1285,7 +1285,7 @@ module EideticRML
         end
         pen_style_for('solid').apply(writer)
         raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
-        writer.paragraph_xy(content_left, content_top, rich_text(writer), options)
+        writer.paragraph_xy(content_left, content_top + rich_text(writer).ascent(content_width), rich_text(writer), options)
         @rich_text = nil
       end
 
@@ -1561,7 +1561,7 @@ module EideticRML
 
       def print(writer)
         @document_page_no = 0
-        writer.open
+        writer.open(:v_text_align => :base)
         pages.each do |page|
           page.print(writer)
         end
