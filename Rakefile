@@ -19,7 +19,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = false
   # s.extra_rdoc_files = ['README']
   # s.rdoc_options << '--title' << 'Eidetic RML' << '--main' << 'README' << '-x' << 'test'
-  s.files = FileList["*.rb"] + ['Rakefile'] + FileList["test/test*.rb"] + FileList["samples/test*.erml"] + ['samples/testimg.jpg']
+  s.files = FileList["*.rb"] + ['Rakefile'] + FileList["test/test*.rb"] + FileList["samples/test*.erml*"] + ['samples/testimg.jpg']
   s.platform = Gem::Platform::RUBY
 end
 
