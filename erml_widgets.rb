@@ -678,7 +678,7 @@ module EideticRML
       end
 
       def stream
-        @stream ||= open(url) { |io| io.read }
+        @stream ||= open(url, EideticPDF::ImageReadMode) { |io| io.read }
       end
     end
 
