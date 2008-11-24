@@ -231,13 +231,13 @@ module EideticRML
             bottom -= (widget.height + @style.vpadding)
           end
         end
-        unaligned.each do |widget|
+        unaligned.each_with_index do |widget, index|
           widget.visible = !container_full
           next if container_full
           widget.top(top, :pt)
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
-          if bottom and widget.bottom > bottom
+          if bottom and widget.bottom > bottom and index > 0
             container_full = true
             widget.visible = false
             next
