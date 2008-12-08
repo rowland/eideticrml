@@ -936,6 +936,18 @@ class PageTestCases < Test::Unit::TestCase
     @page.style('legalland')
     assert_equal(8.5, @page.height(:in))
   end
+
+  def test_orientation
+    assert_equal(:portrait, @page.orientation) # default
+    @doc.orientation(:landscape)
+    assert_equal(:landscape, @page.orientation) # inherited
+    @doc.orientation(:portrait)
+    assert_equal(:portrait, @page.orientation) # inherited
+    @page.orientation(:landscape)
+    assert_equal(:landscape, @page.orientation) # overridden
+    @page.orientation(:portrait)
+    assert_equal(:portrait, @page.orientation) # overridden
+  end
 end
 
 class DocumentTestCases < Test::Unit::TestCase

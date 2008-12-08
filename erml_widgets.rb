@@ -1477,7 +1477,8 @@ module EideticRML
 
       def orientation(value=nil)
         # inherited
-        # TODO
+        return style.orientation if value.nil?
+        style(:copy).orientation(value)
       end
 
       def print(writer)
@@ -1542,6 +1543,11 @@ module EideticRML
         init_default_styles
       end
 
+      # def orientation(value=nil)
+      #   return @orientation || :portrait if value.nil?
+      #   super(value)
+      # end
+
       def rules
         @rules ||= Rules::RuleCollection.new
       end
@@ -1552,16 +1558,23 @@ module EideticRML
       end
 
       def pages_up(value=nil)
-        # TODO
+        return @pages_up || [1, 1] if value.nil?
+        if value.respond_to?(:to_str)
+          x, y = value.to_s.split(',', 2)
+        else
+          x, y = Array(value)
+        end
+        @pages_up = [x.to_i, y.to_i]
       end
 
       def pages_up_layout(value=nil)
-        # TODO
+        return @pages_up_layout || :across if value.nil?
+        @pages_up_layout = value.to_sym if [:across, :down].include?(value.to_sym)
       end
 
       def print(writer)
         @document_page_no = 0
-        writer.open(:v_text_align => :base)
+        writer.open(:v_text_align => :base, :pages_up => pages_up, :pages_up_layout => pages_up_layout, :orientation => orientation)
         pages.each do |page|
           page.print(writer)
         end

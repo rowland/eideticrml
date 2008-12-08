@@ -1,0 +1,17 @@
+<erml>
+	<styles>
+	  <font id="body" name="Clarendon-Light" size="12" />
+	</styles>
+	<rules>
+	  <!--
+	    p { font: body; }
+    -->
+	</rules>
+	<pages orientation="landscape" pages_up="2,2" pages_up_layout="down">
+<% 4.times do %>
+		<page units="in" margin="0.25" padding="0.25" border="solid">
+	    <p>Page <pageno /></p>
+    </page>
+<% end %>
+	</pages>
+</erml>
