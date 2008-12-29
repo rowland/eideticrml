@@ -4,7 +4,11 @@
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
 require 'rubygems'
-gem 'eideticpdf'
+if File.exist?('../eideticpdf')
+  $:.unshift('../eideticpdf')
+else
+  gem 'eideticpdf'
+end
 require 'epdfdw'
 
 module EideticRML
