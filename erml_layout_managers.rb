@@ -404,15 +404,15 @@ module EideticRML
           max_height = 0
           left = container.content_left
           grid.cols.times do |c|
-            widget = grid[c, r]
-            next unless widget
-            rh = heights[c,r]
-            widget.top(top, :pt)
-            widget.left(left, :pt)
-            height = (0...rh[0]).inject((rh[0] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][1] }
-            widget.height(height, :pt)
-            left += widget.width + @style.hpadding
-            max_height = [max_height, rh[1]].max if rh[0] == 1
+            if widget = grid[c, r]
+              rh = heights[c,r]
+              widget.top(top, :pt)
+              widget.left(left, :pt)
+              height = (0...rh[0]).inject((rh[0] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][1] }
+              widget.height(height, :pt)
+              max_height = [max_height, rh[1]].max if rh[0] == 1
+            end
+            left += widths[c][1] + @style.hpadding
           end
           top += max_height + @style.vpadding
         end
