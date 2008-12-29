@@ -1297,6 +1297,7 @@ module EideticRML
 
       def rich_text(writer)
         if @rich_text.nil?
+          @text_pieces ||= []
           # Trim trailing whitespace.
           while !@text_pieces.empty? and @text_pieces.last[0].respond_to?(:to_str) and @text_pieces.last[0].rstrip!
             @text_pieces.pop if @text_pieces.last[0].empty?

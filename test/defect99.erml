@@ -1,0 +1,128 @@
+<erml>
+  <styles>
+    <layout id='table' padding='0'>  </layout>
+    <pen color='Gray' id='solid'></pen>
+  </styles>
+  <rules>
+    <!-- 
+      td {
+        border: solid;
+        padding: 5pt; }
+      
+      set_h {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      exercise_h {
+        border: solid;
+        padding: 5pt;
+        width: 1.25in; }
+      
+      lbs_h {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      reps_h {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      rest_h {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      effort_h {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      set {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      exercise {
+        border: solid;
+        padding: 5pt;
+        width: 1.25in; }
+      
+      lbs {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      reps {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      rest {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+      
+      effort {
+        border: solid;
+        padding: 5pt;
+        width: 0.5in; }
+    -->
+  </rules>
+  <pages units='in'>
+    <define id='td' tag='p'></define>
+    <define id='set_h' tag='label'></define>
+    <define id='exercise_h' tag='label'></define>
+    <define id='lbs_h' tag='label'></define>
+    <define id='reps_h' tag='label'></define>
+    <define id='rest_h' tag='label'></define>
+    <define id='effort_h' tag='label'></define>
+    <define id='set' tag='label'></define>
+    <define id='exercise' tag='label'></define>
+    <define id='lbs' tag='label'></define>
+    <define id='reps' tag='label'></define>
+    <define id='rest' tag='label'></define>
+    <define id='effort' tag='p'></define>
+    <page margin='0.25'>
+      <table border='solid' cols='9' width='5.25'>
+        <td colspan='2'>
+          Routine:
+        </td>
+        <td colspan='3'>
+          Plan
+        </td>
+        <td colspan='4'>
+          Actual
+        </td>
+
+        <set_h>Set</set_h>
+        <exercise_h>Exercise</exercise_h>
+        <lbs_h>lbs</lbs_h>
+        <reps_h>reps</reps_h>
+        <rest_h>rest</rest_h>
+        <effort_h>effort</effort_h>
+        <lbs_h>lbs</lbs_h>
+        <reps_h>reps</reps_h>
+        <rest_h>rest</rest_h>
+
+        <set rowspan='2'>1</set>
+        <exercise>benchpress</exercise>
+        <lbs>120</lbs>
+        <reps>5</reps>
+        <rest rowspan='2'>1:30</rest>
+        <effort>hard</effort>
+        <lbs>100</lbs>
+        <reps>1</reps>
+        <rest rowspan='2'>3:00</rest>
+
+        <exercise>curl</exercise>
+        <lbs>50</lbs>
+        <reps>5</reps>
+        <effort></effort>
+        <lbs>50</lbs>
+        <reps>2</reps>
+      </table>
+    </page>
+  </pages>
+</erml>
