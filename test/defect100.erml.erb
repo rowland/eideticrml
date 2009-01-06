@@ -1,0 +1,41 @@
+<erml>
+	<styles>
+	  <font id="title" name="Optima" size="14" />	   	  
+	  <font id="body" name="Optima" size="12" />
+	  <layout id="vbox" padding="10pt" />	  	
+		<layout id="flow" padding="0.5in" />
+		<layout id="vbox" padding="0.05in" />
+		<layout id="hbox" padding="0.15in" />					
+		<font id="zapf1" name="ZapfDingbats" size="7" />
+		<font id="helv9" name="Helvetica" size="9" />
+	</styles>
+	<rules>
+		<!--
+	    p { font: body; text-align: justify }
+	    header { display: always; margin-bottom: 12pt }
+	    footer { display: always; layout: hbox }
+	    .title { font: title }	    
+			p.low9 { font: helv9; padding: 5pt; }
+		-->
+	</rules>
+	<pages>
+    <define id="hline" tag="line" angle="0" width="100%" height="0.1in" />
+		<define id="vline" tag="line" angle="90" height="100%" width="1pt" />				
+	  <define id="em" tag="span" font.weight="Bold" />
+	  <define id="header" tag="div" align="top" />
+	  <define id="footer" tag="div" align="bottom" />		
+		<page units="in" margin="0.5" margin_top="0.25" margin_bottom="0.25" layout="vbox" overflow="true">
+			<header>
+				<image url="test/footer1_11-10.jpg" height="1" width="7.5" />
+			</header>
+			<p text_align='center' class='title'>Worksheet Name</p>
+			<p text_align='justify' class='low9'> </p>
+      <% 50.times do |i| %>
+      <p><%= i %>. Testing.</p>
+      <% end %>
+			<footer>
+				<image url="test/footer1_11-10.jpg" height="1" width="7.5" />
+			</footer>        
+		</page>
+	</pages>
+</erml>

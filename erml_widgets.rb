@@ -373,7 +373,8 @@ module EideticRML
           end
         end
         @printed = true
-        @width, @height = @orig_width, @orig_height
+        @width = @orig_width if @orig_width
+        @height = @orig_height if @orig_height
       rescue Exception => e
         raise RuntimeError, e.message + "\nError printing #{path}.", e.backtrace
       end
