@@ -1487,7 +1487,7 @@ module EideticRML
         root.section_page_no = 0
         while more
           more(false)
-          writer.open_page
+          writer.open_page(:page_size => size, :orientation => orientation)
           root.document_page_no += 1
           root.section_page_no += 1
           layout_widget(writer)
@@ -1507,7 +1507,8 @@ module EideticRML
 
       def size(value=nil)
         # inherited
-        # TODO
+        return style.size if value.nil?
+        style(:copy).size(value)
       end
 
       def style(value=nil)

@@ -948,6 +948,18 @@ class PageTestCases < Test::Unit::TestCase
     @page.orientation(:portrait)
     assert_equal(:portrait, @page.orientation) # overridden
   end
+
+  def test_size
+    assert_equal(:letter, @page.size) # default
+    @doc.size(:legal)
+    assert_equal(:legal, @page.size) # inherited
+    @doc.size(:letter)
+    assert_equal(:letter, @page.size) # inherited
+    @page.size(:legal)
+    assert_equal(:legal, @page.size) # overridden
+    @page.size(:letter)
+    assert_equal(:letter, @page.size) # overridden
+  end
 end
 
 class DocumentTestCases < Test::Unit::TestCase
