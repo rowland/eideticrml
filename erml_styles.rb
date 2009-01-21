@@ -182,8 +182,8 @@ module EideticRML
       include HasWidth
 
       def initialize(styles, attrs={})
-        super(styles, attrs)
         @width, @units = 36, :pt
+        super(styles, attrs)
       end
 
       def apply(writer)
