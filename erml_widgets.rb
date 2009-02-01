@@ -106,7 +106,7 @@ module EideticRML
         return to_units(value, right) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @right = parse_measurement_pts(value, units || self.units)
-        @right = parent.width + @right if @right < 0
+        @right = parent.width + @right if @right <= 0
       end
 
       def bottom(value=nil, units=nil)
@@ -114,7 +114,7 @@ module EideticRML
         return to_units(value, bottom) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @bottom = parse_measurement_pts(value, units || self.units)
-        @bottom = parent.height + @bottom if @bottom < 0
+        @bottom = parent.height + @bottom if @bottom <= 0
       end
 
       def shift(value=nil, units=nil)

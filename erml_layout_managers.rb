@@ -33,8 +33,8 @@ module EideticRML
       def layout_relative(container, writer, widgets)
         widgets.each do |widget|
           widget.before_layout
-          widget.left(container.content_left, :pt) if widget.left.nil?
-          widget.top(container.content_top, :pt) if widget.top.nil?
+          widget.left(container.content_left, :pt) if widget.left.nil? and widget.right.nil?
+          widget.top(container.content_top, :pt) if widget.top.nil? and widget.bottom.nil?
           widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
@@ -68,7 +68,7 @@ module EideticRML
         widgets, remaining = container.children.partition do |child|
           (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
         end
-        remaining.each { |widget| widget.visible = false if widget.printed; }
+        remaining.each { |widget| widget.visible = false if widget.printed }
         widgets.each do |widget|
           widget.visible = !container_full
           next if container_full
@@ -105,7 +105,7 @@ module EideticRML
         widgets, remaining = container.children.partition do |child|
           (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
         end
-        remaining.each { |widget| widget.visible = false }
+        remaining.each { |widget| widget.visible = false if widget.printed }
         static, relative = widgets.partition { |widget| widget.position == :static }
         lpanels, unaligned = static.partition { |widget| widget.align == :left }
         rpanels, unaligned = unaligned.partition { |widget| widget.align == :right }
@@ -191,7 +191,7 @@ module EideticRML
         widgets, remaining = container.children.partition do |child|
           (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
         end
-        remaining.each { |widget| widget.visible = false }
+        remaining.each { |widget| widget.visible = false if widget.printed }
         static, relative = widgets.partition { |widget| widget.position == :static }
         headers, unaligned = static.partition { |widget| widget.align == :top }
         footers, unaligned = unaligned.partition { |widget| widget.align == :bottom }
@@ -419,7 +419,11 @@ module EideticRML
         if container.height.nil?
           container.height(top - container.content_top + container.non_content_height - @style.vpadding, :pt)
         end
-        container.children.each { |widget| widget.layout_widget(writer) }
+        static, remaining = container.children.partition do |child|
+          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
+        end
+        remaining.each { |widget| widget.visible = false if widget.printed }
+        static.each { |widget| widget.layout_widget(writer) }
       end
 
     public
@@ -430,6 +434,7 @@ module EideticRML
           grid = col_grid(container)
         end
         layout_grid(grid, container, writer)
+        super(container, writer)
       end
     end
   end

@@ -1,0 +1,32 @@
+<erml>
+  <pages margin="2" units="in">
+    <page layout="flow" border="dotted">
+      <p>Positioning image with flow layout.</p>
+      <image url="test/AGASI2.jpg" left="0" top="0" />
+      <image url="test/AGASI2.jpg" right="0" top="0" />
+      <image url="test/AGASI2.jpg" right="0" bottom="0" />
+      <image url="test/AGASI2.jpg" left="0" bottom="0" />
+    </page>
+    <page layout="vbox" border="dotted">
+      <p>Positioning image with vbox layout.</p>
+      <image url="test/AGASI2.jpg" left="0" top="0" />
+      <image url="test/AGASI2.jpg" right="0" top="0" />
+      <image url="test/AGASI2.jpg" right="0" bottom="0" />
+      <image url="test/AGASI2.jpg" left="0" bottom="0" />
+    </page>
+    <page layout="hbox" border="dotted">
+      <p>Positioning image with hbox layout.</p>
+      <image url="test/AGASI2.jpg" left="0" top="0" />
+      <image url="test/AGASI2.jpg" right="0" top="0" />
+      <image url="test/AGASI2.jpg" right="0" bottom="0" />
+      <image url="test/AGASI2.jpg" left="0" bottom="0" />
+    </page>
+    <page layout="table" border="dotted" cols="1">
+      <p>Positioning image with table layout.</p>
+      <image url="test/AGASI2.jpg" left="0" top="0" />
+      <image url="test/AGASI2.jpg" right="0" top="0" />
+      <image url="test/AGASI2.jpg" right="0" bottom="0" />
+      <image url="test/AGASI2.jpg" left="0" bottom="0" />
+    </page>
+  </pages>
+</erml>
