@@ -1,0 +1,21 @@
+<erml>
+  <styles>
+    <brush id="e6" color="#eeeeee" />
+    <brush id="a6" color="#aaaaaa" />
+    <brush id="e3" color="#eee" />
+    <brush id="a3" color="#aaa" />
+  </styles>
+  <rules>
+    <!--
+      p { width: 1; height: 1 }
+    -->
+  </rules>
+  <pages margin="1" units="in">
+    <page layout="table" cols="2">
+      <p fill="e6">Color #eeeeee</p>
+      <p fill="a6">Color #aaaaaa</p>
+      <p fill="a3">Color #aaa</p>
+      <p fill="e3">Color #eee</p>
+    </page>
+  </pages>
+</erml>

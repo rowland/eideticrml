@@ -15,7 +15,7 @@ module EideticRML
         when /^#([0-9A-Fa-f]{6})$/ # 6-digit hex color
           $1.to_i(16)
         when /^#([0-9A-Fa-f]{3})$/ # 3-digit hex color
-          $1.gsub(/(\w)/, '0\\1').to_i(16)
+          $1.gsub(/(\w)/, '\\1\\1').to_i(16)
         else
           value
         end
