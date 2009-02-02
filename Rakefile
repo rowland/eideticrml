@@ -5,8 +5,8 @@ require 'rcov/rcovtask'
 
 spec = Gem::Specification.new do |s|
   s.name = "eideticrml"
-  s.version = "0.1.8"
-  s.date = "2009-1-21"
+  s.version = "0.1.9"
+  s.date = "2009-2-1"
   s.summary = "Report Markup Language"
   s.requirements = "Ruby 1.8.x, eideticpdf"
   s.require_path = '.'
