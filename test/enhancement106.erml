@@ -1,0 +1,22 @@
+<erml>
+  <styles>
+    <font id="big" name="Helvetica" size="16" />
+  </styles>
+  <rules>
+    <!--
+      #foo { font.style: italic; }
+      #bar { font.style: bold; }
+      #foo, #bar { font.color: Blue; }
+      sig { font: big; }
+      sig, .name { font.color: Green; }
+    -->
+  </rules>
+  <pages margin="1" units="in">
+    <define id="sig" tag="p" />
+    <page layout="flow">
+      <p id="foo">Hello again, <span class="name">Bart</span>.</p>
+      <p id="bar">Goodbye, <span class="name">Bart</span>.</p>
+      <sig>Button Man</sig>
+    </page>
+  </pages>
+</erml>

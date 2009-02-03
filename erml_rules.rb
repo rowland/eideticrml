@@ -41,7 +41,11 @@ module EideticRML
       end
 
       def self.selector_re_s(selector)
-        selector.split(' ').map { |group| group_re_s(group) }.join(SPACE_RE) << '$'
+        selectors = selector.split(',').map { |sel| sel.strip }
+        result = selectors.map do |sel|
+          sel.split(' ').map { |group| group_re_s(group) }.join(SPACE_RE) << '$'
+        end
+        result.size > 1 ? '(' << result.join('|') << ')' : result.first
       end
 
       def self.group_re_s(group)

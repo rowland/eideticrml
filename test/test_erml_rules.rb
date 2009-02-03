@@ -25,6 +25,7 @@ class RuleTestCases < Test::Unit::TestCase
 
   def test_selector_re_s
     assert_equal('foo#bar(\\.\\w+)*\\/([^\\/]+\\/)*foo(#\\w+)?(\\.\\w+)*\\.bar(\\.\\w+)*$', Rule.selector_re_s('foo#bar foo.bar'))
+    assert_equal('(foo(#\\w+)?(\\.\\w+)*$|bar(#\\w+)?(\\.\\w+)*$)', Rule.selector_re_s('foo, bar'))
   end
 
   def test_foo
@@ -33,6 +34,15 @@ class RuleTestCases < Test::Unit::TestCase
     assert re =~ 'foo#bar'
     assert re =~ 'foo.bar'
     assert re =~ 'foo#bar.baz'
+  end
+
+  def test_foo_comma_bar
+    re = Regexp.compile Rule.selector_re_s('foo, bar')
+    assert re =~ 'foo'
+    assert re =~ 'foo#bar'
+    assert re =~ 'bar'
+    assert re =~ 'bar.baz'
+    assert re !~ 'baz'
   end
 
   def test_pound_bar
