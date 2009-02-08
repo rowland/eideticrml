@@ -264,7 +264,10 @@ module EideticRML
 
       def row_grid(container)
         raise ArgumentError, "cols must be specified." if container.cols.nil?
-        static = container.children.select { |widget| widget.position == :static }
+        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
+        static = container.children.select do |child|
+          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
+        end
         grid = Support::Grid.new(container.cols, 0)
         row = col = 0
         static.each do |widget|
@@ -283,7 +286,10 @@ module EideticRML
 
       def col_grid(container)
         raise ArgumentError, "rows must be specified." if container.rows.nil?
-        static = container.children.select { |widget| widget.position == :static }
+        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
+        static = container.children.select do |child|
+          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
+        end
         grid = Support::Grid.new(0, container.rows)
         row = col = 0
         static.each do |widget|
@@ -359,6 +365,7 @@ module EideticRML
       end
 
       def layout_grid(grid, container, writer)
+        container_full = false
         widths = detect_widths(grid)
         percents, others = widths.partition { |w| w[0] == :percent }
         specified, others = others.partition { |w| w[0] == :specified }
@@ -400,11 +407,14 @@ module EideticRML
         end
 
         top = container.content_top
+        bottom = container.content_top + container.max_content_height
         grid.rows.times do |r|
           max_height = 0
           left = container.content_left
           grid.cols.times do |c|
             if widget = grid[c, r]
+              widget.visible = !container_full
+              next if container_full
               rh = heights[c,r]
               widget.top(top, :pt)
               widget.left(left, :pt)
@@ -414,11 +424,17 @@ module EideticRML
             end
             left += widths[c][1] + @style.hpadding
           end
+          if top + max_height > bottom
+            container_full = true
+            grid.cols.times { |c| grid[c, r].visible = (r == 0) }
+            container.more(true) if container.overflow and (r > 0)
+          end
           top += max_height + @style.vpadding
         end
         if container.height.nil?
           container.height(top - container.content_top + container.non_content_height - @style.vpadding, :pt)
         end
+        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
         static, remaining = container.children.partition do |child|
           (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
         end
