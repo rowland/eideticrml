@@ -602,6 +602,36 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(w1, @widget.send(:widget_for, 'w1'))
     assert_equal(w2, @widget.send(:widget_for, 'w2'))
   end
+
+  def test_max_content_height
+    assert_equal(792, @page.height)
+    assert_equal(792, @page.content_height)
+    assert_equal(792, @page.max_content_height)
+    assert_equal(792, @widget.max_content_height)
+    
+    @page.margin(50)
+    @page.padding(50)
+    assert_equal(792, @page.height)
+    assert_equal(592, @page.content_height)
+    assert_equal(592, @page.max_content_height)
+    assert_equal(592, @widget.max_content_height)
+    
+    @widget.margin(50)
+    @widget.padding(50)
+    assert_equal(392, @widget.max_content_height)    
+  end
+
+  def test_max_height
+    assert_equal(792, @page.max_height)
+    assert_equal(792, @widget.max_height)
+
+    @page.margin(50)
+    @page.padding(50)
+    assert_equal(592, @widget.max_height)
+
+    @widget.top(@page.content_top + 100)
+    assert_equal(492, @widget.max_height)
+  end
 end
 
 class RectangleTestCases < Test::Unit::TestCase

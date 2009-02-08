@@ -165,6 +165,14 @@ module EideticRML
         end
       end
 
+      def max_content_height
+        max_height - non_content_height
+      end
+
+      def max_height
+        height || parent.max_content_height - ((top || parent.content_top) - parent.content_top)
+      end
+
       def content_top(units=:pt)
         to_units(units, top + margin_top + padding_top)
       end

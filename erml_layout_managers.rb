@@ -84,7 +84,7 @@ module EideticRML
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
           if container.bottom and widget.bottom > container.bottom
             container_full = true
-            widget.visible = false
+            widget.visible = (cy == 0)
             next
           end
           cx += widget.width + @style.hpadding
@@ -201,14 +201,14 @@ module EideticRML
           widget.left(container.content_left, :pt)
         end
         top = container.content_top
-        bottom = footers.empty? ? nil : container.content_bottom
+        bottom = container.content_top + container.max_content_height
         headers.each do |widget|
           widget.visible = !container_full
           next if container_full
           widget.top(top, :pt)
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
-          if bottom and widget.bottom > bottom
+          if widget.bottom > bottom
             container_full = true
             widget.visible = false
             next
@@ -237,9 +237,9 @@ module EideticRML
           widget.top(top, :pt)
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
-          if bottom and widget.bottom > bottom and index > 0
+          if widget.bottom > bottom
             container_full = true
-            widget.visible = false
+            widget.visible = (index == 0)
             next
           end
           top += (widget.height + @style.vpadding)
