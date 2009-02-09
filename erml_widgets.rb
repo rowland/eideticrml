@@ -128,11 +128,11 @@ module EideticRML
       end
 
       def preferred_width(writer, units=:pt)
-        @width || 0
+        to_units(units, @width || 0)
       end
 
       def preferred_height(writer, units=:pt)
-        @height || 0
+        to_units(units, @height || 0)
       end
 
       def width(value=nil, units=nil)
@@ -368,6 +368,7 @@ module EideticRML
       def print(writer)
         return if visible == false
         return if disabled
+        # $stderr.puts "print #{tag} { left = #{left}, top = #{top}}"
         before_print(writer)
         if @rotate.nil?
           paint_background(writer)
@@ -658,10 +659,13 @@ module EideticRML
 
       def preferred_height(writer, units=:pt)
         if @height.nil? and @width
+          # $stderr.puts "path A, width = #{@width}"
           h = @width * image(writer).height.quo(image(writer).width)
         else
+          # $stderr.puts "path B"
           h = @height || image(writer).height
         end
+        # $stderr.puts "h = #{h}"
         to_units(units, h)
       end
 
@@ -672,6 +676,7 @@ module EideticRML
 
     protected
       def draw_content(writer)
+        # $stderr.puts "print image: #{url}"
         writer.print_image_file(load_image(writer), left, top, width, height)
       end
 
@@ -924,7 +929,6 @@ module EideticRML
 
       def preferred_height(writer, units=:pt)
         font.apply(writer)
-        # @preferred_height = writer.height(@lines) + non_content_height - writer.height * (1 - writer.line_height)
         @preferred_height = writer.height(@lines) + non_content_height - (writer.height - writer.height.quo(writer.line_height))
         to_units(units, @preferred_height)
       end
@@ -1003,7 +1007,7 @@ module EideticRML
       end
 
       # def preferred_height(writer, units=:pt)
-      #   @preferred_height = @height || children.map { |child| child.bottom }.max + padding_bottom + margin_bottom
+      #   @preferred_height = @preferred_content_height ? @preferred_content_height + non_content_height : height
       #   to_units(units, @preferred_height)
       # end
 
