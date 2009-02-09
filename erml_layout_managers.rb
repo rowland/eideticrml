@@ -48,6 +48,14 @@ module EideticRML
       def self.for_name(name)
         @@klasses[name] unless @@klasses.nil?
       end
+      
+    protected
+      def printable_widgets(container, position)
+        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
+        widgets, remaining = container.children.partition do |child|
+          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
+        end
+      end
     end
 
     class AbsoluteLayout < LayoutManager
@@ -64,10 +72,7 @@ module EideticRML
       def layout(container, writer)
         cx = cy = max_y = 0
         container_full = false
-        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
-        widgets, remaining = container.children.partition do |child|
-          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
-        end
+        widgets, remaining = printable_widgets(container, :static)
         remaining.each { |widget| widget.visible = false if widget.printed }
         widgets.each do |widget|
           widget.visible = !container_full
@@ -101,10 +106,7 @@ module EideticRML
 
       def layout(container, writer)
         container_full = false
-        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
-        widgets, remaining = container.children.partition do |child|
-          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
-        end
+        widgets, remaining = printable_widgets(container, :static)
         remaining.each { |widget| widget.visible = false if widget.printed }
         static, relative = widgets.partition { |widget| widget.position == :static }
         lpanels, unaligned = static.partition { |widget| widget.align == :left }
@@ -187,10 +189,7 @@ module EideticRML
 
       def layout(container, writer)
         container_full = false
-        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
-        widgets, remaining = container.children.partition do |child|
-          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
-        end
+        widgets, remaining = printable_widgets(container, :static)
         remaining.each { |widget| widget.visible = false if widget.printed }
         static, relative = widgets.partition { |widget| widget.position == :static }
         headers, unaligned = static.partition { |widget| widget.align == :top }
@@ -264,10 +263,7 @@ module EideticRML
 
       def row_grid(container)
         raise ArgumentError, "cols must be specified." if container.cols.nil?
-        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
-        static = container.children.select do |child|
-          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
-        end
+        static = printable_widgets(container, :static).first
         grid = Support::Grid.new(container.cols, 0)
         row = col = 0
         static.each do |widget|
@@ -286,10 +282,7 @@ module EideticRML
 
       def col_grid(container)
         raise ArgumentError, "rows must be specified." if container.rows.nil?
-        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
-        static = container.children.select do |child|
-          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
-        end
+        static = printable_widgets(container, :static).first
         grid = Support::Grid.new(0, container.rows)
         row = col = 0
         static.each do |widget|
@@ -434,10 +427,7 @@ module EideticRML
         if container.height.nil?
           container.height(top - container.content_top + container.non_content_height - @style.vpadding, :pt)
         end
-        dpgno, spgno = container.root.document_page_no, container.root.section_page_no
-        static, remaining = container.children.partition do |child|
-          (child.position == :static) and (!child.printed or child.display_for_page(dpgno, spgno))
-        end
+        static, remaining = printable_widgets(container, :static)
         remaining.each { |widget| widget.visible = false if widget.printed }
         static.each { |widget| widget.layout_widget(writer) }
       end
