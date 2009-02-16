@@ -238,9 +238,9 @@ module EideticRML
           dy += widget.height + (index > 0 ? @style.vpadding : 0) if widget.visible
         end
         set_height = container.height.nil?
-        # container.height(container.max_height, :pt) if set_height
+        # container.height(container.max_height_avail, :pt) if set_height
         unaligned.each_with_index do |widget, index|
-          widget.visible = (widget.bottom <= bottom) || (index == 0) || (container.overflow && widget.top < bottom)
+          widget.visible = (widget.bottom <= bottom) || (index == 0) #|| (container.overflow && widget.top < bottom)
           if widget.visible and widget.bottom > bottom and container.overflow
             widget.layout_widget(writer)
           end
@@ -257,7 +257,7 @@ module EideticRML
         container.children.each do |widget|
           if widget.visible and widget.position == :static
             if widget.bottom > container.content_bottom
-              widget.disabled = container.overflow
+              widget.disabled = !container.overflow
             end
             # widget.after_layout if widget.visible
           end

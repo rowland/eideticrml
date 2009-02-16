@@ -166,10 +166,10 @@ module EideticRML
       end
 
       def max_content_height
-        max_height - non_content_height
+        max_height_avail - non_content_height
       end
 
-      def max_height
+      def max_height_avail
         height || parent.max_content_height - ((top || parent.content_top) - parent.content_top)
       end
 
@@ -995,9 +995,9 @@ module EideticRML
       def after_layout
         # puts "after_layout: #{tag}"
         layout.manager.after_layout(self) unless layout.nil?
-        # children.each do |widget|
-        #   widget.after_layout if widget.visible
-        # end
+        children.each do |widget|
+          widget.after_layout if widget.visible
+        end
       end
 
       def more(flag=nil)
