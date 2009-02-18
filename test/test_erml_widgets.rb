@@ -8,9 +8,11 @@ require 'test/unit'
 require File.join(File.dirname(__FILE__), 'test_helpers')
 require 'erml_widgets'
 require 'erml_styles'
+require 'erml_support'
 
 include EideticRML::Widgets
 include EideticRML::Styles
+include EideticRML::Support
 
 class StdWidgetFactoryTestCases < Test::Unit::TestCase
   def test_for_namespace
@@ -319,6 +321,88 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(720, @widget.height)
   end
 
+  def test_max_width_fixed
+    @page.units(:in)
+    assert_nil(@widget.max_width)
+    @widget.max_width('5')
+    assert_equal(5, @widget.max_width(:in))
+    assert_equal(360, @widget.max_width)
+  end
+
+  def test_max_width_percent
+    @page.units(:in)
+    assert_nil(@widget.max_width)
+    @widget.max_width('50%')
+    assert_equal(0.5, @widget.max_width_pct)
+    assert_equal(4.25, @widget.max_width(:in))
+    assert_equal(306, @widget.max_width)
+
+    @widget.width('50%')
+    w = Widget.new(@widget)
+    w.max_width('50%')
+    assert_equal(0.5, w.max_width_pct)
+    assert_equal(2.125, w.max_width(:in))
+    assert_equal(153, w.max_width)
+
+    # child with percent max_width should resize along with parent
+    @widget.width('100%')
+    assert_equal(0.5, w.max_width_pct)
+    assert_equal(4.25, w.max_width(:in))
+    assert_equal(306, w.max_width)
+  end
+
+  def test_max_width_relative
+    @page.margin('1in')
+    assert_nil(@widget.max_width)
+    @widget.max_width('-2in')
+    assert_equal(4.5, @widget.max_width(:in))
+    assert_equal(324, @widget.max_width)
+    @widget.max_width('+1in')
+    assert_equal(7.5, @widget.max_width(:in))
+    assert_equal(540, @widget.max_width)
+  end
+
+  def test_max_height_fixed
+    @page.units(:in)
+    assert_nil(@widget.max_height)
+    @widget.max_height('3.5')
+    assert_equal(3.5, @widget.max_height(:in))
+    assert_equal(252, @widget.max_height)
+  end
+
+  def test_max_height_percent
+    @page.units(:in)
+    assert_nil(@widget.max_height)
+    @widget.max_height('50%')
+    assert_equal(0.5, @widget.max_height_pct)
+    assert_equal(5.5, @widget.max_height(:in))
+    assert_equal(396, @widget.max_height)
+
+    @widget.height('50%')
+    w = Widget.new(@widget)
+    w.max_height('50%')
+    assert_equal(0.5, w.max_height_pct)
+    assert_equal(2.75, w.max_height(:in))
+    assert_equal(198, w.max_height)
+
+    # child with percent max_height should resize along with parent
+    @widget.height('100%')
+    assert_equal(0.5, w.max_height_pct)
+    assert_equal(5.5, w.max_height(:in))
+    assert_equal(396, w.max_height)
+  end
+
+  def test_max_height_relative
+    @page.margin('1in')
+    assert_nil(@widget.max_height)
+    @widget.max_height('-2in')
+    assert_equal(7, @widget.max_height(:in))
+    assert_equal(504, @widget.max_height)
+    @widget.max_height('+1in')
+    assert_equal(10, @widget.max_height(:in))
+    assert_equal(720, @widget.max_height)
+  end
+
   def test_content_top
     @widget.top(50)
     assert_equal(50, @widget.content_top)
@@ -621,16 +705,39 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal(392, @widget.max_content_height)    
   end
 
-  def test_max_height
-    assert_equal(792, @page.max_height)
-    assert_equal(792, @widget.max_height)
+  def test_max_height_avail
+    assert_equal(792, @page.max_height_avail)
+    assert_equal(792, @widget.max_height_avail)
 
     @page.margin(50)
     @page.padding(50)
-    assert_equal(592, @widget.max_height)
+    assert_equal(592, @widget.max_height_avail)
 
     @widget.top(@page.content_top + 100)
-    assert_equal(492, @widget.max_height)
+    assert_equal(492, @widget.max_height_avail)
+  end
+
+  def test_visible
+    b = Bounds.new(1,1,7.5,10)
+    assert_equal 0, @widget.visible(b)
+    @widget.left 0
+    @widget.top 0
+    @widget.right 8.5
+    @widget.bottom 11
+    assert_equal 0, @widget.visible(b)
+    @widget.left 1
+    @widget.top 1
+    @widget.right 7.5
+    @widget.bottom 10
+    assert_equal 1, @widget.visible(b)
+    @widget.left 2
+    @widget.top 2
+    assert_equal 1, @widget.visible(b)
+    @widget.right 6
+    @widget.bottom 8
+    assert_equal 1, @widget.visible(b)
+    @widget.left 0.5
+    assert_equal 0, @widget.visible(b)
   end
 end
 

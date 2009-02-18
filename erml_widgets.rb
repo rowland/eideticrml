@@ -20,7 +20,7 @@ module EideticRML
     class Widget
       include Support
 
-      attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel
+      attr_reader :parent, :width_pct, :height_pct, :max_width_pct, :max_height_pct
       attr_accessor :disabled
       attr_writer :printed, :visible
 
@@ -162,6 +162,36 @@ module EideticRML
         else
           @height = parse_measurement_pts(value, units || self.units)
           @height_pct = nil
+        end
+      end
+
+      def max_width(value=nil, units=nil)
+        return @max_width_pct ? @max_width_pct * parent.content_width : @max_width if value.nil?
+        return to_units(value, max_width) if value.is_a?(Symbol)
+        if value =~ /(\d+(\.\d+)?)%/
+          @max_width_pct = $1.to_f.quo(100)
+          @max_width = @max_width_pct * parent.content_width
+        elsif value.to_s =~ /^[+-]/
+          @max_width = parent.content_width + parse_measurement_pts(value, units || self.units)
+          @max_width_pct = nil
+        else
+          @max_width = parse_measurement_pts(value, units || self.units)
+          @max_width_pct = nil
+        end
+      end
+
+      def max_height(value=nil, units=nil)
+        return @max_height_pct ? @max_height_pct * parent.content_height : @max_height if value.nil?
+        return to_units(value, max_height) if value.is_a?(Symbol)
+        if value =~ /(\d+(\.\d+)?)%/
+          @max_height_pct = $1.to_f.quo(100)
+          @max_height = @max_height_pct * parent.content_height
+        elsif value.to_s =~ /^[+-]/
+          @max_height = parent.content_height + parse_measurement_pts(value, units || self.units)
+          @max_height_pct = nil
+        else
+          @max_height = parse_measurement_pts(value, units || self.units)
+          @hmax_height_pct = nil
         end
       end
 
@@ -465,6 +495,7 @@ module EideticRML
 
       def visible(bounds=nil)
         return @visible if bounds.nil?
+        return 0 if left.nil? or top.nil? or right.nil? or bottom.nil?
         (left >= bounds.left and top >= bounds.top and right <= bounds.right and bottom <= bounds.bottom) ? 1 : 0
       end
 
@@ -1045,6 +1076,10 @@ module EideticRML
       def source(id=nil)
         return children if id.nil?
         @children = widget_for(id).children
+      end
+
+      def visible(bounds=nil)
+        bounds.nil? ? super : super + children.inject(0) { |total, widget| total + widget.visible(bounds) }
       end
 
     protected
