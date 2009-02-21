@@ -739,6 +739,19 @@ class WidgetTestCases < Test::Unit::TestCase
     @widget.left 0.5
     assert_equal 0, @widget.visible(b)
   end
+
+  def test_postpone
+    assert !@widget.disabled
+    assert !@widget.printed
+    @widget.postpone
+    # nothing happens the first time
+    assert !@widget.disabled
+    assert !@widget.printed
+    @widget.postpone
+    # widget is marked disabled (and therefore "printed") after the second postponement
+    assert @widget.disabled
+    assert @widget.printed
+  end
 end
 
 class RectangleTestCases < Test::Unit::TestCase
