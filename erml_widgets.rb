@@ -91,6 +91,7 @@ module EideticRML
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @left = parse_measurement_pts(value, units || self.units)
         @left = parent.width + @left if @left < 0
+        @width = @right - @left unless @right.nil?
       end
 
       def top(value=nil, units=nil)
@@ -99,6 +100,7 @@ module EideticRML
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @top = parse_measurement_pts(value, units || self.units)
         @top = parent.height + @top if @top < 0
+        @height = @bottom - @top unless @bottom.nil?
       end
 
       def right(value=nil, units=nil)
@@ -107,6 +109,7 @@ module EideticRML
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @right = parse_measurement_pts(value, units || self.units)
         @right = parent.width + @right if @right <= 0
+        @width = @right - @left unless @left.nil?
       end
 
       def bottom(value=nil, units=nil)
@@ -115,6 +118,7 @@ module EideticRML
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @bottom = parse_measurement_pts(value, units || self.units)
         @bottom = parent.height + @bottom if @bottom <= 0
+        @height = @bottom - @top unless @top.nil?
       end
 
       def shift(value=nil, units=nil)
@@ -148,6 +152,7 @@ module EideticRML
           @width = parse_measurement_pts(value, units || self.units)
           @width_pct = nil
         end
+        @right = nil unless @left.nil?
       end
 
       def height(value=nil, units=nil)
@@ -163,6 +168,7 @@ module EideticRML
           @height = parse_measurement_pts(value, units || self.units)
           @height_pct = nil
         end
+        @bottom = nil unless @top.nil?
       end
 
       def max_width(value=nil, units=nil)
