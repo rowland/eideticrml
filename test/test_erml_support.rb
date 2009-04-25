@@ -114,3 +114,27 @@ class GridTestCases < Test::Unit::TestCase
     get4
   end
 end
+
+class BoundsTestCases < Test::Unit::TestCase
+  def test_init_empty
+    b = Support::Bounds.new
+    assert_equal nil, b.left
+    assert_equal nil, b.top
+    assert_equal nil, b.right
+    assert_equal nil, b.bottom
+  end
+
+  def test_init_full
+    b = Support::Bounds.new(3,5,7,11)
+    assert_equal 3, b.left
+    assert_equal 5, b.top
+    assert_equal 7, b.right
+    assert_equal 11, b.bottom
+  end
+
+  def test_width_height
+    b = Support::Bounds.new(3,5,7,11)
+    assert_equal 4, b.width
+    assert_equal 6, b.height
+  end
+end
