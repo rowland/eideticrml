@@ -506,6 +506,7 @@ module EideticRML
       end
 
       def postpone
+        @visible = false
         @postponed ||= 0
         @postponed += 1
         @disabled = true if @postponed > 1
