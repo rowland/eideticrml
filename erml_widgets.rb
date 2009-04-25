@@ -406,6 +406,7 @@ module EideticRML
       end
 
       def print(writer)
+        # $stderr.puts "<<<try printing #{object_id} (#{tag}) visible: #{visible}"
         return if visible == false
         return if disabled
         # $stderr.puts "print #{tag} { left = #{left}, top = #{top}}"
@@ -422,6 +423,7 @@ module EideticRML
           end
         end
         @printed = true
+        # $stderr.puts ">>>printed #{object_id} (#{tag})"
         @width = @orig_width if @orig_width
         @height = @orig_height if @orig_height
       rescue Exception => e
@@ -434,6 +436,10 @@ module EideticRML
 
       def root
         parent.nil? ? self : parent.root
+      end
+
+      def root_page
+        parent.root_page
       end
 
       def display(value=nil)
@@ -510,6 +516,14 @@ module EideticRML
         @postponed ||= 0
         @postponed += 1
         @disabled = true if @postponed > 1
+      end
+
+      def leaf?
+        true
+      end
+
+      def leaves
+        leaf? ? 1 : 0
       end
 
     protected
@@ -1016,6 +1030,14 @@ module EideticRML
         @children = []
       end
 
+      def after_layout
+        # puts "after_layout: #{tag}"
+        layout.manager.after_layout(self) unless layout.nil?
+        children.each do |widget|
+          widget.after_layout if widget.visible
+        end
+      end
+
       def cols(value=nil)
         return @cols if value.nil?
         @cols = value.to_i if value.to_i > 0
@@ -1029,6 +1051,7 @@ module EideticRML
       def layout_container(writer)
         layout('flow') if layout.nil?
         layout.manager.layout(self, writer)
+        # returns count
       end
 
       def layout_widget(writer)
@@ -1036,12 +1059,12 @@ module EideticRML
         layout_container(writer)
       end
 
-      def after_layout
-        # puts "after_layout: #{tag}"
-        layout.manager.after_layout(self) unless layout.nil?
-        children.each do |widget|
-          widget.after_layout if widget.visible
-        end
+      def leaf?
+        children.empty?
+      end
+
+      def leaves
+        visible ? children.select { |w| w.visible }.inject(0) { |m, widget| m + widget.leaves } : 0
       end
 
       def more(flag=nil)
@@ -1562,6 +1585,10 @@ module EideticRML
         style(:copy).orientation(value)
       end
 
+      def positioned_widgets
+        @positioned_widgets ||= Hash.new(0)
+      end
+
       def print(writer)
         root.section_page_no = 0
         while more
@@ -1569,15 +1596,24 @@ module EideticRML
           writer.open_page(:page_size => size, :orientation => orientation)
           root.document_page_no += 1
           root.section_page_no += 1
+          positioned_widgets.clear
+          # $stderr.puts "----before layout widget"
           layout_widget(writer)
-          after_layout
+          # after_layout
+          # $stderr.puts "----before super print"
           super(writer)
+          # $stderr.puts "----after super print"
           writer.close_page
+          break if positioned_widgets[:static] == 0
         end
       end
 
       def right(units=:pt)
         width(units)
+      end
+
+      def root_page
+        self
       end
 
       def rotate(value=nil)
