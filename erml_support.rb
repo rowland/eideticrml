@@ -38,6 +38,8 @@ module EideticRML
 
     module_function :parse_measurement, :parse_measurement_pts
 
+    Bounds = Struct.new(:left, :top, :right, :bottom)
+
     class Grid
       attr_reader :cols
       attr_accessor :rows

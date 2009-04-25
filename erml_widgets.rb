@@ -21,8 +21,8 @@ module EideticRML
       include Support
 
       attr_reader :parent, :width_pct, :height_pct, :width_rel, :height_rel
-      attr_accessor :visible, :disabled
-      attr_writer :printed
+      attr_accessor :disabled
+      attr_writer :printed, :visible
 
       def initialize(parent, attrs={})
         @parent = parent
@@ -210,6 +210,10 @@ module EideticRML
       end
 
       def layout_widget(writer)
+        # override this method
+      end
+
+      def after_layout
         # override this method
       end
 
@@ -457,6 +461,11 @@ module EideticRML
       def z_index(value=nil)
         return @z_index || 0 if value.nil?
         @z_index = value.to_i
+      end
+
+      def visible(bounds=nil)
+        return @visible if bounds.nil?
+        (left >= bounds.left and top >= bounds.top and right <= bounds.right and bottom <= bounds.bottom) ? 1 : 0
       end
 
     protected
@@ -983,6 +992,14 @@ module EideticRML
         layout_container(writer)
       end
 
+      def after_layout
+        # puts "after_layout: #{tag}"
+        layout.manager.after_layout(self) unless layout.nil?
+        # children.each do |widget|
+        #   widget.after_layout if widget.visible
+        # end
+      end
+
       def more(flag=nil)
         parent.more(flag)
       end
@@ -1159,6 +1176,7 @@ module EideticRML
 
       def layout_container(writer)
         # suppress default behavior
+        0
       end
 
       def preferred_width(writer, units=:pt)
@@ -1236,6 +1254,7 @@ module EideticRML
 
       def layout_container(writer)
         # suppress default behavior
+        0
       end
 
       def layout_widget(writer)
@@ -1503,6 +1522,7 @@ module EideticRML
           root.document_page_no += 1
           root.section_page_no += 1
           layout_widget(writer)
+          after_layout
           super(writer)
           writer.close_page
         end
