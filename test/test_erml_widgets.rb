@@ -754,57 +754,59 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def test_right_should_change_width
-    w = Widget.new(@page)
-    w.left 1
-    w.width 4
-    assert_equal 5, w.right
-    w.right 8
-    assert_equal 7, w.width
+    @widget.left 1
+    @widget.width 4
+    assert_equal 5, @widget.right
+    @widget.right 8
+    assert_equal 7, @widget.width
   end
 
   def test_left_should_change_width
-    w = Widget.new(@page)
-    w.right 8
-    w.width 4
-    assert_equal 4, w.left
-    w.left 1
-    assert_equal 7, w.width
+    @widget.right 8
+    @widget.width 4
+    assert_equal 4, @widget.left
+    @widget.left 1
+    assert_equal 7, @widget.width
   end
 
   def test_bottom_should_change_height
-    w = Widget.new(@page)
-    w.top 1
-    w.height 4
-    assert_equal 5, w.bottom
-    w.bottom 10
-    assert_equal 9, w.height
+    @widget.top 1
+    @widget.height 4
+    assert_equal 5, @widget.bottom
+    @widget.bottom 10
+    assert_equal 9, @widget.height
   end
 
   def test_top_should_change_height
-    w = Widget.new(@page)
-    w.bottom 10
-    w.height 4
-    assert_equal 6, w.top
-    w.top 1
-    assert_equal 9, w.height
+    @widget.bottom 10
+    @widget.height 4
+    assert_equal 6, @widget.top
+    @widget.top 1
+    assert_equal 9, @widget.height
   end
 
   def test_width_should_change_right
-    w = Widget.new(@page)
-    w.left 1
-    w.right 5
-    assert_equal 4, w.width
-    w.width 7
-    assert_equal 8, w.right
+    @widget.left 1
+    @widget.right 5
+    assert_equal 4, @widget.width
+    @widget.width 7
+    assert_equal 8, @widget.right
   end
 
   def test_height_should_change_bottom
-    w = Widget.new(@page)
-    w.top 1
-    w.bottom 5
-    assert_equal 4, w.height
-    w.height 9
-    assert_equal 10, w.bottom
+    @widget.top 1
+    @widget.bottom 5
+    assert_equal 4, @widget.height
+    @widget.height 9
+    assert_equal 10, @widget.bottom
+  end
+
+  def test_leaf?
+    assert @widget.leaf?
+    c = Container.new(@page)
+    assert c.leaf?
+    w = Widget.new(c)
+    assert !c.leaf?
   end
 end
 

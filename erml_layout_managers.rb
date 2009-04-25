@@ -17,6 +17,8 @@ module EideticRML
         layout_absolute(container, writer, absolute_widgets)
         relative_widgets = container.children.select { |widget| widget.position == :relative }
         layout_relative(container, writer, relative_widgets)
+        container.children.each { |widget| container.root_page.positioned_widgets[widget.position] += 1 if widget.visible and widget.leaf? }
+        # $stderr.puts "+++base+++ #{container.root_page.positioned_widgets[:static]}"
       end
 
       def layout_absolute(container, writer, widgets)
@@ -75,6 +77,7 @@ module EideticRML
       def layout(container, writer)
         cx = cy = max_y = 0
         container_full = false
+        bottom = container.content_top + container.max_content_height
         widgets, remaining = printable_widgets(container, :static)
         remaining.each { |widget| widget.visible = false if widget.printed }
         widgets.each do |widget|
@@ -90,9 +93,12 @@ module EideticRML
           widget.top(container.content_top + cy, :pt)
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
-          if container.bottom and widget.bottom > container.bottom
+          # if container.bottom and widget.bottom > container.bottom
+          if widget.bottom > bottom
             container_full = true
-            widget.visible = (cy == 0)
+            # widget.visible = (cy == 0)
+            widget.visible = container.root_page.positioned_widgets[:static] == 0
+            # $stderr.puts "+++flow+++ #{container.root_page.positioned_widgets[:static]}, visible: #{widget.visible}"
             next
           end
           cx += widget.width + @style.hpadding
@@ -214,7 +220,7 @@ module EideticRML
           top += (widget.height + @style.vpadding)
           dy += widget.height + ((index > 0) ? @style.vpadding : 0)
         end
-        headers.each { |widget| widget.visible = (widget.bottom <= bottom) }
+        headers.each { |widget| widget.visible = (widget.bottom <= bottom) } # or first static widget?
 
         unless footers.empty?
           container.height('100%') if container.height.nil?
@@ -225,44 +231,53 @@ module EideticRML
             bottom -= (widget.height + @style.vpadding)
           end
         end
-        footers.each { |widget| widget.visible = (widget.top >= top) }
+        footers.each { |widget| widget.visible = (widget.top >= top) } # or first static widget?
 
         unaligned.each_with_index do |widget, index|
+          widget.visible = !container_full
+          next if container_full
           widget.top(top, :pt)
           widget.layout_widget(writer)
           # $stderr.puts "<#{widget.tag}> after layout_widget: size = #{widget.width}, #{widget.height}"
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
           # $stderr.puts "<#{widget.tag}> position/size: #{widget.left}, #{widget.top}, #{widget.width}, #{widget.height}"
-          # $stderr.puts "<#{widget.tag}> bottom = #{widget.bottom}"
+          # $stderr.puts "#{widget.object_id}: <#{widget.tag}> bottom = #{widget.bottom}"
           top += (widget.height + @style.vpadding)
-          dy += widget.height + (index > 0 ? @style.vpadding : 0) if widget.visible
-        end
-        set_height = container.height.nil?
-        # container.height(container.max_height_avail, :pt) if set_height
-        unaligned.each_with_index do |widget, index|
-          widget.visible = (widget.bottom <= bottom) || (index == 0) #|| (container.overflow && widget.top < bottom)
-          if widget.visible and widget.bottom > bottom and container.overflow
-            widget.layout_widget(writer)
+          dy += widget.height + (index > 0 ? @style.vpadding : 0) #if widget.visible
+          if top > bottom
+            container_full = true
+            widget.visible = widget.leaves > 0 # container.root_page.positioned_widgets[:static] == 0
+            # $stderr.puts "+++vbox+++ #{container.root_page.positioned_widgets[:static]}, tag: #{widget.tag}, visible: #{widget.visible}"
           end
         end
+        # set_height = container.height.nil?
+        # container.height(container.max_height_avail, :pt) if set_height
+        # unaligned.each_with_index do |widget, index|
+        #   # widget.visible = (widget.bottom <= bottom) || (index == 0) #|| (container.overflow && widget.top < bottom)
+        #   widget.visible = (widget.bottom <= bottom) || (container.root_page.positioned_widgets[:static] == 0) #|| (container.overflow && widget.top < bottom)
+        #   # if widget.visible and widget.bottom > bottom and container.overflow
+        #   #   widget.layout_widget(writer)
+        #   # end
+        # end
 
         container_full = unaligned.last && !unaligned.last.visible
         container.more(true) if container_full and container.overflow
         # container.height(top - container.content_top + @style.vpadding, :pt) if container.height.nil?
         container.height(dy + container.non_content_height, :pt) if container.height.nil?
         super(container, writer)
+        # $stderr.puts " end layout container: #{container.tag}, visible: #{container.visible}"
       end
 
-      def after_layout(container)
-        container.children.each do |widget|
-          if widget.visible and widget.position == :static
-            if widget.bottom > container.content_bottom
-              widget.disabled = !container.overflow
-            end
-            # widget.after_layout if widget.visible
-          end
-        end
-      end
+      # def after_layout(container)
+      #   container.children.each do |widget|
+      #     if widget.visible and widget.position == :static
+      #       if widget.bottom > container.content_bottom
+      #         widget.disabled = !container.overflow
+      #       end
+      #       # widget.after_layout if widget.visible
+      #     end
+      #   end
+      # end
     end
 
     class TableLayout < LayoutManager
