@@ -499,6 +499,12 @@ module EideticRML
         (left >= bounds.left and top >= bounds.top and right <= bounds.right and bottom <= bounds.bottom) ? 1 : 0
       end
 
+      def postpone
+        @postponed ||= 0
+        @postponed += 1
+        @disabled = true if @postponed > 1
+      end
+
     protected
       def attribute(id, value)
         keys = id.to_s.split('.', 2)
