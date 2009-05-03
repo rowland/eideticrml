@@ -1,0 +1,31 @@
+%erml
+  %styles
+    %font{ :id => "title", :name => "NewCenturySchlbk", :size => "14" }
+    %font{ :id => "body", :name => "NewCenturySchlbk", :size => "12" }
+    %font{ :id => "code", :name => "Courier", :size => "12" }
+    %brush{ :id => "signature", :color => "LightSteelBlue" }
+    %brush{ :id => "codeblock", :color => "#EEEEEE" }
+    %layout{ :id => "method", :manager => "vbox", :vpadding => "5pt" }
+    %layout{ :id => "options", :manager => "table", :vpadding => "5pt" }
+  %rules
+    /
+      title { font: title; font.underline: true; }
+      signature { font: code; fill: signature; padding: 3pt; }
+      method p { font.line-height: 1.5; }
+      options { padding: 5pt; }
+      key { width: 30%; padding: 3pt; font: code; line-height: 1.3; }
+      definition { line-height: 1.3; }
+      code { font: code; }
+      codeblock { font: code; border: Gray; fill: codeblock; padding: 5pt; width: 100%; }
+  %pages{ :margin => "0.5", :units => "in", :font => "body" }
+    %define{ :id => "header", :tag => "div", :align => "top" }
+    %define{ :id => "footer", :tag => "div", :align => "bottom" }
+    %define{ :id => "title", :tag => "p" }
+    %define{ :id => "method", :tag => "div", :layout => "method" }
+    %define{ :id => "signature", :tag => "p" }
+    %define{ :id => "options", :tag => "div", :layout => "options", :order => "rows", :cols => "2" }
+    %define{ :id => "key", :tag => "p" }
+    %define{ :id => "definition", :tag => "p" }
+    %define{ :id => "code", :tag => "span" }
+    %define{ :id => "codeblock", :tag => "pre" }
+    = render 'EideticRML_helpers.erml.haml'
