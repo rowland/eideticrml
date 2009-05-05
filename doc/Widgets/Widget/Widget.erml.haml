@@ -1,3 +1,230 @@
 %page
   %header
     %title Widget
+
+  %title Properties
+
+  %method
+    %signature align
+    %options
+      %key top
+      %definition
+      %key right
+      %definition
+      %key bottom
+      %definition
+      %key left
+      %definition
+
+  %method
+    %signature position
+    %options
+      %key static (default)
+      %definition
+      %key relative
+      %definition
+      %key absolute
+      %definition
+
+  %method
+    %signature tag
+    %p Override tag for purposes of rule matching. Mostly used with <code>define</code>.
+
+  %method
+    %signature id
+    %p Set id of element.
+
+  %method
+    %signature class
+
+  %method
+    %signature left
+    %p Positions widget relative to container.
+
+  %method
+    %signature top
+    %p Positions widget relative to container.
+
+  %method
+    %signature right
+    %p Positions widget relative to container.
+
+  %method
+    %signature bottom
+    %p Positions widget relative to container.
+
+  %method
+    %signature shift="X,Y"
+    %p Shifts position of widget by X and Y offsets.
+
+  %method
+    %signature width="VALUE"
+    %p Set width of widget. VALUE may include a units suffix, which overrides the inherited units.
+    %p A leading - (minus sign) or + (plus sign) makes the value relative to the container's width.
+    %p A trailing % (percent sign) makes the width a percentage of the parent's width.
+
+  %method
+    %signature height="VALUE"
+    %p Set height of widget. VALUE may include a units suffix, which overrides the inherited units.
+    %p A leading - (minus sign) or + (plus sign) makes the value relative to the container's height.
+    %p A trailing % (percent sign) makes the height a percentage of the parent's height.
+
+  %method
+    %signature max_width="VALUE"
+
+  %method
+    %signature max_height="VALUE"
+
+  %method
+    %signature units="UNITS"
+    %p Valid UNITS include <code>pt</code>, <code>in</code> or <code>cm</code>.
+    %p Additional units may be defined in code. See EideticPDF.
+    %p Default value is inherited from container.
+
+  %method
+    %signature border="PEN"
+    %p Draw border using pre-defined PEN. See <code>PenStyle</code>.
+
+  %method
+    %signature border_top="PEN"
+    %p Draw top border using pre-defined PEN. See <code>border</code>, <code>PenStyle</code>.
+
+  %method
+    %signature border_right="PEN"
+    %p Draw right border using pre-defined PEN. See <code>border</code>, <code>PenStyle</code>.
+
+  %method
+    %signature border_bottom="PEN"
+    %p Draw bottom border using pre-defined PEN. See <code>border</code>, <code>PenStyle</code>.
+
+  %method
+    %signature border_left="PEN"
+    %p Draw left border using pre-defined PEN. See <code>border</code>, <code>PenStyle</code>.
+
+  %method
+    %signature fill="BRUSH"
+    %p Paint background of widget using pre-defined BRUSH.
+
+  %method
+    %signature margin="VALUE"
+    %p Set all four margins to VALUE, which may contain a unit suffix overriding the default.
+    %signature margin="TOP_BOTTOM,LEFT_RIGHT"
+    %p Set top and bottom margins to first value and left and right margins to second value. Each value may contain a unit suffix overriding the default.
+    %signature margin="TOP,RIGHT,BOTTOM,LEFT"
+    %p Sets each margin independently. Each value may contain a unit suffix overriding the default.
+
+  %method
+    %signature margin_top="VALUE"
+    %p Set top margin to VALUE, which may contain a unit suffix overriding the default. See <code>margin</code>.
+
+  %method
+    %signature margin_right="VALUE"
+    %p Set right margin to VALUE, which may contain a unit suffix overriding the default. See <code>margin</code>.
+
+  %method
+    %signature margin_bottom="VALUE"
+    %p Set bottom margin to VALUE, which may contain a unit suffix overriding the default. See <code>margin</code>.
+
+  %method
+    %signature margin_left="VALUE"
+    %p Set left margin to VALUE, which may contain a unit suffix overriding the default. See <code>margin</code>.
+
+  %method
+    %signature padding="VALUE"
+    %p Set padding on all four sides to VALUE, which may contain a unit suffix overriding the default.
+    %signature padding="TOP_BOTTOM,LEFT_RIGHT"
+    %p Set top and bottom padding to first value and left and right padding to second value. Each value may contain a unit suffix overriding the default.
+    %signature padding="TOP,RIGHT,BOTTOM,LEFT"
+    %p Sets each padding independently. Each value may contain a unit suffix overriding the default.
+
+  %method
+    %signature padding_top="VALUE"
+    %p Set padding on top side to VALUE, which may contain a unit suffix overriding the default. See <code>padding</code>.
+
+  %method
+    %signature padding_right="VALUE"
+    %p Set padding on right side to VALUE, which may contain a unit suffix overriding the default. See <code>padding</code>.
+
+  %method
+    %signature padding_bottom="VALUE"
+    %p Set padding on bottom side to VALUE, which may contain a unit suffix overriding the default. See <code>padding</code>.
+
+  %method
+    %signature padding_left="VALUE"
+    %p Set padding on left side to VALUE, which may contain a unit suffix overriding the default. See <code>padding</code>.
+
+  %method
+    %signature font="FONT"
+    %p Draw text with pre-defined FONT. See <code>FontStyle</code>.
+
+  %method
+    %signature font_color="COLOR"
+    %p Override current font's color. See <code>FontStyle</code>. Alias: <code>font.color</code>.
+
+  %method
+    %signature font_size="SIZE"
+    %p Override current font's size. See <code>FontStyle</code>. Alias: <code>font.size</code>.
+
+  %method
+    %signature font_style="STYLE"
+    %p Override current font's style. See <code>FontStyle</code>. Alias: <code>font.style</code>.
+
+  %method
+    %signature font_weight="WEIGHT"
+    %p Override current font's weight. See <code>FontStyle</code>. Alias: <code>font.weight</code>.
+
+  %method
+    %signature display="WHEN"
+    %p Display this widget according to selected rule.
+    %options
+      %key once
+      %definition TODO
+      %key always
+      %definition TODO
+      %key first
+      %definition TODO
+      %key succeeding
+      %definition TODO
+      %key even
+      %definition TODO
+      %key odd
+      %definition TODO
+
+
+  %method
+    %signature colspan="COLUMNS"
+    %p When this widget is a cell in a table, make it span COLUMNS columns. See <code>TableLayout</code>.
+
+  %method
+    %signature rowspan="ROWS"
+    %p When this widget is a cell in a table, make it span ROWS rows. See <code>TableLayout</code>.
+
+  %method
+    %signature origin_x="VALUE"
+    %p TODO
+    %options
+      %key left
+      %definition TODO
+      %key center
+      %definition TODO
+      %key right
+      %definition TODO
+
+  %method
+    %signature origin_y="VALUE"
+    %p TODO
+    %options
+      %key top
+      %definition TODO
+      %key middle
+      %definition TODO
+      %key bottom
+      %definition TODO
+
+  %method
+    %signature rotate="ANGLE"
+    %p TODO
+
+  %method
+    %signature z_index="INDEX"
+    %p TODO
