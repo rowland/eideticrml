@@ -5,26 +5,27 @@
   %title Properties
 
   %method
-    %signature align
+    %signature align="SIDE"
+    %p Used by layout managers to position the widget within its container.
     %options
       %key top
-      %definition
+      %definition Align widget to the top of its container. See <code>VBox</code>.
       %key right
-      %definition
+      %definition Align widget to the right side of its container. See <code>HBox</code>.
       %key bottom
-      %definition
+      %definition Align widget to the bottom of its container. See <code>VBox</code>.
       %key left
-      %definition
+      %definition Align widget to the left side of its container. See <code>HBox</code>.
 
   %method
-    %signature position
+    %signature position="HOW"
     %options
       %key static (default)
-      %definition
+      %definition Widget observes the normal rules of its container' layout manager.
       %key relative
-      %definition
+      %definition Widget is positioned relative to its container and does not observe the normal rules of its container's layout manager.
       %key absolute
-      %definition
+      %definition Widget is positioned relative to the page and does not observe the normal rules of its container's layout manager.
 
   %method
     %signature tag
@@ -39,23 +40,23 @@
 
   %method
     %signature left
-    %p Positions widget relative to container.
+    %p Positions widget relative to container. <code>position</code> will be <code>relative</code> or <code>absolute</code>.
 
   %method
     %signature top
-    %p Positions widget relative to container.
+    %p Positions widget relative to container. <code>position</code> will be <code>relative</code> or <code>absolute</code>.
 
   %method
     %signature right
-    %p Positions widget relative to container.
+    %p Positions widget relative to container. <code>position</code> will be <code>relative</code> or <code>absolute</code>.
 
   %method
     %signature bottom
-    %p Positions widget relative to container.
+    %p Positions widget relative to container. <code>position</code> will be <code>relative</code> or <code>absolute</code>.
 
   %method
     %signature shift="X,Y"
-    %p Shifts position of widget by X and Y offsets.
+    %p Shifts position of widget by X and Y offsets. Primarily useful when widget is positioned by a layout manager.
 
   %method
     %signature width="VALUE"
