@@ -16,7 +16,20 @@
       %definition Align widget to the bottom of its container. See <code>VBox</code>.
       %key left
       %definition Align widget to the left side of its container. See <code>HBox</code>.
-
+    %hbox{:width => '100%', :height => 2}
+      %p{:align => 'left', :width => 0.7} VBox
+      %vbox{:width => 2, :height => '100%', :border => 'Black', :align => 'left'}
+        %div{:width => '100%', :height => '0.5', :border => 'Gray', :align => 'top'}
+          %label{:padding => '3pt'} top
+        %div{:width => '100%', :height => '0.5', :border => 'Gray', :align => 'bottom'}
+          %label{:padding => '3pt'} bottom
+      %p{:align => 'right', :width => 0.7} HBox
+      %hbox{:width => 2, :height => '100%', :border => 'Black', :align => 'right'}
+        %div{:height => '100%', :width => '0.5', :border => 'Gray', :align => 'left'}
+          %label{:padding => '3pt'} left
+        %div{:height => '100%', :width => '0.5', :border => 'Gray', :align => 'right'}
+          %label{:padding => '3pt'} right
+      
   %method
     %signature position="HOW"
     %options
