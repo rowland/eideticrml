@@ -118,6 +118,16 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_equal('erml/page/p.class', p2.path)
   end
 
+  def make_div(left, top, width, height)
+    div = StdWidgetFactory.instance.make_widget('div', @page)
+    div.position(:absolute)
+    div.top(top)
+    div.left(left)
+    div.width(width)
+    div.height(height)
+    div
+  end
+
   def test_top
     assert_equal(:static, @widget.position)
 
@@ -131,6 +141,12 @@ class WidgetTestCases < Test::Unit::TestCase
 
     @widget.top("-2in")
     assert_equal(9, @widget.top(:in))
+
+    div = make_div("1in", "1in", "2in", "2in")
+    w = Widget.new(div)
+    w.top("0.5in")
+    assert_equal(108, w.top)
+    assert_equal(1.5, w.top(:in))
   end
 
   def test_right
@@ -148,6 +164,12 @@ class WidgetTestCases < Test::Unit::TestCase
 
     @widget.right("-1in")
     assert_equal(6.5, @widget.left(:in))
+
+    div = make_div("1in", "1in", "2in", "2in")
+    w = Widget.new(div)
+    w.right("-0.5in")
+    assert_equal(180, w.right)
+    assert_equal(2.5, w.right(:in))
   end
 
   def test_bottom
@@ -165,6 +187,12 @@ class WidgetTestCases < Test::Unit::TestCase
     @widget.height("72")
     assert_equal(576, @widget.top)
     assert_equal(8, @widget.top(:in))
+
+    div = make_div("1in", "1in", "2in", "2in")
+    w = Widget.new(div)
+    w.bottom("-0.5in")
+    assert_equal(180, w.bottom)
+    assert_equal(2.5, w.bottom(:in))
   end
 
   def test_left
@@ -180,6 +208,12 @@ class WidgetTestCases < Test::Unit::TestCase
 
     @widget.left("-2in")
     assert_equal(6.5, @widget.left(:in))
+
+    div = make_div("1in", "1in", "2in", "2in")
+    w = Widget.new(div)
+    w.left("0.5in")
+    assert_equal(108, w.left)
+    assert_equal(1.5, w.left(:in))
   end
 
   def test_units

@@ -86,7 +86,7 @@ module EideticRML
       end
 
       def left(value=nil, units=nil)
-        return shifted_x(@left || ((@right.nil? or width.nil?) ? nil : @right - width)) if value.nil?
+        return rel_x(shifted_x(@left || ((@right.nil? or width.nil?) ? nil : @right - width))) if value.nil?
         return to_units(value, left) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @left = parse_measurement_pts(value, units || self.units)
@@ -95,7 +95,7 @@ module EideticRML
       end
 
       def top(value=nil, units=nil)
-        return shifted_y(@top || ((@bottom.nil? or height.nil?) ? nil : (@bottom - height))) if value.nil?
+        return rel_y(shifted_y(@top || ((@bottom.nil? or height.nil?) ? nil : @bottom - height))) if value.nil?
         return to_units(value, top) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @top = parse_measurement_pts(value, units || self.units)
@@ -104,7 +104,7 @@ module EideticRML
       end
 
       def right(value=nil, units=nil)
-        return shifted_x(@right || ((@left.nil? or width.nil?) ? nil : @left + width)) if value.nil?
+        return rel_y(shifted_x(@right || ((@left.nil? or width.nil?) ? nil : @left + width))) if value.nil?
         return to_units(value, right) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @right = parse_measurement_pts(value, units || self.units)
@@ -113,7 +113,7 @@ module EideticRML
       end
 
       def bottom(value=nil, units=nil)
-        return shifted_y(@bottom || ((@top.nil? or height.nil?) ? nil : @top + height)) if value.nil?
+        return rel_y(shifted_y(@bottom || ((@top.nil? or height.nil?) ? nil : @top + height))) if value.nil?
         return to_units(value, bottom) if value.is_a?(Symbol)
         @position = :relative if position == :static and value.respond_to?(:to_str)
         @bottom = parse_measurement_pts(value, units || self.units)
@@ -632,6 +632,14 @@ module EideticRML
 
       def shifted_y(value)
         value.nil? ? nil : shift_y + value
+      end
+
+      def rel_x(value)
+        value.nil? ? nil : (position == :relative ? parent.left + value : value)
+      end
+
+      def rel_y(value)
+        value.nil? ? nil : (position == :relative ? parent.top + value : value)
       end
 
       def widget_for(id)
