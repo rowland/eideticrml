@@ -20,16 +20,16 @@
       %p{:align => 'left', :width => 0.7} VBox
       %vbox{:width => 2, :height => '100%', :border => 'Black', :align => 'left'}
         %div{:width => '100%', :height => '0.5', :border => 'Gray', :align => 'top'}
-          %label{:padding => '3pt'} top
+          %lbl top
         %div{:width => '100%', :height => '0.5', :border => 'Gray', :align => 'bottom'}
-          %label{:padding => '3pt'} bottom
+          %lbl bottom
       %p{:align => 'right', :width => 0.7} HBox
       %hbox{:width => 2, :height => '100%', :border => 'Black', :align => 'right'}
-        %div{:height => '100%', :width => '0.5', :border => 'Gray', :align => 'left'}
-          %label{:padding => '3pt'} left
-        %div{:height => '100%', :width => '0.5', :border => 'Gray', :align => 'right'}
-          %label{:padding => '3pt'} right
-      
+        %div{:height => '100%', :width => 0.7, :border => 'Gray', :align => 'left'}
+          %lbl left
+        %div{:height => '100%', :width => 0.7, :border => 'Gray', :align => 'right'}
+          %lbl right
+
   %method
     %signature position="HOW"
     %options
@@ -98,6 +98,13 @@
   %method
     %signature border="PEN"
     %p Draw border using pre-defined PEN. See <code>PenStyle</code>.
+    %illustration
+      %div{:border => 'solid', :width => 1, :height => 1}
+        %lbl solid
+      %div{:border => 'dotted', :width => 1, :height => 1}
+        %lbl dotted
+      %div{:border => 'dashed', :width => 1, :height => 1}
+        %lbl dashed
 
   %method
     %signature border_top="PEN"

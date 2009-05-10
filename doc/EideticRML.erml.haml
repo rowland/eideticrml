@@ -7,6 +7,7 @@
     %brush{ :id => "codeblock", :color => "#EEEEEE" }
     %layout{ :id => "method", :manager => "vbox", :vpadding => "5pt" }
     %layout{ :id => "options", :manager => "table", :vpadding => "5pt" }
+    %layout{ :id => "illustration", :manager => "hbox", :hpadding => "5pt" }
   %rules
     /
       title { font: title; font.underline: true; }
@@ -17,6 +18,7 @@
       definition { line-height: 1.3; }
       code { font: code; }
       codeblock { font: code; border: Gray; fill: codeblock; padding: 5pt; width: 100%; }
+      lbl { padding: 3pt; font: code; }
   %pages{ :margin => "0.5", :units => "in", :font => "body" }
     %define{ :id => "header", :tag => "div", :align => "top" }
     %define{ :id => "footer", :tag => "div", :align => "bottom" }
@@ -28,18 +30,20 @@
     %define{ :id => "definition", :tag => "p" }
     %define{ :id => "code", :tag => "span" }
     %define{ :id => "codeblock", :tag => "pre" }
-    = render 'helpers'
-    = render 'LayoutManagers/LayoutManagers'
-    = render 'StyleBuilder/StyleBuilder'
-    = render 'RuleBuilder/RuleBuilder'
-    = render 'PageBuilder/PageBuilder'
-    = render 'Builder/Builder'
-    = render 'XmlStyleParser/XmlStyleParser'
-    = render 'XmlRuleParser/XmlRuleParser'
-    = render 'XmlPageParser/XmlPageParser'
-    = render 'XmlParser/XmlParser'
-    = render 'Rules/Rules'
-    = render 'Styles/Styles'
-    = render 'Support/Support'
+    %define{ :id => "illustration", :tag => "div", :layout => "illustration"}
+    %define{ :id => "lbl", :tag => "label" }
+    / = render 'helpers'
+    / = render 'LayoutManagers/LayoutManagers'
+    / = render 'StyleBuilder/StyleBuilder'
+    / = render 'RuleBuilder/RuleBuilder'
+    / = render 'PageBuilder/PageBuilder'
+    / = render 'Builder/Builder'
+    / = render 'XmlStyleParser/XmlStyleParser'
+    / = render 'XmlRuleParser/XmlRuleParser'
+    / = render 'XmlPageParser/XmlPageParser'
+    / = render 'XmlParser/XmlParser'
+    / = render 'Rules/Rules'
+    / = render 'Styles/Styles'
+    / = render 'Support/Support'
     = render 'Widgets/Widgets'
     
