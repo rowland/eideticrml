@@ -301,7 +301,7 @@ module EideticRML
             w.bottom(:in).should == 2.5
           end
         end
-        
+
         context "left" do
           it "should allow positioning relative to container" do
             w = Widget.new(@div)
@@ -309,6 +309,25 @@ module EideticRML
             w.left.should == 108
             w.left(:in).should == 1.5
           end
+        end
+      end
+
+      context "units" do
+        it "should default to :pt" do
+          @doc.units.should == :pt
+          @widget.units.should == :pt
+        end
+
+        it "should should be inherited from container" do
+          @doc.units(:in)
+          @doc.units.should == :in
+          @widget.units.should == :in
+        end
+
+        it "should allow inherited value to be overridden" do
+          @widget.units(:in)
+          @widget.units.should == :in
+          @doc.units.should == :pt
         end
       end
     end
