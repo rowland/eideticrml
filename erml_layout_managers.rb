@@ -35,8 +35,9 @@ module EideticRML
       def layout_relative(container, writer, widgets)
         widgets.each do |widget|
           widget.before_layout
-          widget.left(container.content_left, :pt) if widget.left.nil? and widget.right.nil?
-          widget.top(container.content_top, :pt) if widget.top.nil? and widget.bottom.nil?
+          widget.position(:relative) if widget.position == :static
+          widget.left(0, :pt) if widget.left.nil? and widget.right.nil?
+          widget.top(0, :pt) if widget.top.nil? and widget.bottom.nil?
           widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?
           widget.layout_widget(writer)
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
