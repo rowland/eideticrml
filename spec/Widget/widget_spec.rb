@@ -602,6 +602,172 @@ module EideticRML
           @widget.max_height.should == 720
         end
       end
+      
+      context "content_top" do
+        before :each do
+          @widget.top(50)
+        end
+        
+        it "should default to the widget top" do
+          @widget.content_top.should == 50
+        end
+        
+        it "should be increased by padding" do
+          @widget.padding(10)
+          @widget.content_top.should == 60
+        end
+        
+        it "should be increased by margin" do
+          @widget.margin(5)
+          @widget.content_top.should == 55
+        end
+        
+        it "should be increased by the sum of padding and margin" do
+          @widget.padding(10)
+          @widget.margin(5)
+          @widget.content_top.should == 65
+        end
+      end
+
+      context "content_right" do
+        before :each do
+          @widget.right(50)
+        end
+
+        it "should default to the widget right" do
+          @widget.content_right.should == 50
+        end
+
+        it "should be reduced by padding" do
+          @widget.padding(10)
+          @widget.content_right.should == 40
+        end
+
+        it "should be reduced by margin" do
+          @widget.margin(5)
+          @widget.content_right.should == 45
+        end
+
+        it "should be reduced by the sum of padding and margin" do
+          @widget.padding(10)
+          @widget.margin(5)
+          @widget.content_right.should == 35
+        end
+      end
+
+      context "content_bottom" do
+        before :each do
+          @widget.bottom(50)
+        end
+
+        it "should default to the widget bottom" do
+          @widget.content_bottom.should == 50
+        end
+
+        it "should be reduced by padding" do
+          @widget.padding(10)
+          @widget.content_bottom.should == 40
+        end
+
+        it "should be reduced by margin" do
+          @widget.margin(5)
+          @widget.content_bottom.should == 45
+        end
+
+        it "should be reduced by the sum of padding and margin" do
+          @widget.padding(10)
+          @widget.margin(5)
+          @widget.content_bottom.should == 35
+        end
+      end
+
+      context "content_left" do
+        before :each do
+          @widget.left(50)
+        end
+
+        it "should default to the widget left" do
+          @widget.content_left.should == 50
+        end
+
+        it "should be increased by padding" do
+          @widget.padding(10)
+          @widget.content_left.should == 60
+        end
+
+        it "should be increased by margin" do
+          @widget.margin(5)
+          @widget.content_left.should == 55
+        end
+
+        it "should be increased by the sum of padding and margin" do
+          @widget.padding(10)
+          @widget.margin(5)
+          @widget.content_left.should == 65
+        end
+      end
+
+      context "content_width" do
+        it "should default to zero" do
+          @widget.content_width.should == 0
+        end
+        
+        it "should equal width without margins or padding" do
+          @widget.width('36')
+          @widget.content_width.should == 36
+          @widget.content_width(:in).should == 0.5
+        end
+        
+        it "should be reduced by margin" do
+          @widget.width('36')
+          @widget.margin([1,2,3,4]) # right=2, left=4
+          @widget.content_width.should == 30
+        end
+        
+        it "should be reduced by padding" do
+          @widget.width('36')
+          @widget.padding([4,3,2,1]) # right=3, left=1
+          @widget.content_width.should == 32
+        end
+        
+        it "should be reduced by the sum of margin and padding" do
+          @widget.width('36')
+          @widget.margin([1,2,3,4])
+          @widget.padding([4,3,2,1])
+          @widget.content_width.should == 26
+        end
+      end
+
+      context "content_height" do
+        it "should default to zero" do
+          @widget.content_height.should == 0
+        end
+        
+        it "should equal height without margins or padding" do
+          @widget.height('3.5in')
+          @widget.content_height.should == 252
+          @widget.content_height(:in).should == 3.5
+        end
+
+        it "should be reduced by margin" do
+          @widget.height('3.5in')
+          @widget.margin([1,2,3,4]) # top=1, bottom=3
+          @widget.content_height.should == 248
+        end
+        
+        it "should be reduced by padding" do
+          @widget.height('3.5in')
+          @widget.padding([4,3,2,1]) # top=4, bottom=2
+          @widget.content_height.should == 246
+        end
+        
+        it "should be reduced by the sum of margin and padding" do
+          @widget.height('3.5in')
+          @widget.margin([1,2,3,4])
+          @widget.padding([4,3,2,1])
+          @widget.content_height.should == 242
+        end
+      end
     end
   end
 end
