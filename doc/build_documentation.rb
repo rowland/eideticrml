@@ -26,6 +26,7 @@ class DocumentationBuilder
     basename = File.basename(filename).gsub(/\.(erml|haml)/,'')
     pdfname = File.join(dirname, basename + '.pdf')
     xml = render(filename)
+    # $stdout.puts xml
     pdf = EideticRML::XmlParser.parse(xml)
     File.open(pdfname,'w') { |f| f.write(pdf) }
     pdfname
@@ -44,4 +45,4 @@ filename = File.expand_path(ARGV.shift || File.join(File.dirname(__FILE__), 'Eid
 builder = DocumentationBuilder.new
 pdfname = builder.render_doc(filename)
 
-`open #{pdfname}`
+`open -a Preview #{pdfname}`

@@ -125,14 +125,34 @@
   %method
     %signature fill="BRUSH"
     %p Paint background of widget using pre-defined BRUSH.
+    %div{:width => 2, :height => 1, :fill => 'LightSteelBlue', :border => 'Black'}
+      %lbl fill="LightSteelBlue"
 
   %method
     %signature margin="VALUE"
     %p Set all four margins to VALUE, which may contain a unit suffix overriding the default.
+    %p The margin is the area outside the border of a widget, between the widget and the edge of its parent container's content area.
+    %illustration{:width => '100%', :height => 2}
+      %div{:width => 2, :height => '100%', :border => 'Gray'}
+        %lbl{:left => 0.1, :top => 0.1} margin="0.5"
+        %div{:margin => 0.5, :width => '100%', :height => '100%', :border => 'Black'}
+
+  %method
     %signature margin="TOP_BOTTOM,LEFT_RIGHT"
     %p Set top and bottom margins to first value and left and right margins to second value. Each value may contain a unit suffix overriding the default.
+    %illustration{:width => '100%', :height => 2}
+      %div{:width => 2, :height => '100%', :border => 'Gray'}
+        %lbl{:left => 0.1, :top => 0.1} margin="0.5, 0.25"
+        %div{:margin => "0.5, 0.25", :width => '100%', :height => '100%', :border => 'Black'}
+
+  %method
     %signature margin="TOP,RIGHT,BOTTOM,LEFT"
     %p Sets each margin independently. Each value may contain a unit suffix overriding the default.
+    %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    %illustration{:width => '100%', :height => 2}
+      %div{:width => 2, :height => '100%', :border => 'Gray'}
+        %lbl{:left => 0.1, :top => 0.1} margin="0.5,0.4,0.3,0.2"
+        %div{:margin => "0.5, 0.4, 0.3, 0.2", :width => '100%', :height => '100%', :border => 'Black'}
 
   %method
     %signature margin_top="VALUE"
@@ -153,10 +173,27 @@
   %method
     %signature padding="VALUE"
     %p Set padding on all four sides to VALUE, which may contain a unit suffix overriding the default.
+    %p The padding is the area inside the border of a widget, between the border and the widget's content area.
+    %illustration{:width => '100%', :height => 2}
+      %div{:width => 2, :height => '100%', :border => 'Black', :padding => 0.5}
+        %lbl{:left => 0.1, :top => 0.1} padding="0.5"
+        %p{:width => '100%', :height => '100%', :fill => 'LightGray'} Contents
+
+  %method
     %signature padding="TOP_BOTTOM,LEFT_RIGHT"
     %p Set top and bottom padding to first value and left and right padding to second value. Each value may contain a unit suffix overriding the default.
+    %illustration{:width => '100%', :height => 2}
+      %div{:width => 2, :height => '100%', :border => 'Black', :padding => "0.5, 0.25"}
+        %lbl{:left => 0.1, :top => 0.1} padding="0.5,0.25"
+        %p{:width => '100%', :height => '100%', :fill => 'LightGray'} Contents
+
+  %method
     %signature padding="TOP,RIGHT,BOTTOM,LEFT"
     %p Sets each padding independently. Each value may contain a unit suffix overriding the default.
+    %illustration{:width => '100%', :height => 2}
+      %div{:width => 2, :height => '100%', :border => 'Black', :padding => "0.5, 0.4, 0.3, 0.2"}
+        %lbl{:left => 0.1, :top => 0.1} padding="0.5,0.4,0.3,0.2"
+        %p{:width => '100%', :height => '100%', :fill => 'LightGray'} Contents
 
   %method
     %signature padding_top="VALUE"
@@ -215,10 +252,22 @@
   %method
     %signature colspan="COLUMNS"
     %p When this widget is a cell in a table, make it span COLUMNS columns. See <code>TableLayout</code>.
+    %div{:layout => 'table', :cols => 3, :border => 'Black', :width => 3}
+      %lbl{:colspan => 2, :border => 'Gray'} colspan="2"
+      %lbl{:border => 'Gray'} 3
+      %lbl{:border => 'Gray'} 4
+      %lbl{:border => 'Gray'} 5
+      %lbl{:border => 'Gray'} 6
 
   %method
     %signature rowspan="ROWS"
     %p When this widget is a cell in a table, make it span ROWS rows. See <code>TableLayout</code>.
+    %div{:layout => 'table', :cols => 3, :border => 'Black', :width => 3}
+      %lbl{:rowspan => 2, :border => 'Gray'} rowspan="2"
+      %lbl{:border => 'Gray'} 2
+      %lbl{:border => 'Gray'} 3
+      %lbl{:border => 'Gray'} 5
+      %lbl{:border => 'Gray'} 6
 
   %method
     %signature origin_x="VALUE"
@@ -230,6 +279,17 @@
       %definition TODO
       %key right
       %definition TODO
+    %illustration{:width => '100%', :height => 2}
+      %table{:cols => 3}
+        %label{:text_align => "left"} Top Left
+        %label{:text_align => "center"} Top Center
+        %label{:text_align => "right"} Top Right
+        %label{:text_align => "left"} Middle Left
+        %label{:text_align => "center", :rotate => 30, :origin_x => "center", :origin_y => "middle", :fill => "White", :z_index => 1} Middle Center
+        %label{:text_align => "right"} Middle Right
+        %label{:text_align => "left"} Bottom Left
+        %label{:text_align => "center"} Bottom Center
+        %label{:text_align => "right"} Bottom Right
 
   %method
     %signature origin_y="VALUE"
