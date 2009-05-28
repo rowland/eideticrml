@@ -394,7 +394,7 @@ module EideticRML
           @widget.width.should == nil
         end
 
-        it "should be accept a fixed number in the default units" do
+        it "should accept a fixed value in the default units" do
           @page.units(:in)
           @widget.width('5')
           @widget.width(:in).should == 5
@@ -408,7 +408,7 @@ module EideticRML
           @widget.width.should == 306
         end
 
-        it "should accept a percentage of a parent widget" do
+        it "should accept a percentage of a parent widget's width" do
           @widget.width('50%')
           w = Widget.new(@widget)
           w.width('50%')
@@ -447,7 +447,7 @@ module EideticRML
           @widget.height.should == nil
         end
 
-        it "should be accept a fixed number in the default units" do
+        it "should accept a fixed value in the default units" do
           @page.units(:in)
           @widget.height('3.5')
           @widget.height(:in).should == 3.5
@@ -461,7 +461,7 @@ module EideticRML
           @widget.height.should == 396
         end
 
-        it "should accept a percentage of a parent widget" do
+        it "should accept a percentage of a parent widget's height" do
           @widget.height('50%')
           w = Widget.new(@widget)
           w.height('50%')
@@ -479,19 +479,127 @@ module EideticRML
           w.height(:in).should == 5.5
           w.height.should == 396
         end
-        
+
         it "should accept negative relative values" do
           @page.margin('1in')
           @widget.height('-2in')
           @widget.height(:in).should == 7
           @widget.height.should == 504
         end
-        
+
         it "should accept positive relative values" do
           @page.margin('1in')
           @widget.height('+1in')
           @widget.height(:in).should == 10
           @widget.height.should == 720
+        end
+      end
+
+      context "max_width" do
+        it "should default to nil" do
+          @widget.max_width.should == nil
+        end
+
+        it "should accept a fixed value in the default units" do
+          @page.units(:in)
+          @widget.max_width('5')
+          @widget.max_width(:in).should == 5
+          @widget.max_width.should == 360
+        end
+
+        it "should accept a percentage of page width" do
+          @page.units(:in)
+          @widget.max_width('50%')
+          @widget.max_width_pct.should == 0.5
+          @widget.max_width(:in).should == 4.25
+          @widget.max_width.should == 306
+        end
+
+        it "should accept a percentage of a parent widget's width" do
+          @widget.width('50%')
+          w = Widget.new(@widget)
+          w.max_width('50%')
+          w.max_width_pct.should == 0.5
+          w.max_width(:in).should == 2.125
+          w.max_width.should == 153
+        end
+
+        it "should resize along with parent when a percent is specified" do
+          @widget.width('50%')
+          w = Widget.new(@widget)
+          w.max_width('50%')
+          @widget.width('100%')
+          w.max_width_pct.should == 0.5
+          w.max_width(:in).should == 4.25
+          w.max_width.should == 306
+        end
+
+        it "should accept negative relative values" do
+          @page.margin('1in')
+          @widget.max_width('-2in')
+          @widget.max_width(:in).should == 4.5
+          @widget.max_width.should == 324
+        end
+
+        it "should accept positive relative values" do
+          @page.margin('1in')
+          @widget.max_width('+1in')
+          @widget.max_width(:in).should == 7.5
+          @widget.max_width.should == 540
+        end
+      end
+
+      context "max_height" do
+        it "should default to nil" do
+          @widget.max_height.should == nil
+        end
+
+        it "should accept a fixed value in the default units" do
+          @page.units(:in)
+          @widget.max_height('3.5')
+          @widget.max_height(:in).should == 3.5
+          @widget.max_height.should == 252
+        end
+
+        it "should accept a percentage of page height" do
+          @page.units(:in)
+          @widget.max_height('50%')
+          @widget.max_height_pct.should == 0.5
+          @widget.max_height(:in).should == 5.5
+          @widget.max_height.should == 396
+        end
+
+        it "should accept a percentage of a parent widget's height" do
+          @widget.height('50%')
+          w = Widget.new(@widget)
+          w.max_height('50%')
+          w.max_height_pct.should == 0.5
+          w.max_height(:in).should == 2.75
+          w.max_height.should == 198
+        end
+
+        it "should resize along with parent when a percent is specified" do
+          @widget.height('50%')
+          w = Widget.new(@widget)
+          w.max_height('50%')
+          @widget.height('100%')
+          w.max_height_pct.should == 0.5
+          w.max_height(:in).should == 5.5
+          w.max_height.should == 396
+        end
+
+        it "should accept negative relative values" do
+          @page.margin('1in')
+          @widget.max_height('-2in')
+          @widget.max_height(:in).should == 7
+          @widget.max_height.should == 504
+        end
+
+        it "should accept positive relative values" do
+          @page.margin('1in')
+          @widget.max_height('+1in')
+          @widget.max_height(:in).should == 10
+          @widget.max_height.should == 720
         end
       end
     end
