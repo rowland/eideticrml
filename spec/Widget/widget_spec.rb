@@ -330,6 +330,170 @@ module EideticRML
           @doc.units.should == :pt
         end
       end
+      
+      def assert_font_defaults(f)
+        f.should_not == nil
+        f.name.should == 'Helvetica'
+        f.size.should == 12
+        f.style.should == ''
+        f.sub_type.should == 'Type1'
+        f.encoding.should == 'WinAnsiEncoding'
+        f.color.should == 0
+      end
+      
+      context "font" do
+        it "should have expected defaults" do
+          assert_font_defaults(@doc.font)
+          @widget.font.should == @doc.font
+        end
+
+        it "should be overridable" do
+          @widget.font('alt')
+          @widget.font.should == @alt
+          assert_font_defaults(@doc.font) # unchanged
+        end
+
+        it "should be copyable" do
+          @widget.font(:copy)
+          @widget.font.should_not == @doc.font
+        end
+
+        it "should not affect parent when copied" do
+          @widget.font(:copy).size(20)
+          @widget.font.size.should == 20
+          assert_font_defaults(@doc.font) # unchanged
+        end
+
+        it "should allow style to be set without affecting parent" do
+          @widget.font_style('Italic')
+          @widget.font.style.should == 'Italic'
+          assert_font_defaults(@doc.font) # unchanged
+        end
+
+        it "should allow color to be set without affecting parent" do
+          @widget.font_color('Orange')
+          @widget.font.color.should == 'Orange'
+          assert_font_defaults(@doc.font) # unchanged
+        end
+
+        it "should allow size to be set without affecting parent" do
+          @widget.font_size(13)
+          @widget.font.size.should == 13
+          assert_font_defaults(@doc.font) # unchanged
+        end
+
+        it "should allow weight to be set without affecting parent" do
+          @widget.font_weight('Bold')
+          @widget.font_weight.should == 'Bold'
+          assert_font_defaults(@doc.font) # unchanged
+        end
+      end
+
+      context "width" do
+        it "should default to nil" do
+          @widget.width.should == nil
+        end
+
+        it "should be accept a fixed number in the default units" do
+          @page.units(:in)
+          @widget.width('5')
+          @widget.width(:in).should == 5
+          @widget.width.should == 360
+        end
+
+        it "should accept a percentage of page width" do
+          @widget.width('50%')
+          @widget.width_pct.should == 0.5
+          @widget.width(:in).should == 4.25
+          @widget.width.should == 306
+        end
+
+        it "should accept a percentage of a parent widget" do
+          @widget.width('50%')
+          w = Widget.new(@widget)
+          w.width('50%')
+          w.width_pct.should == 0.5
+          w.width(:in).should == 2.125
+          w.width.should == 153
+        end
+
+        it "should resize along with parent when a percent is specified" do
+          @widget.width('50%')
+          w = Widget.new(@widget)
+          w.width('50%')
+          @widget.width('100%')
+          w.width_pct.should == 0.5
+          w.width(:in).should == 4.25
+          w.width.should == 306
+        end
+        
+        it "should accept negative relative values" do
+          @page.margin('1in')
+          @widget.width('-2in')
+          @widget.width(:in).should == 4.5
+          @widget.width.should == 324
+        end
+        
+        it "should accept positive relative values" do
+          @page.margin('1in')
+          @widget.width('+1in')
+          @widget.width(:in).should == 7.5
+          @widget.width.should == 540
+        end
+      end
+
+      context "height" do
+        it "should default to nil" do
+          @widget.height.should == nil
+        end
+
+        it "should be accept a fixed number in the default units" do
+          @page.units(:in)
+          @widget.height('3.5')
+          @widget.height(:in).should == 3.5
+          @widget.height.should == 252
+        end
+
+        it "should accept a percentage of page height" do
+          @widget.height('50%')
+          @widget.height_pct.should == 0.5
+          @widget.height(:in).should == 5.5
+          @widget.height.should == 396
+        end
+
+        it "should accept a percentage of a parent widget" do
+          @widget.height('50%')
+          w = Widget.new(@widget)
+          w.height('50%')
+          w.height_pct.should == 0.5
+          w.height(:in).should == 2.75
+          w.height.should == 198
+        end
+
+        it "should resize along with parent when a percent is specified" do
+          @widget.height('50%')
+          w = Widget.new(@widget)
+          w.height('50%')
+          @widget.height('100%')
+          w.height_pct.should == 0.5
+          w.height(:in).should == 5.5
+          w.height.should == 396
+        end
+        
+        it "should accept negative relative values" do
+          @page.margin('1in')
+          @widget.height('-2in')
+          @widget.height(:in).should == 7
+          @widget.height.should == 504
+        end
+        
+        it "should accept positive relative values" do
+          @page.margin('1in')
+          @widget.height('+1in')
+          @widget.height(:in).should == 10
+          @widget.height.should == 720
+        end
+      end
     end
   end
 end
