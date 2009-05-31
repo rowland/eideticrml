@@ -961,6 +961,48 @@ module EideticRML
           @widget.padding.should == [72,72,72,72]
         end
       end
+
+      context "colspan" do
+        it "should default to 1" do
+          @widget.colspan.should == 1
+        end
+        
+        it "should not accept values < 1" do
+          @widget.colspan(0)
+          @widget.colspan.should == 1 # unchanged
+        end
+        
+        it "should accept integer values >= 1" do
+          @widget.colspan(2)
+          @widget.colspan.should == 2
+        end
+        
+        it "should accept string values" do
+          @widget.colspan('3')
+          @widget.colspan.should == 3
+        end
+      end
+
+      context "rowspan" do
+        it "should default to 1" do
+          @widget.rowspan.should == 1
+        end
+        
+        it "should not accept values < 1" do
+          @widget.rowspan(0)
+          @widget.rowspan.should == 1 # unchanged
+        end
+        
+        it "should accept integer values >= 1" do
+          @widget.rowspan(2)
+          @widget.rowspan.should == 2
+        end
+        
+        it "should accept string values" do
+          @widget.rowspan('3')
+          @widget.rowspan.should == 3
+        end
+      end
     end
   end
 end
