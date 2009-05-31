@@ -112,17 +112,17 @@ module EideticRML
           @widget.tag.should == 'widget'
         end
       end
-      
+
       context "id" do
         it "should default to nil" do
           @widget.id.should == nil
         end
-        
+
         it "should ignore bogus values" do
           @widget.id(' !@#$%')
           @widget.id.should == nil
         end
-        
+
         it "should allow valid values" do
           @widget.id('widget')
           @widget.id.should == 'widget'
@@ -133,12 +133,12 @@ module EideticRML
         it "should default to nil" do
           @widget.klass.should == nil
         end
-        
+
         it "should ignore bogus values" do
           @widget.klass(' !@#$%')
           @widget.klass.should == nil
         end
-        
+
         it "should allow valid values" do
           @widget.klass('foo bar')
           @widget.klass.should == 'foo bar'
@@ -150,7 +150,7 @@ module EideticRML
           @doc.selector_tag.should == 'erml'
           @page.selector_tag.should == 'page'
         end
-        
+
         it "should start with a default value and change as id and class are assigned" do
           p1 = StdWidgetFactory.instance.make_widget('p', @page)
           p1.selector_tag.should == 'p'
@@ -164,13 +164,13 @@ module EideticRML
           p2.selector_tag.should == 'p.class'
         end
       end
-      
+
       context "path" do
         it "should have expected values for @doc and @page" do
           @doc.path.should == 'erml'
           @page.path.should == 'erml/page'
         end
-        
+
         it "should start with a default value and change as id and class are assigned" do
           p1 = StdWidgetFactory.instance.make_widget('p', @page)
           p1.path.should == 'erml/page/p'
@@ -184,7 +184,7 @@ module EideticRML
           p2.path.should == 'erml/page/p.class'
         end
       end
-      
+
       context "top" do
         it "should be settable with default units" do
           @widget.top("18")
@@ -210,14 +210,14 @@ module EideticRML
           @widget.right.should == 36
           @widget.right(:in).should == 0.5
         end
-        
+
         it "should allow width to be subtracted to determine left" do
           @widget.right(342)
           @widget.right(:in).should == 4.75
           @widget.width(1, :in)
           @widget.left(:in).should == 3.75
         end
-        
+
         it "should treat negative values as relative to container right" do
           @widget.right("-1in")
           @widget.width(1, :in)
@@ -231,13 +231,13 @@ module EideticRML
           @widget.bottom.should == 54
           @widget.bottom(:in).should == 0.75
         end
-        
+
         it "should allow height to be subtracted to determine top" do
           @widget.bottom(54)
           @widget.height(36)
           @widget.top.should == 18
         end
-      
+
         it "should treat negative values as relative to container bottom" do
           @widget.bottom("-144")
           @widget.height("72")
@@ -330,7 +330,7 @@ module EideticRML
           @doc.units.should == :pt
         end
       end
-      
+
       def assert_font_defaults(f)
         f.should_not == nil
         f.name.should == 'Helvetica'
@@ -340,7 +340,7 @@ module EideticRML
         f.encoding.should == 'WinAnsiEncoding'
         f.color.should == 0
       end
-      
+
       context "font" do
         it "should have expected defaults" do
           assert_font_defaults(@doc.font)
@@ -426,14 +426,14 @@ module EideticRML
           w.width(:in).should == 4.25
           w.width.should == 306
         end
-        
+
         it "should accept negative relative values" do
           @page.margin('1in')
           @widget.width('-2in')
           @widget.width(:in).should == 4.5
           @widget.width.should == 324
         end
-        
+
         it "should accept positive relative values" do
           @page.margin('1in')
           @widget.width('+1in')
@@ -602,26 +602,26 @@ module EideticRML
           @widget.max_height.should == 720
         end
       end
-      
+
       context "content_top" do
         before :each do
           @widget.top(50)
         end
-        
+
         it "should default to the widget top" do
           @widget.content_top.should == 50
         end
-        
+
         it "should be increased by padding" do
           @widget.padding(10)
           @widget.content_top.should == 60
         end
-        
+
         it "should be increased by margin" do
           @widget.margin(5)
           @widget.content_top.should == 55
         end
-        
+
         it "should be increased by the sum of padding and margin" do
           @widget.padding(10)
           @widget.margin(5)
@@ -711,25 +711,25 @@ module EideticRML
         it "should default to zero" do
           @widget.content_width.should == 0
         end
-        
+
         it "should equal width without margins or padding" do
           @widget.width('36')
           @widget.content_width.should == 36
           @widget.content_width(:in).should == 0.5
         end
-        
+
         it "should be reduced by margin" do
           @widget.width('36')
           @widget.margin([1,2,3,4]) # right=2, left=4
           @widget.content_width.should == 30
         end
-        
+
         it "should be reduced by padding" do
           @widget.width('36')
           @widget.padding([4,3,2,1]) # right=3, left=1
           @widget.content_width.should == 32
         end
-        
+
         it "should be reduced by the sum of margin and padding" do
           @widget.width('36')
           @widget.margin([1,2,3,4])
@@ -742,7 +742,7 @@ module EideticRML
         it "should default to zero" do
           @widget.content_height.should == 0
         end
-        
+
         it "should equal height without margins or padding" do
           @widget.height('3.5in')
           @widget.content_height.should == 252
@@ -754,18 +754,156 @@ module EideticRML
           @widget.margin([1,2,3,4]) # top=1, bottom=3
           @widget.content_height.should == 248
         end
-        
+
         it "should be reduced by padding" do
           @widget.height('3.5in')
           @widget.padding([4,3,2,1]) # top=4, bottom=2
           @widget.content_height.should == 246
         end
-        
+
         it "should be reduced by the sum of margin and padding" do
           @widget.height('3.5in')
           @widget.margin([1,2,3,4])
           @widget.padding([4,3,2,1])
           @widget.content_height.should == 242
+        end
+      end
+
+      context "border" do
+        it "should default to nil" do
+          @widget.border.should == nil
+        end
+
+        it "should accept a pen style" do
+          @widget.border('blue_dash')
+          @widget.border.should_not == nil
+          @widget.border.id.should == 'blue_dash'
+          @widget.border.color.should == 'Blue'
+          @widget.border.width.should == 4
+          @widget.border.units.should == :pt
+        end
+      end
+
+      context "border_top" do
+        it "should default to nil" do
+          @widget.border_top.should == nil
+        end
+
+        it "should accept a pen style" do
+          @widget.border_top('blue_dash')
+          @widget.border_top.should == @blue_dash
+        end
+
+        it "should be overridden by border" do
+          @widget.border_top('blue_dash')
+          @widget.border('dotted')
+          @widget.border_top.should == @dotted
+        end
+      end
+
+      context "border_right" do
+        it "should default to nil" do
+          @widget.border_right.should == nil
+        end
+
+        it "should accept a pen style" do
+          @widget.border_right('blue_dash')
+          @widget.border_right.should == @blue_dash
+        end
+
+        it "should be overridden by border" do
+          @widget.border_right('blue_dash')
+          @widget.border('dotted')
+          @widget.border_right.should == @dotted
+        end
+      end
+
+      context "border_bottom" do
+        it "should default to nil" do
+          @widget.border_bottom.should == nil
+        end
+
+        it "should accept a pen style" do
+          @widget.border_bottom('blue_dash')
+          @widget.border_bottom.should == @blue_dash
+        end
+
+        it "should be overridden by border" do
+          @widget.border_bottom('blue_dash')
+          @widget.border('dotted')
+          @widget.border_bottom.should == @dotted
+        end
+      end
+
+      context "border_left" do
+        it "should default to nil" do
+          @widget.border_left.should == nil
+        end
+
+        it "should accept a pen style" do
+          @widget.border_left('blue_dash')
+          @widget.border_left.should == @blue_dash
+        end
+
+        it "should be overridden by border" do
+          @widget.border_left('blue_dash')
+          @widget.border('dotted')
+          @widget.border_left.should == @dotted
+        end
+      end
+
+      context "margin" do
+        it "should default to zero" do
+          @widget.margin_top.should == 0
+          @widget.margin_right.should == 0
+          @widget.margin_bottom.should == 0
+          @widget.margin_left.should == 0
+        end
+
+        it "should accept a single string value, including units, and set all four margins" do
+          @widget.margin('1in')
+          @widget.margin_top(:in).should == 1
+          @widget.margin_right(:in).should == 1
+          @widget.margin_bottom(:in).should == 1
+          @widget.margin_left(:in).should == 1
+
+          @widget.margin_top.should == 72
+          @widget.margin_right.should == 72
+          @widget.margin_bottom.should == 72
+          @widget.margin_left.should == 72
+        end
+
+        it "should accept a string containing two values, including units, setting top and bottom to first value and left and right to second value" do
+          @widget.margin('1cm,2cm')
+          @widget.margin_top(:cm).should == 1
+          @widget.margin_right(:cm).should == 2
+          @widget.margin_bottom(:cm).should == 1
+          @widget.margin_left(:cm).should == 2
+
+          @widget.margin_top.should == 28.35
+          @widget.margin_right.should == 56.7
+          @widget.margin_bottom.should == 28.35
+          @widget.margin_left.should == 56.7
+        end
+
+        it "should accept a string containing four values: top, right, bottom and left" do
+          @widget.margin('1in,2cm,3cm,4pt')
+          @widget.margin_top(:in).should == 1
+          @widget.margin_right(:cm).should == 2
+          @widget.margin_bottom(:cm).to_s.should match(/^3.0/) # close
+          @widget.margin_left(:pt).should == 4
+
+          @widget.margin_top.should == 72
+          @widget.margin_right.should == 56.7
+          @widget.margin_bottom.to_s.should match /^85.05/ # close
+          @widget.margin_left.should == 4
+        end
+
+        it "should accept a single numeric value and set all four margins" do
+          @page.units(:in)
+          @widget.margin(1)
+          @widget.margin(:in).should == [1,1,1,1]
+          @widget.margin.should == [72,72,72,72]
         end
       end
     end
