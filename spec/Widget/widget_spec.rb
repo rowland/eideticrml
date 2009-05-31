@@ -906,6 +906,61 @@ module EideticRML
           @widget.margin.should == [72,72,72,72]
         end
       end
+      
+      context "padding" do
+        it "should default to zero" do
+          @widget.padding_top.should == 0
+          @widget.padding_right.should == 0
+          @widget.padding_bottom.should == 0
+          @widget.padding_left.should == 0
+        end
+        
+        it "should accept a single string value, including units, and set padding on all four sides" do
+          @widget.padding('1in')
+          @widget.padding_top(:in).should == 1
+          @widget.padding_right(:in).should == 1
+          @widget.padding_bottom(:in).should == 1
+          @widget.padding_left(:in).should == 1
+
+          @widget.padding_top.should == 72
+          @widget.padding_right.should == 72
+          @widget.padding_bottom.should == 72
+          @widget.padding_left.should == 72
+        end
+
+        it "should accept a string containing two values, including units, setting top and bottom to first value and left and right to second value" do
+          @widget.padding('1cm,2cm')
+          @widget.padding_top(:cm).should == 1
+          @widget.padding_right(:cm).should == 2
+          @widget.padding_bottom(:cm).should == 1
+          @widget.padding_left(:cm).should == 2
+
+          @widget.padding_top.should == 28.35
+          @widget.padding_right.should == 56.7
+          @widget.padding_bottom.should == 28.35
+          @widget.padding_left.should == 56.7
+        end
+
+        it "should accept a string containing four values: top, right, bottom and left" do
+          @widget.padding('1in,2cm,3cm,4pt')
+          @widget.padding_top(:in).should == 1
+          @widget.padding_right(:cm).should == 2
+          @widget.padding_bottom(:cm).to_s.should match(/^3.0/)
+          @widget.padding_left(:pt).should == 4
+
+          @widget.padding_top.should == 72
+          @widget.padding_right.should == 56.7
+          @widget.padding_bottom.to_s.should match(/^85.05/)
+          @widget.padding_left.should == 4
+        end
+        
+        it "should accept a single numeric value and set padding on all four sides" do
+          @page.units(:in)
+          @widget.padding(1)
+          @widget.padding(:in).should == [1,1,1,1]
+          @widget.padding.should == [72,72,72,72]
+        end
+      end
     end
   end
 end
