@@ -202,6 +202,14 @@ module EideticRML
           @widget.top("-2in")
           @widget.top(:in).should == 9
         end
+
+        it "top_should_change_height" do
+          @widget.bottom 10
+          @widget.height 4
+          @widget.top.should == 6
+          @widget.top 1
+          @widget.height.should == 9
+        end
       end
 
       context "right" do
@@ -222,6 +230,14 @@ module EideticRML
           @widget.right("-1in")
           @widget.width(1, :in)
           @widget.left(:in).should == 6.5
+        end
+
+        it "should change width" do
+          @widget.left 1
+          @widget.width 4
+          @widget.right.should == 5
+          @widget.right 8
+          @widget.width.should == 7
         end
       end
 
@@ -244,6 +260,14 @@ module EideticRML
           @widget.top.should == 576
           @widget.top(:in).should == 8
         end
+
+        it "should change height" do
+          @widget.top 1
+          @widget.height 4
+          @widget.bottom.should == 5
+          @widget.bottom 10
+          @widget.height.should == 9
+        end
       end
 
       context "left" do
@@ -262,6 +286,14 @@ module EideticRML
         it "should treat negative values as relative to container width" do
           @widget.left("-2in")
           @widget.left(:in).should == 6.5
+        end
+
+        it "should change width" do
+          @widget.right 8
+          @widget.width 4
+          @widget.left.should == 4
+          @widget.left 1
+          @widget.width.should == 7
         end
       end
 
@@ -440,6 +472,14 @@ module EideticRML
           @widget.width(:in).should == 7.5
           @widget.width.should == 540
         end
+
+        it "should change right" do
+          @widget.left 1
+          @widget.right 5
+          @widget.width.should == 4
+          @widget.width 7
+          @widget.right.should == 8
+        end
       end
 
       context "height" do
@@ -492,6 +532,14 @@ module EideticRML
           @widget.height('+1in')
           @widget.height(:in).should == 10
           @widget.height.should == 720
+        end
+
+        it "should change bottom" do
+          @widget.top 1
+          @widget.bottom 5
+          @widget.height.should == 4
+          @widget.height 9
+          @widget.bottom.should == 10
         end
       end
 
