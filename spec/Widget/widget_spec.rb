@@ -1233,11 +1233,11 @@ module EideticRML
         before :each do
           @b = Support::Bounds.new(1,1,7.5,10)
         end
-        
+
         it "should return 0 for unplaced widgets" do
             @widget.visible(@b).should == 0
         end
-        
+
         it "should return 0 for widgets that are partly in bounds" do
           @widget.left 0
           @widget.top 0
@@ -1251,7 +1251,7 @@ module EideticRML
           @widget.bottom 8
           @widget.visible(@b).should == 0
         end
-        
+
         it "should return 1 for widgets that are entirely in bounds" do
           @widget.left 1
           @widget.top 1
@@ -1266,6 +1266,23 @@ module EideticRML
           @widget.right 6
           @widget.bottom 8
           @widget.visible(@b).should == 1
+        end
+      end
+
+      context "leaf?" do
+        it "should be true for a normal widget" do
+          @widget.leaf?.should be(true)
+        end
+
+        it "should be true for an empty container" do
+          c = Container.new(@page)
+          c.leaf?.should be(true)
+        end
+
+        it "should be false for a container with at least 1 child" do
+          c = Container.new(@page)
+          w = Widget.new(c)
+          c.leaf?.should be(false)
         end
       end
     end
