@@ -1003,6 +1003,74 @@ module EideticRML
           @widget.rowspan.should == 3
         end
       end
+
+      context "fill" do
+        it "should default to nil" do
+          @widget.fill.should == nil
+        end
+
+        it "should accept a brush style" do
+          @widget.fill('battleship')
+          @widget.fill.should_not == nil
+          @widget.fill.id.should == 'battleship'
+          @widget.fill.color.should == 'LightSteelBlue'
+        end
+      end
+
+      context "rotate" do
+        it "should default to nil" do
+          @widget.rotate.should == nil
+        end
+
+        it "should accept a string value" do
+          @widget.rotate("45")
+          @widget.rotate.should == 45
+        end
+      end
+
+      context "origin_x" do
+        it "should default to same value as left" do
+          @widget.origin_x.should == nil
+          @widget.left(15)
+          @widget.origin_x.should == 15
+        end
+
+        it "should accept 'center' and return horizontal center of widget" do
+          @widget.left(15)
+          @widget.width(10)
+          @widget.origin_x('center')
+          @widget.origin_x.should == 20
+        end
+
+        it "should accept 'right' and return right coordinate of widget" do
+          @widget.left(15)
+          @widget.width(10)
+          @widget.origin_x('right')
+          @widget.origin_x.should == 25
+        end
+      end
+
+      context "origin_y" do
+        it "should default to same value as top" do
+          @widget.origin_y.should == nil
+          @widget.top(15)
+          @widget.origin_y.should == 15
+        end
+
+        it "should accept 'middle' and return vertical center of widget" do
+          @widget.top(15)
+          @widget.height(10)
+          @widget.origin_y('middle')
+          @widget.origin_y.should == 20
+        end
+
+        it "should accept 'bottom' and return bottom coordinate of widget" do
+          @widget.top(15)
+          @widget.height(10)
+          @widget.origin_y('bottom')
+          @widget.origin_y.should == 25
+        end
+      end
     end
   end
 end
