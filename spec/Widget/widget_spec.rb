@@ -1115,6 +1115,51 @@ module EideticRML
           @widget.display.should == :once
         end
       end
+
+      context "widget_for" do
+        before :each do
+          @w1 = Widget.new(@page)
+          @w1.id('w1')
+          @w2 = Widget.new(@page)
+          @w2.id('w2')
+        end
+
+        # use .send because widget_for is protected
+        it "should return nil for bogus id's" do
+          @widget.send(:widget_for, 'bogus').should == nil
+        end
+
+        it "should return correct widget for id" do
+          @widget.send(:widget_for, 'w1').should == @w1
+          @widget.send(:widget_for, 'w2').should == @w2
+        end
+      end
+
+      context "max_content_height" do
+        it "should default to page size" do
+          @page.height.should == 792
+          @page.content_height.should == 792
+          @page.max_content_height.should == 792
+          @widget.max_content_height.should == 792
+        end
+
+        it "should be decreased by page margin and padding" do
+          @page.margin(50)
+          @page.padding(50)
+          @page.height.should == 792
+          @page.content_height.should == 592
+          @page.max_content_height.should == 592
+          @widget.max_content_height.should == 592
+        end
+
+        it "should be decreased by sum of page and widget margin and padding" do
+          @page.margin(50)
+          @page.padding(50)
+          @widget.margin(50)
+          @widget.padding(50)
+          @widget.max_content_height.should == 392
+        end
+      end
     end
   end
 end
