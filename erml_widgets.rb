@@ -511,12 +511,12 @@ module EideticRML
         (left >= bounds.left and top >= bounds.top and right <= bounds.right and bottom <= bounds.bottom) ? 1 : 0
       end
 
-      def postpone
-        @visible = false
-        @postponed ||= 0
-        @postponed += 1
-        @disabled = true if @postponed > 1
-      end
+      # def postpone
+      #   @visible = false
+      #   @postponed ||= 0
+      #   @postponed += 1
+      #   @disabled = true if @postponed > 1
+      # end
 
       def leaf?
         true
