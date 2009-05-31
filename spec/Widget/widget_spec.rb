@@ -890,12 +890,12 @@ module EideticRML
           @widget.margin('1in,2cm,3cm,4pt')
           @widget.margin_top(:in).should == 1
           @widget.margin_right(:cm).should == 2
-          @widget.margin_bottom(:cm).to_s.should match(/^3.0/) # close
+          @widget.margin_bottom(:cm).should be_close(3.0, 2 ** -20) # close
           @widget.margin_left(:pt).should == 4
 
           @widget.margin_top.should == 72
           @widget.margin_right.should == 56.7
-          @widget.margin_bottom.to_s.should match /^85.05/ # close
+          @widget.margin_bottom.should be_close(85.05, 2 ** -20) # close
           @widget.margin_left.should == 4
         end
 
@@ -1069,6 +1069,26 @@ module EideticRML
           @widget.height(10)
           @widget.origin_y('bottom')
           @widget.origin_y.should == 25
+        end
+      end
+
+      context "printed" do
+        before :each do
+          @writer = EideticPDF::DocumentWriter.new
+          @writer.open
+        end
+
+        after :each do
+          @writer.close
+        end
+
+        it "should default to nil (false)" do
+          @widget.printed.should be(nil)
+        end
+
+        it "should be true after printing" do
+          @widget.print(@writer)
+          @widget.printed.should be(true)
         end
       end
     end
