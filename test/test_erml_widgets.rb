@@ -1138,7 +1138,6 @@ class PageTestCases < Test::Unit::TestCase
     assert_equal([2,2,2,2], @page.margin(:in)) # in specified units
 
     assert_equal([1,1,1,1], @doc.margin(:in)) # unchanged
-    assert_equal([1,1,1,1], @doc.margin(:in)) # unchanged
   end
 
   def test_margin2
