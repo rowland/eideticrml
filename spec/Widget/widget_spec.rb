@@ -1160,6 +1160,26 @@ module EideticRML
           @widget.max_content_height.should == 392
         end
       end
+
+      context "max_height_avail" do
+        it "should default to page size" do
+          @page.max_height_avail.should == 792
+          @widget.max_height_avail.should == 792
+        end
+        
+        it "should be decreased by page margin and padding" do
+          @page.margin(50)
+          @page.padding(50)
+          @widget.max_height_avail.should == 592
+        end
+
+        it "should be decreased by distance from page.content_top to top of widget" do
+          @page.margin(50)
+          @page.padding(50)
+          @widget.top(@page.content_top + 100)
+          @widget.max_height_avail.should == 492
+        end
+      end
     end
   end
 end
