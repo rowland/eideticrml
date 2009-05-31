@@ -1091,6 +1091,30 @@ module EideticRML
           @widget.printed.should be(true)
         end
       end
+
+      context "display" do
+        it "should default to :once" do
+          @widget.display.should == :once
+        end
+
+        it "should accept valid symbols" do
+          [:always, :first, :succeeding, :even, :odd, :once].each do |v|
+            @widget.display(v)
+            @widget.display.should == v
+          end
+        end
+
+        it "should accept valid string values" do
+          [:always, :first, :succeeding, :even, :odd, :once].each do |v|
+            @widget.display(v.to_s)
+            @widget.display.should == v
+          end
+        end
+
+        it "should ignore bogus values" do
+          @widget.display.should == :once
+        end
+      end
     end
   end
 end
