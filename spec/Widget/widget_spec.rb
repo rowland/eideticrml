@@ -1180,6 +1180,46 @@ module EideticRML
           @widget.max_height_avail.should == 492
         end
       end
+
+      context "visible" do
+        before :each do
+          @b = Support::Bounds.new(1,1,7.5,10)
+        end
+        
+        it "should return 0 for unplaced widgets" do
+            @widget.visible(@b).should == 0
+        end
+        
+        it "should return 0 for widgets that are partly in bounds" do
+          @widget.left 0
+          @widget.top 0
+          @widget.right 8.5
+          @widget.bottom 11
+          @widget.visible(@b).should == 0
+
+          @widget.top 2
+          @widget.left 0.5
+          @widget.right 6
+          @widget.bottom 8
+          @widget.visible(@b).should == 0
+        end
+        
+        it "should return 1 for widgets that are entirely in bounds" do
+          @widget.left 1
+          @widget.top 1
+          @widget.right 7.5
+          @widget.bottom 10
+          @widget.visible(@b).should == 1
+
+          @widget.left 2
+          @widget.top 2
+          @widget.visible(@b).should == 1
+
+          @widget.right 6
+          @widget.bottom 8
+          @widget.visible(@b).should == 1
+        end
+      end
     end
   end
 end
