@@ -6,4 +6,4 @@ rescue LoadError
   require 'spec'
 end
 
-require File.dirname(__FILE__) + '/../erml'
+require File.expand_path(File.dirname(__FILE__) + '/../erml')
