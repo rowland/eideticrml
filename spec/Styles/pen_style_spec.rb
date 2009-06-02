@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 module EideticRML
   module Styles
-    describe Style do
+    describe PenStyle do
       before :each do
         @pen_style = Style.for_name('pen').new(nil)
       end
