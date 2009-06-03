@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 module EideticRML
   module LayoutManagers
-    describe LayoutManager do
+    describe AbsoluteLayout do
 
       before :each do
         @style = Styles::LayoutStyle.new(nil)
