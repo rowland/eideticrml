@@ -62,7 +62,7 @@ task :ermls do
       end
     end
     File.open(pdf, 'w') { |f| f.write(doc) }
-    `open #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+    `open -a Preview #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
   end
   elapsed = Time.now - start
   puts "Elapsed: #{(elapsed * 1000).round} ms"
