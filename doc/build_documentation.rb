@@ -25,7 +25,9 @@ class DocumentationBuilder
     dirname = File.dirname(filename)
     basename = File.basename(filename).gsub(/\.(erml|haml)/,'')
     pdfname = File.join(dirname, basename + '.pdf')
+    xmlname = File.join(dirname, basename + '.xml')
     xml = render(filename)
+    File.open(xmlname,'w') { |f| f.write(xml) }
     # $stdout.puts xml
     pdf = EideticRML::XmlParser.parse(xml)
     File.open(pdfname,'w') { |f| f.write(pdf) }
