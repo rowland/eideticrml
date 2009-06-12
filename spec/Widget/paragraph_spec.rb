@@ -136,6 +136,15 @@ module EideticRML
           @p.text("text")
           @p.text.first.should == ["text", @p.font]
         end
+
+        it "should replace newlines and any following whitespace with a single space" do
+          @p.text("first\n\t second")
+          @p.text.first.should == ["first second", @p.font]
+        end
+
+        it "should allow non-string values (like spans)" do
+          pageno = StdWidgetFactory.instance.make_widget('pageno', @p)
+        end
       end
 
       context "underline" do

@@ -1365,6 +1365,7 @@ module EideticRML
 
       def text(value=nil, font=nil)
         return @text_pieces if value.nil?
+        value.gsub!(/\n\s*/, ' ') if value.respond_to?(:gsub!)
         @text_pieces ||= []
         value.lstrip! if @text_pieces.empty? and value.respond_to?(:lstrip!)
         @text_pieces << [value, font || self.font] unless value.respond_to?(:empty?) and value.empty?
