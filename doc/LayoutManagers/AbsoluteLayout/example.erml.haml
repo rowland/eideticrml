@@ -1,0 +1,5 @@
+%div{ :width => '100%', :left => 0.5, :top => 3, :height => 3, :border => 'dotted', :layout => 'absolute' }
+  %p{ :left => 1, :top => 3.25 } Container with <code>layout="absolute"</code>.
+  %rect{ :width => 1.5, :height => 1, :left => 1, :top => 3.75, :border => 'solid', :padding => '5pt', :corners => 0.1 }
+    %p.code 1, 3.75
+  %p{ :left => 1, :top => 5 } Children are positioned relative to page, not to container.
