@@ -9,7 +9,7 @@ require 'erml_widgets'
 
 module EideticRML
   STANDARD_ALIASES = [
-    { 'id' => 'h', 'tag' => 'p', 'font.weight' => 'Bold', 'text_align' => 'center' }.freeze,
+    { 'id' => 'h', 'tag' => 'p', 'font.weight' => 'Bold', 'text_align' => 'center', 'width' => '100%' }.freeze,
     { 'id' => 'b', 'tag' => 'span', 'font.weight' => 'Bold' }.freeze,
     { 'id' => 'i', 'tag' => 'span', 'font.style' => 'Italic' }.freeze,
     { 'id' => 'u', 'tag' => 'span', 'underline' => 'true' }.freeze,

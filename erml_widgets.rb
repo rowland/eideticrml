@@ -1342,7 +1342,8 @@ module EideticRML
       end
 
       def preferred_width(writer, units=:pt)
-        @preferred_width = @width || parent.content_width
+        # @preferred_width = @width || parent.content_width
+        @preferred_width = @width || (rich_text(writer).width(parent.content_width - bullet_width - non_content_width) || 0) + bullet_width + non_content_width + 1
         to_units(units, @preferred_width)
       end
 

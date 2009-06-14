@@ -4,7 +4,7 @@
 	</styles>
 	<pages>
 		<page units="in" margin="0.75">
-			<p underline="true">Images</p>
+			<p underline="true" width="100%">Images</p>
 			<image url="samples/testimg.jpg" />
 			<image url="samples/testimg.jpg" />
 			<image url="samples/testimg.jpg" width="7">
