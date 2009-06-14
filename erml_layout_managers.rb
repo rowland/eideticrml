@@ -24,6 +24,7 @@ module EideticRML
       def layout_absolute(container, writer, widgets)
         widgets.each do |widget|
           widget.before_layout
+          widget.position(:absolute)
           widget.left(0, :pt) if widget.left.nil? and widget.right.nil?
           widget.top(0, :pt) if widget.top.nil? and widget.bottom.nil?
           widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?

@@ -5,16 +5,47 @@ module EideticRML
     describe AbsoluteLayout do
 
       before :each do
-        @style = Styles::LayoutStyle.new(nil)
-        @lm = LayoutManager.for_name('absolute').new(@style)
+        @doc = Widgets::Document.new(nil, :units => :in)
+        @page = Widgets::Page.new(@doc, :margin => 1)
+        @div = Widgets::Container.new(@page, :layout => 'absolute', :width => '100%', :height => '100%')
+        @p = Widgets::Paragraph.new(@div)
+        @style = @doc.styles.for_id('absolute')
+        @lm = @style.manager
       end
 
       context "initialize" do
         it "should make an AbsoluteLayout instance" do
           @lm.should be_kind_of(AbsoluteLayout)
+          @div.layout.manager.should == @lm
         end
       end
 
+      context "widget position" do
+        it "should default to :static" do
+          @p.position.should == :static
+        end
+
+        it "should be :absolute after layout" do
+          @doc.to_s
+          @p.position.should == :absolute
+        end
+      end
+
+      context "widget location" do
+        it "should default to (0, 0)" do
+          @doc.to_s
+          @p.left.should == 0
+          @p.top.should == 0
+        end
+
+        it "should remain at the absolute coordinates set" do
+          @p.left '3'
+          @p.top '5'
+          @doc.to_s
+          @p.left(:in).should == 3
+          @p.top(:in).should == 5
+        end
+      end
     end
   end
 end
