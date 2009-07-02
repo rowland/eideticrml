@@ -1178,10 +1178,18 @@ module EideticRML
 
     protected
       def before_print(writer)
-        @x ||= (content_left + content_right).quo(2)
-        @y ||= (content_top + content_bottom).quo(2)
+        @x ||= (left + margin_left + right - margin_right).quo(2)
+        @y ||= (top + margin_top + bottom - margin_bottom).quo(2)
         @r ||= [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min
         super(writer)
+      end
+
+      def x_offset
+        (position == :relative) ? parent.content_left : 0
+      end
+
+      def y_offset
+        (position == :relative) ? parent.content_top : 0
       end
 
       def draw_content(writer)
@@ -1190,7 +1198,6 @@ module EideticRML
         options[:fill] = !!@fill
         @border.apply(writer) unless @border.nil?
         @fill.apply(writer) unless @fill.nil?
-        x_offset, y_offset = (position == :relative) ? [parent.content_left, parent.content_top] : [0, 0]
         writer.circle(@x + x_offset, @y + y_offset, r, options)
         super(writer)
       end
