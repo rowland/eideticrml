@@ -103,6 +103,7 @@ module EideticRML
             # $stderr.puts "+++flow+++ #{container.root_page.positioned_widgets[:static]}, visible: #{widget.visible}"
             next
           end
+          container.root_page.positioned_widgets[widget.position] += 1
           cx += widget.width + @style.hpadding
           max_y = [max_y, widget.height].max
         end
