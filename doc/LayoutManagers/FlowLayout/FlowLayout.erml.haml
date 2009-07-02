@@ -1,3 +1,10 @@
 %page
   %header
     %title FlowLayout
+  %p
+    The <code>flow</code> layout positions widgets much like words in a paragraph. Starting at the top left corner, widgets are lined up left-to-right while room is available.
+    When there is insufficient horizontal room for another widget to be added, a new row is begun below the first. Horizontal padding is added between widgets as specified by
+    the <code>hpadding</code> property of the current <code>LayoutStyle</code>. Each row is considered to be the height of its tallest widget. Vertical padding is added
+    between rows as specified by the <code>vpadding</code> property of the current <code>LayoutStyle</code>. Both <code>hpadding</code> and <code>vpadding</code> 
+    default to 5 points.
+  = render 'example'
