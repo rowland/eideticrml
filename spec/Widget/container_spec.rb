@@ -131,6 +131,28 @@ module EideticRML
         end
       end
 
+      context "overflow" do
+        it "should default to false" do
+          @div.overflow.should be(nil) #false
+        end
+
+        it "should accept true and false as string and boolean" do
+          @div.overflow(true)
+          @div.overflow.should be(true)
+          @div.overflow(false)
+          @div.overflow.should be(false)
+          @div.overflow('true')
+          @div.overflow.should be(true)
+          @div.overflow('false')
+          @div.overflow.should be(false)
+        end
+
+        it "should accept other values and convert them to a string, evaluating as true" do
+          @div.overflow(1)
+          @div.overflow.should == '1'
+        end
+      end
+
       context "paragraph_style" do
         it "should default to page's paragraph style" do
           @div.paragraph_style.text_align.should == :center
