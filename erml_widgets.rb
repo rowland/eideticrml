@@ -1527,7 +1527,7 @@ module EideticRML
 
       def initialize(parent, attrs={})
         @default_margin = true
-        @more = 1
+        @more = true
         @overflow = true
         super(parent, attrs)
       end

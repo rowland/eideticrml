@@ -86,6 +86,19 @@ module EideticRML
         end
       end
 
+      context "more" do
+        it "should default to true" do
+          @div.more.should be(true)
+          @page.more.should be(true)
+        end
+
+        it "should propagate down the tree" do
+          @div.more(false)
+          @div.more.should be(false)
+          @page.more.should be(false)
+        end
+      end
+
       context "order" do
         it "should default to :rows" do
           @div.order.should == :rows
