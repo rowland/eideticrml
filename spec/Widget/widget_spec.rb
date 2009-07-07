@@ -1273,17 +1273,6 @@ module EideticRML
         it "should be true for a normal widget" do
           @widget.leaf?.should be(true)
         end
-
-        it "should be true for an empty container" do
-          c = Container.new(@page)
-          c.leaf?.should be(true)
-        end
-
-        it "should be false for a container with at least 1 child" do
-          c = Container.new(@page)
-          w = Widget.new(c)
-          c.leaf?.should be(false)
-        end
       end
     end
   end
