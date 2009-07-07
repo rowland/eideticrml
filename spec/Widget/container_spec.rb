@@ -72,6 +72,20 @@ module EideticRML
         end
       end
 
+      context "leaves" do
+        it "should be 1 when container is empty" do
+          @div.leaves.should == 1
+        end
+
+        it "should equal number of leaves contained" do
+          p1 = StdWidgetFactory.instance.make_widget('p', @div)
+          p2 = StdWidgetFactory.instance.make_widget('p', @div)
+          d = StdWidgetFactory.instance.make_widget('div', @div)
+          p3 = StdWidgetFactory.instance.make_widget('p', d)
+          @div.leaves.should == 3
+        end
+      end
+
       context "order" do
         it "should default to :rows" do
           @div.order.should == :rows

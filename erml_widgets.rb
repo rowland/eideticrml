@@ -1072,7 +1072,7 @@ module EideticRML
       end
 
       def leaves
-        visible ? children.select { |w| w.visible }.inject(0) { |m, widget| m + widget.leaves } : 0
+        visible ? children.select { |w| w.visible }.inject(0) { |m, widget| m + widget.leaves } + super : 0
       end
 
       def more(flag=nil)
