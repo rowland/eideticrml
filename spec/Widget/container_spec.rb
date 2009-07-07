@@ -132,55 +132,6 @@ module EideticRML
       end
 
       context "overflow" do
-        it "should default to false" do
-          @div.overflow.should be(nil) #false
-        end
-
-        it "should accept true and false as string and boolean" do
-          @div.overflow(true)
-          @div.overflow.should be(true)
-          @div.overflow(false)
-          @div.overflow.should be(false)
-          @div.overflow('true')
-          @div.overflow.should be(true)
-          @div.overflow('false')
-          @div.overflow.should be(false)
-        end
-
-        it "should accept other values and convert them to a string, evaluating as true" do
-          @div.overflow(1)
-          @div.overflow.should == '1'
-        end
-      end
-
-      context "paragraph_style" do
-        it "should default to page's paragraph style" do
-          @div.paragraph_style.text_align.should == :center
-        end
-      end
-
-      context "rows" do
-        it "should default to nil" do
-          @div.rows.should == nil
-        end
-
-        it "should ignore values < 1" do
-          @div.rows(0)
-          @div.rows.should == nil
-        end
-
-        it "should accept positive integers" do
-          @div.rows(3)
-          @div.rows.should == 3
-        end
-
-        it "should accept positive integers specifed as strings" do
-          @div.rows('5')
-          @div.rows.should == 5
-        end
-      end
-
-      context "overflow" do
         it "should default to nil (false)" do
           @div.overflow.should be(nil)
         end
@@ -204,6 +155,23 @@ module EideticRML
           @div.overflow("false")
           @div.overflow.should be(false)
         end
+
+        it "should accept other values and convert them to a string, evaluating as true" do
+          @div.overflow(1)
+          @div.overflow.should == '1'
+        end
+      end
+
+      context "paragraph_style" do
+        it "should default to page's paragraph style" do
+          @div.paragraph_style.text_align.should == :center
+        end
+      end
+
+      context "preferred_height" do
+      end
+
+      context "preferred_width" do
       end
 
       context "printed" do
@@ -224,6 +192,27 @@ module EideticRML
           p.printed.should be(nil)
           @doc.to_s
           p.printed.should be(true)
+        end
+      end
+
+      context "rows" do
+        it "should default to nil" do
+          @div.rows.should == nil
+        end
+
+        it "should ignore values < 1" do
+          @div.rows(0)
+          @div.rows.should == nil
+        end
+
+        it "should accept positive integers" do
+          @div.rows(3)
+          @div.rows.should == 3
+        end
+
+        it "should accept positive integers specifed as strings" do
+          @div.rows('5')
+          @div.rows.should == 5
         end
       end
 
