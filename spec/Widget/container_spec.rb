@@ -44,6 +44,23 @@ module EideticRML
         end
       end
 
+      context "layout" do
+        it "should default to nil" do
+          @div.layout.should be(nil)
+        end
+
+        it "should accept names of registered layout managers" do
+          %w(absolute flow hbox vbox table).each do |lm|
+            @div.layout(lm)
+            @div.layout.manager.should be_instance_of(LayoutManagers::LayoutManager.for_name(lm))
+          end
+        end
+
+        it "should raise an ArgumentError if an invalid layout manager is specified" do
+          lambda { @div.layout('bogus') }.should raise_error(ArgumentError)
+        end
+      end
+
       context "order" do
         it "should default to :rows" do
           @div.order.should == :rows
