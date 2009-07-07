@@ -12,6 +12,22 @@ module EideticRML
         @style = style
       end
 
+      def row_grid(container)
+        grid = Support::Grid.new(container.children.size, 1)
+        container.children.each_with_index do |widget, index|
+          grid[index, 0] = widget
+        end
+        grid
+      end
+
+      def col_grid(container)
+        grid = Support::Grid.new(1, container.children.size)
+        container.children.each_with_index do |widget, index|
+          grid[0, index] = widget
+        end
+        grid
+      end
+
       def layout(container, writer)
         absolute_widgets = container.children.select { |widget| widget.position == :absolute }
         layout_absolute(container, writer, absolute_widgets)
@@ -68,6 +84,8 @@ module EideticRML
     class AbsoluteLayout < LayoutManager
       register('absolute', self)
 
+      alias :grid :row_grid
+
       def layout(container, writer)
         layout_absolute(container, writer, container.children)
       end
@@ -75,6 +93,8 @@ module EideticRML
 
     class FlowLayout < LayoutManager
       register('flow', self)
+
+      alias :grid :row_grid
 
       def layout(container, writer)
         cx = cy = max_y = 0
@@ -115,6 +135,8 @@ module EideticRML
 
     class HBoxLayout < LayoutManager
       register('hbox', self)
+
+      alias :grid :row_grid
 
       def layout(container, writer)
         container_full = false
@@ -198,6 +220,8 @@ module EideticRML
 
     class VBoxLayout < LayoutManager
       register('vbox', self)
+
+      alias :grid :col_grid
 
       def layout(container, writer)
         # $stderr.puts "layout container: #{container.tag}"
@@ -467,13 +491,16 @@ module EideticRML
       end
 
     public
-      def layout(container, writer)
+      def grid(container)
         if container.order == :rows
-          grid = row_grid(container)
+          row_grid(container)
         else # container.order == :cols
-          grid = col_grid(container)
+          col_grid(container)
         end
-        layout_grid(grid, container, writer)
+      end
+
+      def layout(container, writer)
+        layout_grid(grid(container), container, writer)
         super(container, writer)
       end
     end

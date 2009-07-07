@@ -46,6 +46,19 @@ module EideticRML
           @p.top(:in).should == 5
         end
       end
+
+      context "grid" do
+        it "should place all widgets on one row" do
+          p1 = Widgets::Paragraph.new(@div)
+          p2 = Widgets::Paragraph.new(@div)
+          grid = @lm.grid(@div)
+          grid.cols.should == 3
+          grid.rows.should == 1
+          grid[0, 0].should == @p
+          grid[1, 0].should == p1
+          grid[2, 0].should == p2
+        end
+      end
     end
   end
 end
