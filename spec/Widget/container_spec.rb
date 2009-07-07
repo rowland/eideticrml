@@ -61,6 +61,17 @@ module EideticRML
         end
       end
 
+      context "leaf?" do
+        it "should be true when container is empty" do
+          @div.leaf?.should be(true)
+        end
+
+        it "should be false when container has at least one child" do
+          p = StdWidgetFactory.instance.make_widget('p', @div)
+          @div.leaf?.should be(false)
+        end
+      end
+
       context "order" do
         it "should default to :rows" do
           @div.order.should == :rows
