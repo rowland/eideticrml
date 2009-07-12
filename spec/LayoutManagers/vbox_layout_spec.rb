@@ -19,6 +19,11 @@ module EideticRML
         end
       end
 
+      # ------
+      # | p1 |
+      # |----|
+      # | p2 |
+      # ------
       context "grid" do
         it "should place all widgets in one column" do
           p1 = Widgets::Paragraph.new(@div)
