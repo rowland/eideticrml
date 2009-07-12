@@ -10,6 +10,7 @@ module EideticRML
         @div = Widgets::Container.new(@page, :layout => 'absolute', :width => '100%', :height => '100%')
 
         @style = Styles::LayoutStyle.new(nil)
+        @style.padding(5)
         @lm = LayoutManager.for_name('hbox').new(@style)
       end
 
@@ -31,6 +32,32 @@ module EideticRML
           grid.rows.should == 1
           grid[0, 0].should == p1
           grid[1, 0].should == p2
+        end
+      end
+
+      context "preferred_height" do
+        it "should return the max widget height" do
+          w1 = Widgets::Widget.new(@div)
+          w2 = Widgets::Widget.new(@div)
+          w1.height(10, :pt)
+          w2.height(20, :pt)
+          # w1.preferred_height(nil).should == 10
+          # w2.preferred_height(nil).should == 20
+          grid = @lm.grid(@div)
+          @lm.preferred_height(grid, nil).should == 20
+        end
+      end
+
+      context "preferred_width" do
+        it "should return the sum of widget widths + horizontal padding" do
+          w1 = Widgets::Widget.new(@div)
+          w2 = Widgets::Widget.new(@div)
+          w1.width(10, :pt)
+          w2.width(20, :pt)
+          # w1.preferred_width(nil).should == 10
+          # w2.preferred_width(nil).should == 20
+          grid = @lm.grid(@div)
+          @lm.preferred_width(grid, nil).should == 35
         end
       end
     end
