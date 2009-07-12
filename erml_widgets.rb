@@ -131,6 +131,14 @@ module EideticRML
         @shift_x, @shift_y = parse_measurement_pts(x, units || self.units), parse_measurement_pts(y, units || self.units)
       end
 
+      def has_height?
+        @height and !@height_pct
+      end
+
+      def has_width?
+        @width and !@width_pct
+      end
+
       def preferred_width(writer, units=:pt)
         to_units(units, @width || 0)
       end
@@ -723,6 +731,14 @@ module EideticRML
     class Image < Widget
       StdWidgetFactory.instance.register_widget('image', self)
 
+      def has_height?
+        true
+      end
+
+      def has_width?
+        true
+      end
+
       def preferred_width(writer, units=:pt)
         if @width.nil? and @height
           w = @height * image(writer).width.quo(image(writer).height)
@@ -904,6 +920,14 @@ module EideticRML
         font.apply(writer)
       end
 
+      def has_height?
+        true
+      end
+
+      def has_width?
+        true
+      end
+
       def strikeout(value=nil)
         return font.strikeout if value.nil?
         font(:copy).strikeout(value)
@@ -1051,6 +1075,12 @@ module EideticRML
         @cols = value.to_i if value.to_i > 0
       end
 
+      # def has_height?
+      # end
+      # 
+      # def has_width?
+      # end
+
       def layout(value=nil)
         return @layout_style if value.nil?
         @layout_style = layout_style_for(value)
@@ -1101,6 +1131,9 @@ module EideticRML
       # def preferred_height(writer, units=:pt)
       #   @preferred_height = @preferred_content_height ? @preferred_content_height + non_content_height : height
       #   to_units(units, @preferred_height)
+      # end
+      # def preferred_height(writer, units=:pt)
+      #   @height ? to_units(units, @height) : @height
       # end
 
       def preferred_width(writer, units=:pt)

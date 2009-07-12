@@ -1274,6 +1274,38 @@ module EideticRML
           @widget.leaf?.should be(true)
         end
       end
+
+      context "has_height?" do
+        it "should default to nil (false)" do
+          @widget.has_height?.should be(nil)
+        end
+
+        it "should be true when height has been set" do
+          @widget.height(5)
+          @widget.has_height?.should be(true)
+        end
+
+        it "should be false when height has been set to a percentage" do
+          @widget.height("5%")
+          @widget.has_height?.should be(false)
+        end
+      end
+
+      context "has_width?" do
+        it "should default to nil (false)" do
+          @widget.has_width?.should be(nil)
+        end
+
+        it "should be true when height has been set" do
+          @widget.width(5)
+          @widget.has_width?.should be(true)
+        end
+
+        it "should be false when height has been set to a percentage" do
+          @widget.width("5%")
+          @widget.has_width?.should be(false)
+        end
+      end
     end
   end
 end

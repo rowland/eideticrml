@@ -172,6 +172,18 @@ module EideticRML
           @p.underline.should be(false)
         end
       end
+
+      context "has_height?" do
+        it "should always be true" do
+          @p.has_height?.should be(true)
+        end
+      end
+
+      context "has_width?" do
+        it "should always be true" do
+          @p.has_width?.should be(true)
+        end
+      end
     end
   end
 end

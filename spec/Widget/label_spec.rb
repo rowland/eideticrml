@@ -36,6 +36,18 @@ module EideticRML
           @label.text.should == "text"
         end
       end
+
+      context "has_height?" do
+        it "should always be true" do
+          @label.has_height?.should be(true)
+        end
+      end
+
+      context "has_width?" do
+        it "should always be true" do
+          @label.has_width?.should be(true)
+        end
+      end
     end
   end
 end
