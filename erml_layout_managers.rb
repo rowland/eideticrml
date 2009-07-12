@@ -71,7 +71,7 @@ module EideticRML
       def self.for_name(name)
         @@klasses[name] unless @@klasses.nil?
       end
-      
+
     protected
       def printable_widgets(container, position)
         dpgno, spgno = container.root.document_page_no, container.root.section_page_no
@@ -88,6 +88,14 @@ module EideticRML
 
       def layout(container, writer)
         layout_absolute(container, writer, container.children)
+      end
+
+      def preferred_height(grid, writer)
+        nil
+      end
+
+      def preferred_width(grid, writer)
+        nil
       end
     end
 
@@ -130,6 +138,15 @@ module EideticRML
         container.more(true) if container_full and container.overflow
         container.height(cy + max_y + container.non_content_height, :pt) if container.height.nil? and max_y > 0
         super(container, writer)
+      end
+
+      def preferred_height(grid, writer)
+        grid.row(0).map { |w| w.preferred_height(writer) }.max
+      end
+
+      def preferred_width(grid, writer)
+        row = grid.row(0)
+        row.inject((row.size - 1) * @style.hpadding) { |sum, w| sum + w.preferred_width(writer) }
       end
     end
 
@@ -216,6 +233,14 @@ module EideticRML
         static.each { |widget| widget.layout_widget(writer) if widget.visible and !widget.disabled }
         super(container, writer)
       end
+
+      def preferred_height(grid, writer)
+        nil
+      end
+
+      def preferred_width(grid, writer)
+        nil
+      end
     end
 
     class VBoxLayout < LayoutManager
@@ -293,6 +318,14 @@ module EideticRML
         container.height(dy + container.non_content_height, :pt) if container.height.nil?
         super(container, writer)
         # $stderr.puts " end layout container: #{container.tag}, visible: #{container.visible}"
+      end
+
+      def preferred_height(grid, writer)
+        nil
+      end
+
+      def preferred_width(grid, writer)
+        nil
       end
 
       # def after_layout(container)
@@ -502,6 +535,14 @@ module EideticRML
       def layout(container, writer)
         layout_grid(grid(container), container, writer)
         super(container, writer)
+      end
+
+      def preferred_height(grid, writer)
+        nil
+      end
+
+      def preferred_width(grid, writer)
+        nil
       end
     end
   end
