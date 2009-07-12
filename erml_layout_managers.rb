@@ -141,11 +141,14 @@ module EideticRML
       end
 
       def preferred_height(grid, writer)
-        grid.row(0).map { |w| w.preferred_height(writer) }.max
+        row = grid.row(0)
+        return nil if row.any? { |w| !w.has_height? }
+        row.map { |w| w.preferred_height(writer) }.max
       end
 
       def preferred_width(grid, writer)
         row = grid.row(0)
+        return nil if row.any? { |w| !w.has_width? }
         row.inject((row.size - 1) * @style.hpadding) { |sum, w| sum + w.preferred_width(writer) }
       end
     end
@@ -235,11 +238,14 @@ module EideticRML
       end
 
       def preferred_height(grid, writer)
-        grid.row(0).map { |w| w.preferred_height(writer) }.max
+        row = grid.row(0)
+        return nil if row.any? { |w| !w.has_height? }
+        row.map { |w| w.preferred_height(writer) }.max
       end
 
       def preferred_width(grid, writer)
         row = grid.row(0)
+        return nil if row.any? { |w| !w.has_width? }
         row.inject((row.size - 1) * @style.hpadding) { |sum, w| sum + w.preferred_width(writer) }
       end
     end
