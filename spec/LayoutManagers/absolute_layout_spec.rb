@@ -62,6 +62,28 @@ module EideticRML
           grid[2, 0].should == p2
         end
       end
+
+      context "preferred_height" do
+        it "should always return nil" do
+          w1 = Widgets::Widget.new(@div)
+          w2 = Widgets::Widget.new(@div)
+          w1.height(10, :pt)
+          w2.height(20, :pt)
+          grid = @lm.grid(@div)
+          @lm.preferred_height(grid, nil).should == nil
+        end
+      end
+
+      context "preferred_width" do
+        it "should return the sum of widget widths + horizontal padding" do
+          w1 = Widgets::Widget.new(@div)
+          w2 = Widgets::Widget.new(@div)
+          w1.width(10, :pt)
+          w2.width(20, :pt)
+          grid = @lm.grid(@div)
+          @lm.preferred_width(grid, nil).should == nil
+        end
+      end
     end
   end
 end
