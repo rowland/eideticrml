@@ -328,11 +328,15 @@ module EideticRML
       end
 
       def preferred_height(grid, writer)
-        nil
+        col = grid.col(0)
+        return nil if col.any? { |w| !w.has_height? }
+        col.inject((col.size - 1) * @style.vpadding) { |sum, w| sum + w.preferred_height(writer) }
       end
 
       def preferred_width(grid, writer)
-        nil
+        col = grid.col(0)
+        return nil if col.any? { |w| !w.has_width? }
+        col.map { |w| w.preferred_width(writer) }.max
       end
 
       # def after_layout(container)
