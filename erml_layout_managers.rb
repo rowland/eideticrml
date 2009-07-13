@@ -549,11 +549,49 @@ module EideticRML
       end
 
       def preferred_height(grid, writer)
-        nil
+        # calculate preferred heights, where available
+        heights = Support::Grid.new(grid.cols, grid.rows)
+        grid.cols.times do |c|
+          grid.col(c).each_with_index do |widget, r|
+            next unless widget
+            heights[c, r] = [widget.rowspan, widget.has_height? ? widget.preferred_height(writer) : nil]
+          end
+        end
+
+        heights.rows.times do |r|
+          row_heights = (0...heights.cols).map { |c| heights[c,r] }.compact
+          min_rowspan = row_heights.map { |rowspan, height| rowspan }.min
+          min_rowspan_heights = row_heights.select { |rowspan, height| rowspan == min_rowspan }
+          max_height = min_rowspan_heights.map { |rowspan, height| height }.compact.max
+          # at least one cell must specify a height
+          return nil if max_height.nil?
+          heights.cols.times do |c|
+            rh = heights[c,r]
+            next if rh.nil?
+            # carry height in excess of max height of cells with min_rowspan to cell in next row, subtracting vpadding
+            if rh[0] > min_rowspan
+              heights[c,r+1] = [rh[0] - 1, [rh[1] - max_height - @style.vpadding, 0].max]
+            end
+            rh[1] = max_height
+          end
+        end
+
+        result = 0
+        grid.rows.times do |r|
+          max_height = 0
+          grid.cols.times do |c|
+            if (widget = grid[c, r]) and (rh = heights[c,r])
+              height = (0...rh[0]).inject((rh[0] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][1] }
+              max_height = [max_height, rh[1]].max if rh[0] == 1
+            end
+          end
+          result += max_height + @style.vpadding
+        end
+        result -= @style.vpadding if result > 0
       end
 
       def preferred_width(grid, writer)
-        nil
+        cols = []
       end
     end
   end
