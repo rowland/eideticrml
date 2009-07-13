@@ -591,7 +591,45 @@ module EideticRML
       end
 
       def preferred_width(grid, writer)
-        cols = []
+        # calculate preferred widths, where available
+        widths = Support::Grid.new(grid.cols, grid.rows)
+        grid.rows.times do |r|
+          grid.row(r).each_with_index do |widget, c|
+            next unless widget
+            widths[c, r] = [widget.colspan, widget.has_width? ? widget.preferred_width(writer) : nil]
+          end
+        end
+
+        widths.cols.times do |c|
+          col_widths = (0...widths.rows).map { |r| widths[c,r] }.compact
+          min_colspan = col_widths.map { |colspan, width| colspan }.min
+          min_colspan_widths = col_widths.select { |colspan, width| colspan == min_colspan }
+          max_width = min_colspan_widths.map { |colspan, width| width }.compact.max
+          # at least one cell must specify a width
+          return nil if max_width.nil?
+          widths.rows.times do |r|
+            cw = widths[c,r]
+            next if cw.nil?
+            # carry width in excess of max width of cells with min_colspan to cell in next col, subtracting hpadding
+            if cw[0] > min_colspan
+              widths[c+1,r] = [cw[0] - 1, [cw[1] - max_width - @style.hpadding, 0].max]
+            end
+            cw[1] = max_width
+          end
+        end
+
+        result = 0
+        grid.cols.times do |c|
+          max_width = 0
+          grid.rows.times do |r|
+            if (widget = grid[c, r]) and (cw = widths[c, r])
+              width = (0...cw[0]).inject((cw[0] - 1) * @style.hpadding) { |width, col_offset| width + widths[c+col_offset,r][1] }
+              max_width = [max_width, cw[1]].max if cw[0] == 1
+            end
+          end
+          result += max_width + @style.hpadding
+        end
+        result -= @style.hpadding if result > 0
       end
     end
   end

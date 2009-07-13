@@ -129,18 +129,47 @@ module EideticRML
         before :each do
           @div.cols(3)
           @div.order(:rows)
+        end
+
+        it "should return the sum of widths + horizontal padding" do
           @w1 = Widgets::Widget.new(@div, :width => 10, :height => 10)
           @w2 = Widgets::Widget.new(@div, :width => 15, :height => 12)
           @w3 = Widgets::Widget.new(@div, :width => 10, :height => 25, :rowspan => 2)
           @w4 = Widgets::Widget.new(@div, :width => 25, :height => 10, :colspan => 2)
+          grid = @lm.grid(@div)
+          # @w1.height.should == 10
+          # @w1.preferred_height(nil).should == 10
+          @lm.preferred_width(grid, nil).should == 45 # 10 + (5) + 15 + (5) + 10, vs. 25 + (5) + 10 = 40
         end
 
-        # it "should return the sum of widths + horizontal padding" do
-        #   grid = @lm.grid(@div)
-        #   @w1.height.should == 10
-        #   @w1.preferred_height(nil).should == 10
-        #   @lm.preferred_width(grid, nil).should == 45 # 10 + (5) + 15 + (5) + 10, vs. 25 + (5) + 10 = 40
-        # end
+        it "should return nil when a column width cannot be determined by at least one cell" do
+          @w1 = Widgets::Widget.new(@div, :height => 10)
+          @w2 = Widgets::Widget.new(@div, :width => 15, :height => 12)
+          @w3 = Widgets::Widget.new(@div, :width => 10, :height => 25, :rowspan => 2)
+          @w4 = Widgets::Widget.new(@div, :width => 25, :height => 10, :colspan => 2)
+          grid = @lm.grid(@div)
+          @w1.width.should be(nil)
+          @lm.preferred_width(grid, nil).should be(nil)
+        end
+
+        # ----------------
+        # | w1 | w2 | w3 |
+        # |---------|    |
+        # | w4      |    |
+        # |---------|----|
+        # | w5 | w6 | w7 |
+        # ----------------
+        it "should not return nil when a column width can be determined by at least one cell" do
+          @w1 = Widgets::Widget.new(@div, :height => 10)
+          @w2 = Widgets::Widget.new(@div, :width => 15, :height => 12)
+          @w3 = Widgets::Widget.new(@div, :width => 10, :height => 25, :rowspan => 2)
+          @w4 = Widgets::Widget.new(@div, :width => 25, :height => 10, :colspan => 2)
+          @w5 = Widgets::Widget.new(@div, :width => 10, :height => 10)
+          @w6 = Widgets::Widget.new(@div, :width => 15, :height => 10)
+          @w7 = Widgets::Widget.new(@div, :width => 10, :height => 10)
+          grid = @lm.grid(@div)
+          @lm.preferred_width(grid, nil).should == 45
+        end
       end
     end
   end
