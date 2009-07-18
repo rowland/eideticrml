@@ -338,7 +338,7 @@ end
 if $0 == __FILE__ and erml = ARGV.shift and File.exist?(erml)
   begin
     pdf = render_erml(erml)
-    `open #{pdf}` if pdf and (RUBY_PLATFORM =~ /darwin/) and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+    `open -a Preview #{pdf}` if pdf and (RUBY_PLATFORM =~ /darwin/) and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
   rescue Exception => e
     $stderr.puts e.message, e.backtrace.join("\n")
   end
