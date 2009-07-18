@@ -75,7 +75,7 @@ module EideticRML
       end
 
       context "preferred_width" do
-        it "should return the sum of widget widths + horizontal padding" do
+        it "should always return nil" do
           w1 = Widgets::Widget.new(@div)
           w2 = Widgets::Widget.new(@div)
           w1.width(10, :pt)
