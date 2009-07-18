@@ -118,6 +118,11 @@ module EideticRML
           grid = @lm.grid(@div)
           @lm.preferred_height(grid, nil).should == 42
         end
+
+        it "should return nil if the container is empty" do
+          grid = @lm.grid(@div)
+          @lm.preferred_height(grid, nil).should be(nil)
+        end
       end
 
       context "preferred_width" do
@@ -169,6 +174,43 @@ module EideticRML
           @w7 = Widgets::Widget.new(@div, :width => 10, :height => 10)
           grid = @lm.grid(@div)
           @lm.preferred_width(grid, nil).should == 45
+        end
+
+        it "should return nil if the container is empty" do
+          grid = @lm.grid(@div)
+          @lm.preferred_width(grid, nil).should be(nil)
+        end
+
+        it "should correctly measure text" do
+          t1 = "Lorem ipsum dolor sit amet,"
+          t2 = "consectetur adipisicing elit,"
+          t3 = "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          t4 = "Ut enim ad minim veniam,"
+          t5 = "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          t6 = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+          t7 = "Excepteur sint occaecat cupidatat non proident,"
+          t8 = "sunt in culpa qui officia deserunt mollit anim id est laborum."
+          p1 = Widgets::Paragraph.new(@div, :text => t1, :padding => 3)
+          p2 = Widgets::Paragraph.new(@div, :text => t2, :padding => 3)
+          p3 = Widgets::Paragraph.new(@div, :text => t3, :padding => 3)
+          p4 = Widgets::Paragraph.new(@div, :text => t4, :padding => 3)
+          p5 = Widgets::Paragraph.new(@div, :text => t5, :padding => 3)
+          p6 = Widgets::Paragraph.new(@div, :text => t6, :padding => 3)
+          p7 = Widgets::Paragraph.new(@div, :text => t7, :padding => 3)
+          p8 = Widgets::Paragraph.new(@div, :text => t8, :padding => 3, :colspan => 2)
+          grid = @lm.grid(@div)
+          writer = EideticPDF::DocumentWriter.new
+          writer.open
+          p1w = p1.preferred_width(writer)
+          p2w = p2.preferred_width(writer)
+          p3w = p3.preferred_width(writer)
+          p4w = p4.preferred_width(writer)
+          p5w = p5.preferred_width(writer)
+          p6w = p6.preferred_width(writer)
+          p7w = p7.preferred_width(writer)
+          p8w = p8.preferred_width(writer)
+          expected = [p1w, p4w, p7w].max + @style.padding + [p2w, p5w].max + @style.padding + [p3w, p6w].max
+          @lm.preferred_width(grid, writer).should == expected
         end
       end
     end

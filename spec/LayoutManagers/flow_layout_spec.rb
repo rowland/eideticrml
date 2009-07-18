@@ -32,6 +32,13 @@ module EideticRML
           grid[0, 0].should == p1
           grid[1, 0].should == p2
         end
+
+        it "should return an empty grid for an empty container" do
+          grid = @lm.grid(@div)
+          grid.cols.should == 0
+          grid.rows.should == 1
+          grid.row(0).empty?.should be(true)
+        end
       end
 
       context "preferred_height" do
@@ -58,6 +65,11 @@ module EideticRML
           grid = @lm.grid(@div)
           @lm.preferred_height(grid, nil).should be(nil)
         end
+
+        it "should return nil if the container is empty" do
+          grid = @lm.grid(@div)
+          @lm.preferred_height(grid, nil).should be(nil)
+        end
       end
 
       context "preferred_width" do
@@ -81,6 +93,11 @@ module EideticRML
           # w1.preferred_width(nil).should == 10
           # w2.preferred_width(nil).should == 20
           # w3.has_width?.should be(nil)
+          grid = @lm.grid(@div)
+          @lm.preferred_width(grid, nil).should be(nil)
+        end
+
+        it "should return nil if the container is empty" do
           grid = @lm.grid(@div)
           @lm.preferred_width(grid, nil).should be(nil)
         end

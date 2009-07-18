@@ -152,7 +152,8 @@ module EideticRML
         return to_units(value, width) if value.is_a?(Symbol)
         if value =~ /(\d+(\.\d+)?)%/
           @width_pct = $1.to_f.quo(100)
-          @width = @width_pct * parent.content_width
+          # @width = @width_pct * parent.content_width
+          @width = nil
         elsif value.to_s =~ /^[+-]/
           @width = parent.content_width + parse_measurement_pts(value, units || self.units)
           @width_pct = nil
@@ -925,7 +926,7 @@ module EideticRML
       end
 
       def has_width?
-        true
+        !@width_pct
       end
 
       def strikeout(value=nil)
@@ -1082,12 +1083,12 @@ module EideticRML
       # end
 
       def layout(value=nil)
-        return @layout_style if value.nil?
+        return @layout_style || layout('flow') if value.nil?
         @layout_style = layout_style_for(value)
       end
 
       def layout_container(writer)
-        layout('flow') if layout.nil?
+        # layout('flow') if layout.nil?
         layout.manager.layout(self, writer)
         # returns count
       end
@@ -1136,8 +1137,17 @@ module EideticRML
       #   @height ? to_units(units, @height) : @height
       # end
 
+      # def preferred_width(writer, units=:pt)
+      #   @preferred_width = @width || parent.content_width
+      #   to_units(units, @preferred_width)
+      # end
+
+      def preferred_height(writer, units=:pt)
+        @preferred_height ||= @height || layout.manager.preferred_height(layout_grid, writer)
+      end
+
       def preferred_width(writer, units=:pt)
-        @preferred_width = @width || parent.content_width
+        @preferred_width ||= @width || (layout.manager.preferred_width(layout_grid, writer) || return) + non_content_width
         to_units(units, @preferred_width)
       end
 
@@ -1163,6 +1173,11 @@ module EideticRML
       def draw_content(writer)
         super(writer)
         children.sort { |a, b| a.z_index <=> b.z_index }.each { |child| child.print(writer) }
+      end
+
+      def layout_grid
+        # layout('flow') if layout.nil?
+        @layout_grid ||= layout.manager.grid(self)
       end
 
       def layout_style_for(id)
@@ -1191,9 +1206,17 @@ module EideticRML
         if @height.nil? and @width
           h = @width
         else
-          h = preferred_width(writer)
+          h = super(writer)
         end
         to_units(units, h)
+      end
+
+      def preferred_width(writer, units=:pt)
+        if @width.nil? and @height
+          to_units(units, @height)
+        else
+          super(writer, units)
+        end
       end
 
       def r(value=nil, units=nil)
@@ -1211,6 +1234,7 @@ module EideticRML
 
     protected
       def before_print(writer)
+        # puts "left: #{left}, margin_left: #{margin_left}, right: #{right}, margin_right: #{margin_right}"
         @x ||= (left + margin_left + right - margin_right).quo(2)
         @y ||= (top + margin_top + bottom - margin_bottom).quo(2)
         @r ||= [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min
@@ -1383,7 +1407,10 @@ module EideticRML
 
       def preferred_width(writer, units=:pt)
         # @preferred_width = @width || parent.content_width
-        @preferred_width = @width || (rich_text(writer).width(parent.content_width - bullet_width - non_content_width) || 0) + bullet_width + non_content_width + 1
+        @preferred_width = @width || begin
+          max_width = parent.width ? parent.content_width : root_page.content_width
+          (rich_text(writer).width(max_width - bullet_width - non_content_width) || 0) + bullet_width + non_content_width + 1
+        end
         to_units(units, @preferred_width)
       end
 

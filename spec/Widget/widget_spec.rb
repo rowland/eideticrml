@@ -1301,9 +1301,9 @@ module EideticRML
           @widget.has_width?.should be(true)
         end
 
-        it "should be false when height has been set to a percentage" do
+        it "should be nil (false) when height has been set to a percentage" do
           @widget.width("5%")
-          @widget.has_width?.should be(false)
+          @widget.has_width?.should be(nil)
         end
       end
     end

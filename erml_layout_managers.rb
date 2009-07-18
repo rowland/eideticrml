@@ -114,7 +114,11 @@ module EideticRML
           widget.visible = !container_full
           next if container_full
           widget.before_layout
-          widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?
+          # $stderr.puts widget.instance_variables.map { |v| "%s=%s" % [v, widget.instance_variable_get(v)] }
+          # $stderr.puts "width: #{widget.width.inspect}"
+          # $stderr.puts "content_width: #{container.content_width.inspect}"
+          # $stderr.puts "preferred_width: #{widget.preferred_width(writer).inspect}"
+          widget.width([widget.preferred_width(writer) || container.content_width, container.content_width].min, :pt) if widget.width.nil?
           if cx != 0 and cx + widget.width > container.content_width
             cy += max_y + @style.vpadding
             cx = max_y = 0
@@ -122,7 +126,7 @@ module EideticRML
           widget.left(container.content_left + cx, :pt)
           widget.top(container.content_top + cy, :pt)
           widget.layout_widget(writer)
-          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
+          widget.height(widget.preferred_height(writer) || 0, :pt) if widget.height.nil?
           # if container.bottom and widget.bottom > container.bottom
           if widget.bottom > bottom
             container_full = true
@@ -148,7 +152,7 @@ module EideticRML
 
       def preferred_width(grid, writer)
         row = grid.row(0)
-        return nil if row.any? { |w| !w.has_width? }
+        return nil if row.empty? or row.any? { |w| !w.has_width? }
         row.inject((row.size - 1) * @style.hpadding) { |sum, w| sum + w.preferred_width(writer) }
       end
     end
@@ -245,6 +249,7 @@ module EideticRML
 
       def preferred_width(grid, writer)
         row = grid.row(0)
+        return 0 if row.empty?
         return nil if row.any? { |w| !w.has_width? }
         row.inject((row.size - 1) * @style.hpadding) { |sum, w| sum + w.preferred_width(writer) }
       end
@@ -335,7 +340,7 @@ module EideticRML
 
       def preferred_width(grid, writer)
         col = grid.col(0)
-        return nil if col.any? { |w| !w.has_width? }
+        return nil if col.empty? or col.any? { |w| !w.has_width? }
         col.map { |w| w.preferred_width(writer) }.max
       end
 
@@ -401,7 +406,7 @@ module EideticRML
         grid
       end
 
-      def detect_widths(grid)
+      def detect_widths(grid, writer)
         widths = []
         grid.cols.times do |c|
           col = grid.col(c)
@@ -413,7 +418,7 @@ module EideticRML
           elsif widget.width
             widths << [:specified, widget.width]
           else
-            widths << [:unspecified, 0]
+            widths << [:unspecified, col.map { |w| w ? w.preferred_width(writer) : 0 }.max]
           end
         end
         widths
@@ -461,7 +466,11 @@ module EideticRML
 
       def layout_grid(grid, container, writer)
         container_full = false
-        widths = detect_widths(grid)
+        widths = detect_widths(grid, writer)
+        if container.width.nil?
+          puts "Noooooooo!!!!"
+          # container.width([container.parent.content_width].min, :pt)
+        end
         percents, others = widths.partition { |w| w[0] == :percent }
         specified, others = others.partition { |w| w[0] == :specified }
 
@@ -521,7 +530,7 @@ module EideticRML
           end
           if top + max_height > bottom
             container_full = true
-            grid.cols.times { |c| grid[c, r].visible = (r == 0) }
+            grid.cols.times { |c| grid[c, r].visible = (r == 0) if grid[c, r] }
             container.more(true) if container.overflow and (r > 0)
           end
           top += max_height + @style.vpadding
@@ -597,6 +606,7 @@ module EideticRML
           grid.row(r).each_with_index do |widget, c|
             next unless widget
             widths[c, r] = [widget.colspan, widget.has_width? ? widget.preferred_width(writer) : nil]
+            # puts "widget preferred_width: #{widths[c, r].inspect}"
           end
         end
 
@@ -630,6 +640,8 @@ module EideticRML
           result += max_width + @style.hpadding
         end
         result -= @style.hpadding if result > 0
+        # puts "table preferred_width: #{result}"
+        result
       end
     end
   end

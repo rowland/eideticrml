@@ -87,6 +87,11 @@ module EideticRML
           grid = @lm.grid(@div)
           @lm.preferred_height(grid, nil).should be(nil)
         end
+
+        it "should return nil if the container is empty" do
+          grid = @lm.grid(@div)
+          @lm.preferred_width(grid, nil).should be(nil)
+        end
       end
     end
   end

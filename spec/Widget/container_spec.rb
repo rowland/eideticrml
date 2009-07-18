@@ -45,8 +45,8 @@ module EideticRML
       end
 
       context "layout" do
-        it "should default to nil" do
-          @div.layout.should be(nil)
+        it "should default to flow" do
+          @div.layout.manager.should be_instance_of(LayoutManagers::LayoutManager.for_name('flow'))
         end
 
         it "should accept names of registered layout managers" do
@@ -169,9 +169,15 @@ module EideticRML
       end
 
       context "preferred_height" do
+        it "should default to nil" do
+          @div.preferred_height(nil).should be(nil)
+        end
       end
 
       context "preferred_width" do
+        it "should default to nil" do
+          @div.preferred_width(nil).should be(nil)
+        end
       end
 
       context "printed" do
