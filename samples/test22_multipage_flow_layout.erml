@@ -14,7 +14,7 @@
   </rules>
 	<pages>
 		<page units="in" margin="1">
-			<label underline="true">Multi-Page Flow Layout</label>
+			<label underline="true" width="100%">Multi-Page Flow Layout</label>
 			<rect class="green" />
 			<rect class="gold" />
 		  <circle class="red" />
