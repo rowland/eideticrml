@@ -3,6 +3,7 @@
 		<font id="zapf" name="ZapfDingbats" size="12" />
 		<bullet id="bstar" font="zapf" text="&#x4E;" />
 		<para id="pstar" bullet="bstar" />
+		<layout id="vbox" padding="8" />
 	</styles>
 	<pages>
 		<page units="in" margin="1">

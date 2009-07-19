@@ -79,7 +79,7 @@ module EideticRML
           @page.margin("1in")
           @p.text(Lorem)
           pw = @p.preferred_width(@writer, :in)
-          pw.should <= 6.5
+          pw.should <= @page.width
           pw.should >= 6.0
         end
       end

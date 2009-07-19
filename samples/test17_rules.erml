@@ -1,11 +1,12 @@
 <erml>
 	<styles>
 		<font id="lbl20" name="Courier" size="20" />
+		<layout id="vbox" padding="5" />
 	</styles>
 	<rules url="samples/test17_rules.erls" />
 	<pages>
 		<page units="in" margin="1">
-			<label underline="true" width="100%">Labels</label>
+			<label underline="true">Labels</label>
 			<table cols="3" width="100%">
 				<label text_align="left">Top Left</label>
 				<label text_align="center">Top Center</label>

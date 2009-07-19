@@ -12,29 +12,29 @@
       circle.gold { fill: Gold }
     -->
   </rules>
-	<pages>
-		<page units="in" margin="1">
-			<label underline="true" width="100%">Multi-Page Flow Layout</label>
-			<rect class="green" />
-			<rect class="gold" />
-		  <circle class="red" />
-		  <circle class="red" />
-		  <circle class="red" />
-		  <circle class="red" />
-		  <circle class="red" />
-		  <circle class="red" />
-		  <circle class="red" />
-		  <circle class="red" />
-		  <circle class="red" />
-		  <circle class="gold" />
-		  <circle class="gold" />
-		  <circle class="gold" />
-		  <circle class="gold" />
-		  <circle class="gold" />
-		  <circle class="gold" />
-		  <circle class="gold" />
-		  <circle class="gold" />
-		  <circle class="gold" />
-		</page>
-	</pages>
+  <pages>
+    <page units="in" margin="1" layout="flow">
+      <label underline="true" width="100%">Multi-Page Flow Layout</label>
+      <rect class="green" />
+      <rect class="gold" />
+      <circle class="red" />
+      <circle class="red" />
+      <circle class="red" />
+      <circle class="red" />
+      <circle class="red" />
+      <circle class="red" />
+      <circle class="red" />
+      <circle class="red" />
+      <circle class="red" />
+      <circle class="gold" />
+      <circle class="gold" />
+      <circle class="gold" />
+      <circle class="gold" />
+      <circle class="gold" />
+      <circle class="gold" />
+      <circle class="gold" />
+      <circle class="gold" />
+      <circle class="gold" />
+    </page>
+  </pages>
 </erml>

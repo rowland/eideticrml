@@ -1076,19 +1076,12 @@ module EideticRML
         @cols = value.to_i if value.to_i > 0
       end
 
-      # def has_height?
-      # end
-      # 
-      # def has_width?
-      # end
-
       def layout(value=nil)
-        return @layout_style || layout('flow') if value.nil?
+        return @layout_style || layout('vbox') if value.nil?
         @layout_style = layout_style_for(value)
       end
 
       def layout_container(writer)
-        # layout('flow') if layout.nil?
         layout.manager.layout(self, writer)
         # returns count
       end
@@ -1129,19 +1122,6 @@ module EideticRML
         @paragraph_style = paragraph_style_for(value)
       end
 
-      # def preferred_height(writer, units=:pt)
-      #   @preferred_height = @preferred_content_height ? @preferred_content_height + non_content_height : height
-      #   to_units(units, @preferred_height)
-      # end
-      # def preferred_height(writer, units=:pt)
-      #   @height ? to_units(units, @height) : @height
-      # end
-
-      # def preferred_width(writer, units=:pt)
-      #   @preferred_width = @width || parent.content_width
-      #   to_units(units, @preferred_width)
-      # end
-
       def preferred_height(writer, units=:pt)
         @preferred_height ||= @height || layout.manager.preferred_height(layout_grid, writer)
       end
@@ -1176,7 +1156,6 @@ module EideticRML
       end
 
       def layout_grid
-        # layout('flow') if layout.nil?
         @layout_grid ||= layout.manager.grid(self)
       end
 
@@ -1198,9 +1177,25 @@ module EideticRML
 
       include Shape
 
+      def before_layout
+        super
+        @width ||= @height
+        @height ||= @width
+      end
+
       def clip(value=nil)
         # TODO
       end
+
+      # def has_height?
+      #   (@height or @width) and !@height_pct
+      #   true
+      # end
+
+      # def has_width?
+      #   (@width or @height) and !@width_pct
+      #   true
+      # end
 
       def preferred_height(writer, units=:pt)
         if @height.nil? and @width
@@ -1406,10 +1401,8 @@ module EideticRML
       end
 
       def preferred_width(writer, units=:pt)
-        # @preferred_width = @width || parent.content_width
         @preferred_width = @width || begin
-          max_width = parent.width ? parent.content_width : root_page.content_width
-          (rich_text(writer).width(max_width - bullet_width - non_content_width) || 0) + bullet_width + non_content_width + 1
+          (rich_text(writer).width(root_page.width - bullet_width - non_content_width) || 0) + bullet_width + non_content_width + 1
         end
         to_units(units, @preferred_width)
       end

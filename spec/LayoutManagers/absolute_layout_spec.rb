@@ -64,7 +64,13 @@ module EideticRML
       end
 
       context "preferred_height" do
-        it "should always return nil" do
+        it "should return zero if the container is empty" do
+          div = Widgets::Container.new(@page, :layout => 'absolute')
+          grid = @lm.grid(div)
+          @lm.preferred_height(grid, nil).should == 0
+        end
+
+        it "should return nil when not empty" do
           w1 = Widgets::Widget.new(@div)
           w2 = Widgets::Widget.new(@div)
           w1.height(10, :pt)
@@ -75,7 +81,13 @@ module EideticRML
       end
 
       context "preferred_width" do
-        it "should always return nil" do
+        it "should return zero if the container is empty" do
+          div = Widgets::Container.new(@page, :layout => 'absolute')
+          grid = @lm.grid(div)
+          @lm.preferred_width(grid, nil).should == 0
+        end
+
+        it "should return nil when not empty" do
           w1 = Widgets::Widget.new(@div)
           w2 = Widgets::Widget.new(@div)
           w1.width(10, :pt)

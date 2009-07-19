@@ -82,6 +82,11 @@ module EideticRML
           @div.order(:cols)
         end
 
+        it "should return zero if the container is empty" do
+          grid = @lm.grid(@div)
+          @lm.preferred_height(grid, nil).should == 0
+        end
+
         it "should return the sum of heights + vertical padding" do
           @w1 = Widgets::Widget.new(@div, :width => 10, :height => 10)
           @w2 = Widgets::Widget.new(@div, :width => 15, :height => 12)
@@ -118,11 +123,6 @@ module EideticRML
           grid = @lm.grid(@div)
           @lm.preferred_height(grid, nil).should == 42
         end
-
-        it "should return nil if the container is empty" do
-          grid = @lm.grid(@div)
-          @lm.preferred_height(grid, nil).should be(nil)
-        end
       end
 
       context "preferred_width" do
@@ -134,6 +134,11 @@ module EideticRML
         before :each do
           @div.cols(3)
           @div.order(:rows)
+        end
+
+        it "should return zero if the container is empty" do
+          grid = @lm.grid(@div)
+          @lm.preferred_width(grid, nil).should == 0
         end
 
         it "should return the sum of widths + horizontal padding" do
@@ -174,11 +179,6 @@ module EideticRML
           @w7 = Widgets::Widget.new(@div, :width => 10, :height => 10)
           grid = @lm.grid(@div)
           @lm.preferred_width(grid, nil).should == 45
-        end
-
-        it "should return nil if the container is empty" do
-          grid = @lm.grid(@div)
-          @lm.preferred_width(grid, nil).should be(nil)
         end
 
         it "should correctly measure text" do

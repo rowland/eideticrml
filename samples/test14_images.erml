@@ -1,16 +1,19 @@
 <erml>
 	<styles>
 		<layout id="flow" padding="0.5in" />
+		<layout id="vbox" padding="0.5in" />
 	</styles>
 	<pages>
 		<page units="in" margin="0.75">
-			<p underline="true" width="100%">Images</p>
-			<image url="samples/testimg.jpg" />
-			<image url="samples/testimg.jpg" />
-			<image url="samples/testimg.jpg" width="7">
-				<p>Rose</p>
-			</image>
-			<image url="samples/testimg.jpg" height="1" />
+			<p underline="true">Images</p>
+			<div layout="flow">
+  			<image url="samples/testimg.jpg" />
+  			<image url="samples/testimg.jpg" />
+  			<image url="samples/testimg.jpg" width="7">
+  				<p>Rose</p>
+  			</image>
+  			<image url="samples/testimg.jpg" height="1" />
+  		</div>
 		</page>
 	</pages>
 </erml>

@@ -1,6 +1,7 @@
 <erml>
 	<styles>
 		<pen id="dotted" color="Red" />
+		<layout id="vbox" padding="5" />
 	</styles>
 	<pages>
 		<define id="table" tag="div" layout="table" />

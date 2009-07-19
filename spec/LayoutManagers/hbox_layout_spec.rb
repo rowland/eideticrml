@@ -36,6 +36,11 @@ module EideticRML
       end
 
       context "preferred_height" do
+        it "should return zero if the container is empty" do
+          grid = @lm.grid(@div)
+          @lm.preferred_height(grid, nil).should == 0
+        end
+
         it "should return the max widget height" do
           w1 = Widgets::Widget.new(@div)
           w2 = Widgets::Widget.new(@div)
@@ -59,14 +64,14 @@ module EideticRML
           grid = @lm.grid(@div)
           @lm.preferred_height(grid, nil).should be(nil)
         end
-
-        it "should return nil if the container is empty" do
-          grid = @lm.grid(@div)
-          @lm.preferred_height(grid, nil).should be(nil)
-        end
       end
 
       context "preferred_width" do
+        it "should return zero if the container is empty" do
+          grid = @lm.grid(@div)
+          @lm.preferred_width(grid, nil).should == 0
+        end
+
         it "should return the sum of widget widths + horizontal padding" do
           w1 = Widgets::Widget.new(@div)
           w2 = Widgets::Widget.new(@div)
@@ -89,11 +94,6 @@ module EideticRML
           # w3.has_width?.should be(nil)
           grid = @lm.grid(@div)
           @lm.preferred_width(grid, nil).should be(nil)
-        end
-
-        it "should return zero if the container is empty" do
-          grid = @lm.grid(@div)
-          @lm.preferred_width(grid, nil).should == 0
         end
       end
     end

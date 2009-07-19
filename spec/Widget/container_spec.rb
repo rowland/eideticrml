@@ -45,8 +45,8 @@ module EideticRML
       end
 
       context "layout" do
-        it "should default to flow" do
-          @div.layout.manager.should be_instance_of(LayoutManagers::LayoutManager.for_name('flow'))
+        it "should default to hbox" do
+          @div.layout.manager.should be_instance_of(LayoutManagers::LayoutManager.for_name('vbox'))
         end
 
         it "should accept names of registered layout managers" do
@@ -169,14 +169,14 @@ module EideticRML
       end
 
       context "preferred_height" do
-        it "should default to nil" do
-          @div.preferred_height(nil).should be(nil)
+        it "should default to zero" do
+          @div.preferred_height(nil).should == 0
         end
       end
 
       context "preferred_width" do
         it "should default to nil" do
-          @div.preferred_width(nil).should be(nil)
+          @div.preferred_width(nil).should == 0
         end
       end
 
@@ -189,7 +189,7 @@ module EideticRML
           @doc.to_s
           @div.printed.should be(true)
         end
-        
+
         it "should behave the same for nested widgets" do
           p = StdWidgetFactory.instance.make_widget('p', @div)
           p.text "Hello"

@@ -4,7 +4,7 @@
 		<font id="co14" name="Courier" size="14" />
 		<pen id="blue_dash" color="DeepSkyBlue" width="2" pattern="dashed" cap="round_cap" />
 		<pen id="gray_dot" color="DarkGray" width="1" pattern="dashed" />
-		<layout id="flow" padding="10" />
+		<layout id="vbox" padding="10" />
 		<layout id="hbox" padding="10" />
 	</styles>
 	<rules>

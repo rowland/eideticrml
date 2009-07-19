@@ -91,11 +91,11 @@ module EideticRML
       end
 
       def preferred_height(grid, writer)
-        nil
+        return grid.row(0).empty? ? 0 : nil
       end
 
       def preferred_width(grid, writer)
-        nil
+        return grid.row(0).empty? ? 0 : nil
       end
     end
 
@@ -146,13 +146,15 @@ module EideticRML
 
       def preferred_height(grid, writer)
         row = grid.row(0)
+        return 0 if row.empty?
         return nil if row.any? { |w| !w.has_height? }
         row.map { |w| w.preferred_height(writer) }.max
       end
 
       def preferred_width(grid, writer)
         row = grid.row(0)
-        return nil if row.empty? or row.any? { |w| !w.has_width? }
+        return 0 if row.empty?
+        return nil if row.any? { |w| !w.has_width? }
         row.inject((row.size - 1) * @style.hpadding) { |sum, w| sum + w.preferred_width(writer) }
       end
     end
@@ -243,6 +245,7 @@ module EideticRML
 
       def preferred_height(grid, writer)
         row = grid.row(0)
+        return 0 if row.empty?
         return nil if row.any? { |w| !w.has_height? }
         row.map { |w| w.preferred_height(writer) }.max
       end
@@ -334,13 +337,15 @@ module EideticRML
 
       def preferred_height(grid, writer)
         col = grid.col(0)
+        return 0 if col.empty?
         return nil if col.any? { |w| !w.has_height? }
         col.inject((col.size - 1) * @style.vpadding) { |sum, w| sum + w.preferred_height(writer) }
       end
 
       def preferred_width(grid, writer)
         col = grid.col(0)
-        return nil if col.empty? or col.any? { |w| !w.has_width? }
+        return 0 if col.empty?
+        return nil if col.any? { |w| !w.has_width? }
         col.map { |w| w.preferred_width(writer) }.max
       end
 
@@ -560,6 +565,7 @@ module EideticRML
       def preferred_height(grid, writer)
         # calculate preferred heights, where available
         heights = Support::Grid.new(grid.cols, grid.rows)
+        return 0 if heights.cols == 0 or heights.rows == 0
         grid.cols.times do |c|
           grid.col(c).each_with_index do |widget, r|
             next unless widget
@@ -602,6 +608,7 @@ module EideticRML
       def preferred_width(grid, writer)
         # calculate preferred widths, where available
         widths = Support::Grid.new(grid.cols, grid.rows)
+        return 0 if widths.cols == 0 or widths.rows == 0
         grid.rows.times do |r|
           grid.row(r).each_with_index do |widget, c|
             next unless widget
