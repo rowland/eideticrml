@@ -1244,13 +1244,13 @@ module EideticRML
       end
 
       def preferred_height(writer, units=:pt)
-        @preferred_height ||= @height || ((preferred_radius(writer) || return) * 2 + non_content_height)
+        @preferred_height ||= @height || @width || ((preferred_radius(writer) || return) * 2 + non_content_height)
         # @preferred_height ||= ((preferred_radius(writer) || return) * 2 + non_content_height)
         to_units(units, @preferred_height)
       end
 
       def preferred_width(writer, units=:pt)
-        @preferred_width ||= @width || ((preferred_radius(writer) || return) * 2 + non_content_width)
+        @preferred_width ||= @width || @height || ((preferred_radius(writer) || return) * 2 + non_content_width)
         # @preferred_width ||= ((preferred_radius(writer) || return) * 2 + non_content_width)
         to_units(units, @preferred_width)
       end

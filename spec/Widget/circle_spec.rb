@@ -165,6 +165,11 @@ module EideticRML
           rect = Widget.new(@circle, :width => 3, :height => 1)
           @circle.preferred_width(nil).should == Math.sqrt((3/2.0) ** 2 + (1/2.0) ** 2) * 2 # 3.16227766016838
         end
+
+        it "should match height when only height has been set" do
+          @circle.height(72)
+          @circle.preferred_width(nil).should == 72
+        end
       end
 
       context "preferred_height" do
@@ -177,6 +182,11 @@ module EideticRML
           @circle.layout('flow')
           rect = Widget.new(@circle, :width => 3, :height => 1)
           @circle.preferred_height(nil).should == Math.sqrt((3/2.0) ** 2 + (1/2.0) ** 2) * 2 # 3.16227766016838
+        end
+
+        it "should match width when only width has been set" do
+          @circle.width(72)
+          @circle.preferred_height(nil).should == 72
         end
       end
 
