@@ -225,6 +225,26 @@ module EideticRML
           @circle.default_padding_left.should == Math.sqrt((3/2.0) ** 2 + (1/2.0) ** 2) - 3/2.0 # 0.0811388300841898
         end
       end
+
+      context "before_layout" do
+        it "should set height to width if height has not been set" do
+          @circle.width(1)
+          @circle.before_layout
+          @circle.height.should == 1
+        end
+
+        it "should set width to height if width has not been set" do
+          @circle.height(1)
+          @circle.before_layout
+          @circle.width.should == 1
+        end
+
+        it "should leave both width and height unchanged if neither has been set" do
+          @circle.before_layout
+          @circle.width.should be(nil)
+          @circle.width.should be(nil)
+        end
+      end
     end
   end
 end

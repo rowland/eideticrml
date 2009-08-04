@@ -1206,8 +1206,8 @@ module EideticRML
 
       def before_layout
         super
-        # @width ||= @height
-        # @height ||= @width
+        @width ||= @height
+        @height ||= @width
       end
 
       def clip(value=nil)
