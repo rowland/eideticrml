@@ -66,7 +66,7 @@ module EideticRML
           w2.height(20, :pt)
           # w1.preferred_height(nil).should == 10
           # w2.preferred_height(nil).should == 20
-          # w3.has_height?.should be(nil)
+          # w3.preferred_height(nil).should == nil
           grid = @lm.grid(@div)
           @lm.preferred_height(grid, nil).should be(nil)
         end
@@ -100,6 +100,30 @@ module EideticRML
           # w3.has_width?.should be(nil)
           grid = @lm.grid(@div)
           @lm.preferred_width(grid, nil).should be(nil)
+        end
+      end
+
+      context "russian dolls" do
+        it "should nest containers inside each other" do
+          div1 = Widgets::Container.new(@page, :layout => 'flow', :units => :pt, :padding => 5)
+          div2 = Widgets::Container.new(div1, :layout => 'flow', :units => :pt, :padding => 5)
+          div3 = Widgets::Container.new(div2, :layout => 'flow', :units => :pt, :padding => 5)
+          div4 = Widgets::Container.new(div3, :layout => 'flow', :units => :pt, :padding => 5)
+          div5 = Widgets::Container.new(div4, :layout => 'flow', :units => :pt, :padding => 5)
+          w1 = Widgets::Widget.new(div5, :units => :pt, :width => 7, :height => 5)
+
+          w1.preferred_width(nil).should == 7
+          w1.preferred_height(nil).should == 5
+          div5.preferred_width(nil).should == 17
+          div5.preferred_height(nil).should == 15
+          div4.preferred_width(nil).should == 27
+          div4.preferred_height(nil).should == 25
+          div3.preferred_width(nil).should == 37
+          div3.preferred_height(nil).should == 35
+          div2.preferred_width(nil).should == 47
+          div2.preferred_height(nil).should == 45
+          div1.preferred_width(nil).should == 57
+          div1.preferred_height(nil).should == 55
         end
       end
     end

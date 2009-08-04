@@ -4,6 +4,11 @@
 		<pen id="blue_dash" color="Blue" width="2" pattern="dashed" />
 		<pen id="red_dash" color="Red" width="2" pattern="dashed" />
 	</styles>
+	<rules>
+	  <!--
+	    rect { width: 100%; }
+    -->
+  </rules>
 	<pages>
 		<page units="in" margin="1" layout="vbox">
 			<p underline="true" align="top">VBox Layout</p>

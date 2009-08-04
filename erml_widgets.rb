@@ -140,11 +140,11 @@ module EideticRML
       end
 
       def preferred_width(writer, units=:pt)
-        to_units(units, @width || 0)
+        @width ? to_units(units, @width) : nil
       end
 
       def preferred_height(writer, units=:pt)
-        to_units(units, @height || 0)
+        @height ? to_units(units, @height) : nil
       end
 
       def width(value=nil, units=nil)
@@ -342,26 +342,42 @@ module EideticRML
         @margin_top, @margin_right, @margin_bottom, @margin_left = m unless m.nil?
       end
 
+      def default_padding_top
+        @default_padding_top || 0
+      end
+
+      def default_padding_right
+        @default_padding_right || 0
+      end
+
+      def default_padding_bottom
+        @default_padding_bottom || 0
+      end
+
+      def default_padding_left
+        @default_padding_left || 0
+      end
+
       def padding_top(value=nil)
-        return @padding_top || 0 if value.nil?
+        return (@padding_top || 0) + default_padding_top if value.nil?
         return to_units(value, padding_top) if value.is_a?(Symbol)
         @padding_top = parse_measurement_pts(value, units)
       end
 
       def padding_right(value=nil)
-        return @padding_right || 0 if value.nil?
+        return (@padding_right || 0) + default_padding_right if value.nil?
         return to_units(value, padding_right) if value.is_a?(Symbol)
         @padding_right = parse_measurement_pts(value, units)
       end
 
       def padding_bottom(value=nil)
-        return @padding_bottom || 0 if value.nil?
+        return (@padding_bottom || 0) + default_padding_bottom if value.nil?
         return to_units(value, padding_bottom) if value.is_a?(Symbol)
         @padding_bottom = parse_measurement_pts(value, units)
       end
 
       def padding_left(value=nil)
-        return @padding_left || 0 if value.nil?
+        return (@padding_left || 0) + default_padding_left if value.nil?
         return to_units(value, padding_left) if value.is_a?(Symbol)
         @padding_left = parse_measurement_pts(value, units)
       end
@@ -1122,12 +1138,23 @@ module EideticRML
         @paragraph_style = paragraph_style_for(value)
       end
 
+      def preferred_content_height(writer)
+        @preferred_content_height ||= layout.manager.preferred_height(layout_grid, writer)
+        @preferred_content_height
+      end
+
+      def preferred_content_width(writer)
+        @preferred_content_width ||= layout.manager.preferred_width(layout_grid, writer)
+        @preferred_content_width
+      end
+
       def preferred_height(writer, units=:pt)
-        @preferred_height ||= @height || layout.manager.preferred_height(layout_grid, writer)
+        @preferred_height ||= @height || (preferred_content_height(writer) || return) + non_content_height
+        to_units(units, @preferred_height)
       end
 
       def preferred_width(writer, units=:pt)
-        @preferred_width ||= @width || (layout.manager.preferred_width(layout_grid, writer) || return) + non_content_width
+        @preferred_width ||= @width || (preferred_content_width(writer) || return) + non_content_width
         to_units(units, @preferred_width)
       end
 
@@ -1179,39 +1206,53 @@ module EideticRML
 
       def before_layout
         super
-        @width ||= @height
-        @height ||= @width
+        # @width ||= @height
+        # @height ||= @width
       end
 
       def clip(value=nil)
         # TODO
       end
 
-      # def has_height?
-      #   (@height or @width) and !@height_pct
-      #   true
-      # end
+      def default_padding_top
+        # @preferred_content_height ? @preferred_radius - @preferred_content_height / 2.0 : 0
+        (@preferred_height and @preferred_content_height) ? @preferred_radius - @preferred_content_height / 2.0 : 0
+      end
 
-      # def has_width?
-      #   (@width or @height) and !@width_pct
-      #   true
-      # end
+      def default_padding_right
+        # @preferred_content_width ? @preferred_radius - @preferred_content_width / 2.0 : 0
+        (@preferred_width and @preferred_content_width) ? @preferred_radius - @preferred_content_width / 2.0 : 0
+      end
+
+      def default_padding_bottom
+        # @preferred_content_height ? @preferred_radius - @preferred_content_height / 2.0 : 0
+        (@preferred_height and @preferred_content_height) ? @preferred_radius - @preferred_content_height / 2.0 : 0
+      end
+
+      def default_padding_left
+        # @preferred_content_width ? @preferred_radius - @preferred_content_width / 2.0 : 0
+        (@preferred_width and @preferred_content_width) ? @preferred_radius - @preferred_content_width / 2.0 : 0
+      end
+
+      def preferred_radius(writer, units=:pt)
+        @preferred_radius ||= begin
+          pcw, pch = preferred_content_width(writer), preferred_content_height(writer)
+          return if pcw.nil? and pch.nil?
+          Math.sqrt(((pcw || pch) / 2.0) ** 2 + ((pch || pcw) / 2.0) ** 2)
+        end
+        to_units(units, @preferred_radius)
+      end
 
       def preferred_height(writer, units=:pt)
-        if @height.nil? and @width
-          h = @width
-        else
-          h = super(writer)
-        end
-        to_units(units, h)
+        @preferred_height ||= @height || ((preferred_radius(writer) || return) * 2 + non_content_height)
+        # @preferred_height ||= ((preferred_radius(writer) || return) * 2 + non_content_height)
+        to_units(units, @preferred_height)
       end
 
       def preferred_width(writer, units=:pt)
-        if @width.nil? and @height
-          to_units(units, @height)
-        else
-          super(writer, units)
-        end
+        @preferred_width ||= @width || ((preferred_radius(writer) || return) * 2 + non_content_width)
+        # @preferred_width ||= ((preferred_radius(writer) || return) * 2 + non_content_width)
+        to_units(units, @preferred_width)
       end
 
       def r(value=nil, units=nil)
@@ -1232,7 +1273,10 @@ module EideticRML
         # puts "left: #{left}, margin_left: #{margin_left}, right: #{right}, margin_right: #{margin_right}"
         @x ||= (left + margin_left + right - margin_right).quo(2)
         @y ||= (top + margin_top + bottom - margin_bottom).quo(2)
+        # puts "before_print 1 @r: #{@r.inspect}"
+        # puts "@r ||= [(#{width} - #{margin_left} - #{margin_right}).quo(2), (#{height} - #{margin_top} - #{margin_bottom}).quo(2)].min"
         @r ||= [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min
+        # puts "before_print 2 @r: #{@r.inspect}"
         super(writer)
       end
 
@@ -1250,6 +1294,7 @@ module EideticRML
         options[:fill] = !!@fill
         @border.apply(writer) unless @border.nil?
         @fill.apply(writer) unless @fill.nil?
+        # puts "writer.circle(#{@x} + #{x_offset}, #{@y} + #{y_offset}, #{r}, #{options.inspect})"
         writer.circle(@x + x_offset, @y + y_offset, r, options)
         super(writer)
       end

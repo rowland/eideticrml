@@ -175,7 +175,7 @@ module EideticRML
       end
 
       context "preferred_width" do
-        it "should default to nil" do
+        it "should default to zero" do
           @div.preferred_width(nil).should == 0
         end
       end

@@ -44,8 +44,8 @@ module EideticRML
           widget.left(0, :pt) if widget.left.nil? and widget.right.nil?
           widget.top(0, :pt) if widget.top.nil? and widget.bottom.nil?
           widget.width(widget.preferred_width(writer), :pt) if widget.width.nil?
-          widget.layout_widget(writer)
-          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
+          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
+          widget.layout_widget(writer)                                              # swapped
         end
       end
 
@@ -114,19 +114,16 @@ module EideticRML
           widget.visible = !container_full
           next if container_full
           widget.before_layout
-          # $stderr.puts widget.instance_variables.map { |v| "%s=%s" % [v, widget.instance_variable_get(v)] }
-          # $stderr.puts "width: #{widget.width.inspect}"
-          # $stderr.puts "content_width: #{container.content_width.inspect}"
-          # $stderr.puts "preferred_width: #{widget.preferred_width(writer).inspect}"
           widget.width([widget.preferred_width(writer) || container.content_width, container.content_width].min, :pt) if widget.width.nil?
+          # puts "flow widget width: #{widget.width} #{widget.path}"
           if cx != 0 and cx + widget.width > container.content_width
             cy += max_y + @style.vpadding
             cx = max_y = 0
           end
           widget.left(container.content_left + cx, :pt)
           widget.top(container.content_top + cy, :pt)
-          widget.layout_widget(writer)
-          widget.height(widget.preferred_height(writer) || 0, :pt) if widget.height.nil?
+          widget.layout_widget(writer)                                                   # swapped
+          widget.height(widget.preferred_height(writer) || 0, :pt) if widget.height.nil? # swapped
           # if container.bottom and widget.bottom > container.bottom
           if widget.bottom > bottom
             container_full = true
@@ -145,17 +142,19 @@ module EideticRML
       end
 
       def preferred_height(grid, writer)
-        row = grid.row(0)
-        return 0 if row.empty?
-        return nil if row.any? { |w| !w.has_height? }
-        row.map { |w| w.preferred_height(writer) }.max
+        cells = grid.row(0)
+        return 0 if cells.empty?
+        cell_heights = cells.map { |w| w.preferred_height(writer) }
+        return nil unless cell_heights.all?
+        cell_heights.max
       end
 
       def preferred_width(grid, writer)
-        row = grid.row(0)
-        return 0 if row.empty?
-        return nil if row.any? { |w| !w.has_width? }
-        row.inject((row.size - 1) * @style.hpadding) { |sum, w| sum + w.preferred_width(writer) }
+        cells = grid.row(0)
+        return 0 if cells.empty?
+        cell_widths = cells.map { |w| w.preferred_width(writer) }
+        return nil unless cell_widths.all?
+        cell_widths.inject((cells.size - 1) * @style.hpadding) { |sum, width| sum + width }
       end
     end
 
@@ -244,17 +243,19 @@ module EideticRML
       end
 
       def preferred_height(grid, writer)
-        row = grid.row(0)
-        return 0 if row.empty?
-        return nil if row.any? { |w| !w.has_height? }
-        row.map { |w| w.preferred_height(writer) }.max
+        cells = grid.row(0)
+        return 0 if cells.empty?
+        cell_heights = cells.map { |w| w.preferred_height(writer) }
+        return nil unless cell_heights.all?
+        cell_heights.max
       end
 
       def preferred_width(grid, writer)
-        row = grid.row(0)
-        return 0 if row.empty?
-        return nil if row.any? { |w| !w.has_width? }
-        row.inject((row.size - 1) * @style.hpadding) { |sum, w| sum + w.preferred_width(writer) }
+        cells = grid.row(0)
+        return 0 if cells.empty?
+        cell_widths = cells.map { |w| w.preferred_width(writer) }
+        return nil unless cell_widths.all?
+        cell_widths.inject((cells.size - 1) * @style.hpadding) { |sum, width| sum + width }
       end
     end
 
@@ -273,17 +274,17 @@ module EideticRML
         footers, unaligned = unaligned.partition { |widget| widget.align == :bottom }
         static.each do |widget|
           widget.before_layout
-          widget.width('100%') if widget.width.nil?
+          widget.width([widget.preferred_width(writer) || container.content_width, container.content_width].min, :pt) if widget.width.nil?
+          # puts "vbox widget width: #{widget.width} #{widget.path}"
           widget.left(container.content_left, :pt)
         end
         top, dy = container.content_top, 0
-        # $stderr.puts "top = #{top}"
         bottom = container.content_top + container.max_content_height
 
         headers.each_with_index do |widget, index|
           widget.top(top, :pt)
-          widget.layout_widget(writer)
-          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
+          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
+          widget.layout_widget(writer)                                              # swapped
           top += (widget.height + @style.vpadding)
           dy += widget.height + ((index > 0) ? @style.vpadding : 0)
         end
@@ -293,8 +294,8 @@ module EideticRML
           container.height('100%') if container.height.nil?
           footers.reverse.each do |widget|
             widget.bottom(bottom, :pt)
-            widget.layout_widget(writer)
-            widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
+            widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
+            widget.layout_widget(writer)                                              # swapped
             bottom -= (widget.height + @style.vpadding)
           end
         end
@@ -304,11 +305,8 @@ module EideticRML
           widget.visible = !container_full
           next if container_full
           widget.top(top, :pt)
-          widget.layout_widget(writer)
-          # $stderr.puts "<#{widget.tag}> after layout_widget: size = #{widget.width}, #{widget.height}"
-          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
-          # $stderr.puts "<#{widget.tag}> position/size: #{widget.left}, #{widget.top}, #{widget.width}, #{widget.height}"
-          # $stderr.puts "#{widget.object_id}: <#{widget.tag}> bottom = #{widget.bottom}"
+          widget.layout_widget(writer)                                              # swapped
+          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
           top += (widget.height + @style.vpadding)
           dy += widget.height + (index > 0 ? @style.vpadding : 0) #if widget.visible
           if top > bottom
@@ -332,21 +330,22 @@ module EideticRML
         # container.height(top - container.content_top + @style.vpadding, :pt) if container.height.nil?
         container.height(dy + container.non_content_height, :pt) if container.height.nil?
         super(container, writer)
-        # $stderr.puts " end layout container: #{container.tag}, visible: #{container.visible}"
       end
 
       def preferred_height(grid, writer)
-        col = grid.col(0)
-        return 0 if col.empty?
-        return nil if col.any? { |w| !w.has_height? }
-        col.inject((col.size - 1) * @style.vpadding) { |sum, w| sum + w.preferred_height(writer) }
+        cells = grid.col(0)
+        return 0 if cells.empty?
+        cell_heights = cells.map { |w| w.preferred_height(writer) }
+        return nil unless cell_heights.all?
+        cell_heights.inject((cells.size - 1) * @style.vpadding) { |sum, height| sum + height }
       end
 
       def preferred_width(grid, writer)
-        col = grid.col(0)
-        return 0 if col.empty?
-        return nil if col.any? { |w| !w.has_width? }
-        col.map { |w| w.preferred_width(writer) }.max
+        cells = grid.col(0)
+        return 0 if cells.empty?
+        cell_widths = cells.map { |w| w.preferred_width(writer) }
+        return nil unless cell_widths.all?
+        cell_widths.max
       end
 
       # def after_layout(container)
@@ -365,6 +364,10 @@ module EideticRML
       register('table', self)
 
     private
+      ROW_SPAN   = 0
+      COL_SPAN   = 0
+      ROW_HEIGHT = 1
+      COL_WIDTH  = 1
       def mark_grid(grid, a, b, c, d, value)
         c.times do |aa|
           d.times do |bb|
@@ -431,10 +434,10 @@ module EideticRML
 
       def allocate_specified_widths(width_avail, specified)
         specified.each do |w|
-          if width_avail < w[1]
-            w[1] = 0
+          if width_avail < w[COL_WIDTH]
+            w[COL_WIDTH] = 0
           else
-            width_avail -= (w[1] + @style.hpadding)
+            width_avail -= (w[COL_WIDTH] + @style.hpadding)
           end
         end
         width_avail
@@ -474,7 +477,6 @@ module EideticRML
         widths = detect_widths(grid, writer)
         if container.width.nil?
           puts "Noooooooo!!!!"
-          # container.width([container.parent.content_width].min, :pt)
         end
         percents, others = widths.partition { |w| w[0] == :percent }
         specified, others = others.partition { |w| w[0] == :specified }
@@ -488,7 +490,7 @@ module EideticRML
         grid.cols.times do |c|
           grid.col(c).each_with_index do |widget, r|
             next unless widget
-            if widths[c][1] > 0
+            if widths[c][COL_WIDTH] > 0
               width = (0...widget.colspan).inject(0) { |width, i| width + widths[c + i][1] }
               widget.width(width + (widget.colspan - 1) * @style.hpadding, :pt)
             else
@@ -508,10 +510,10 @@ module EideticRML
           heights.cols.times do |c|
             rh = heights[c,r]
             next if rh.nil?
-            if rh[0] > min_rowspan
-              heights[c,r+1] = [rh[0] - 1, [rh[1] - max_height, 0].max]
+            if rh[ROW_SPAN] > min_rowspan
+              heights[c,r+1] = [rh[ROW_SPAN] - 1, [rh[ROW_HEIGHT] - max_height, 0].max]
             end
-            rh[1] = max_height
+            rh[ROW_HEIGHT] = max_height
           end
         end
 
@@ -525,11 +527,12 @@ module EideticRML
               widget.visible = !container_full
               next if container_full
               rh = heights[c,r]
+              next if rh.nil?
               widget.top(top, :pt)
               widget.left(left, :pt)
-              height = (0...rh[0]).inject((rh[0] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][1] }
+              height = (0...rh[ROW_SPAN]).inject((rh[ROW_SPAN] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][ROW_HEIGHT] }
               widget.height(height, :pt)
-              max_height = [max_height, rh[1]].max if rh[0] == 1
+              max_height = [max_height, rh[ROW_HEIGHT]].max if rh[ROW_SPAN] == 1
             end
             left += widths[c][1] + @style.hpadding
           end
@@ -569,7 +572,8 @@ module EideticRML
         grid.cols.times do |c|
           grid.col(c).each_with_index do |widget, r|
             next unless widget
-            heights[c, r] = [widget.rowspan, widget.has_height? ? widget.preferred_height(writer) : nil]
+            # heights[c, r] = [widget.rowspan, widget.has_height? ? widget.preferred_height(writer) : nil]
+            heights[c, r] = [widget.rowspan, widget.preferred_height(writer)]
           end
         end
 
@@ -612,8 +616,8 @@ module EideticRML
         grid.rows.times do |r|
           grid.row(r).each_with_index do |widget, c|
             next unless widget
-            widths[c, r] = [widget.colspan, widget.has_width? ? widget.preferred_width(writer) : nil]
-            # puts "widget preferred_width: #{widths[c, r].inspect}"
+            # widths[c, r] = [widget.colspan, widget.has_width? ? widget.preferred_width(writer) : nil]
+            widths[c, r] = [widget.colspan, widget.preferred_width(writer)]
           end
         end
 
@@ -628,10 +632,10 @@ module EideticRML
             cw = widths[c,r]
             next if cw.nil?
             # carry width in excess of max width of cells with min_colspan to cell in next col, subtracting hpadding
-            if cw[0] > min_colspan
-              widths[c+1,r] = [cw[0] - 1, [cw[1] - max_width - @style.hpadding, 0].max]
+            if cw[COL_SPAN] > min_colspan
+              widths[c+1,r] = [cw[COL_SPAN] - 1, [cw[COL_WIDTH] - max_width - @style.hpadding, 0].max]
             end
-            cw[1] = max_width
+            cw[COL_WIDTH] = max_width
           end
         end
 
@@ -640,14 +644,13 @@ module EideticRML
           max_width = 0
           grid.rows.times do |r|
             if (widget = grid[c, r]) and (cw = widths[c, r])
-              width = (0...cw[0]).inject((cw[0] - 1) * @style.hpadding) { |width, col_offset| width + widths[c+col_offset,r][1] }
-              max_width = [max_width, cw[1]].max if cw[0] == 1
+              width = (0...cw[COL_SPAN]).inject((cw[COL_SPAN] - 1) * @style.hpadding) { |width, col_offset| width + widths[c+col_offset,r][COL_WIDTH] }
+              max_width = [max_width, cw[COL_WIDTH]].max if cw[COL_SPAN] == 1
             end
           end
           result += max_width + @style.hpadding
         end
         result -= @style.hpadding if result > 0
-        # puts "table preferred_width: #{result}"
         result
       end
     end

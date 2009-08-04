@@ -11,10 +11,10 @@
   %pages
     %define{ :id => 'td', :tag => 'p', :text_align => 'right' }
     %page{ :units => 'in', :margin => 1, :layout => 'vbox' }
-      %hbox
-        %label{ :underline => true } Haml Table
+      %hbox{ :width => '100%' }
+        %p <u>Haml Table</u>
         %label{ :text_align => 'right' }= Time.now.strftime('%Y.%m.%d %H:%M:%S')
       %br/
-      %table{ :order => 'cols', :rows => 25 }
+      %table{ :order => 'cols', :rows => 25, :width => '100%' }
         - 1.upto(100) do |i|
           %td= i
