@@ -122,8 +122,8 @@ module EideticRML
           end
           widget.left(container.content_left + cx, :pt)
           widget.top(container.content_top + cy, :pt)
-          widget.layout_widget(writer)                                                   # swapped
           widget.height(widget.preferred_height(writer) || 0, :pt) if widget.height.nil? # swapped
+          widget.layout_widget(writer)                                                   # swapped
           # if container.bottom and widget.bottom > container.bottom
           if widget.bottom > bottom
             container_full = true
@@ -274,8 +274,9 @@ module EideticRML
         footers, unaligned = unaligned.partition { |widget| widget.align == :bottom }
         static.each do |widget|
           widget.before_layout
+          # puts "<1> vbox widget width: #{widget.width} #{widget.path}"
           widget.width([widget.preferred_width(writer) || container.content_width, container.content_width].min, :pt) if widget.width.nil?
-          # puts "vbox widget width: #{widget.width} #{widget.path}"
+          # puts "<2> vbox widget width: #{widget.width} #{widget.path}"
           widget.left(container.content_left, :pt)
         end
         top, dy = container.content_top, 0
@@ -283,8 +284,8 @@ module EideticRML
 
         headers.each_with_index do |widget, index|
           widget.top(top, :pt)
-          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
           widget.layout_widget(writer)                                              # swapped
+          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
           top += (widget.height + @style.vpadding)
           dy += widget.height + ((index > 0) ? @style.vpadding : 0)
         end
@@ -294,8 +295,8 @@ module EideticRML
           container.height('100%') if container.height.nil?
           footers.reverse.each do |widget|
             widget.bottom(bottom, :pt)
-            widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
             widget.layout_widget(writer)                                              # swapped
+            widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
             bottom -= (widget.height + @style.vpadding)
           end
         end
@@ -305,8 +306,11 @@ module EideticRML
           widget.visible = !container_full
           next if container_full
           widget.top(top, :pt)
+          # puts "<1> vbox widget height: #{widget.height} #{widget.path}"
           widget.layout_widget(writer)                                              # swapped
+          # puts "<2> vbox widget height: #{widget.height} #{widget.path}"
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
+          # puts "<3> vbox widget height: #{widget.height} #{widget.path}"
           top += (widget.height + @style.vpadding)
           dy += widget.height + (index > 0 ? @style.vpadding : 0) #if widget.visible
           if top > bottom
