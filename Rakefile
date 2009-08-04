@@ -51,17 +51,9 @@ desc "Render test erml files to pdf."
 task :ermls do
   start = Time.now
   require 'erml'
-  Dir["samples/*.erml"].each do |erml|
+  Dir["samples/*.erml","samples/*.haml"].each do |erml|
     puts erml
-    pdf = "%s/%s.pdf" % [File.dirname(erml), File.basename(erml, '.erml')]
-    doc = File.open(erml) do |f|
-      begin
-        EideticRML::XmlParser.parse(f)
-      rescue Exception => e
-        puts "Error in %s: %s\n%s" % [erml, e.message, e.backtrace.join("\n")]
-      end
-    end
-    File.open(pdf, 'w') { |f| f.write(doc) }
+    pdf = render_erml(erml)
     `open -a Preview #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
   end
   elapsed = Time.now - start
