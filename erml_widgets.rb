@@ -20,8 +20,8 @@ module EideticRML
     class Widget
       include Support
 
-      attr_reader :parent, :width_pct, :height_pct, :max_width_pct, :max_height_pct
-      attr_accessor :disabled
+      attr_reader :width_pct, :height_pct, :max_width_pct, :max_height_pct
+      attr_accessor :parent, :disabled
       attr_writer :printed, :visible
 
       def initialize(parent, attrs={})
@@ -30,6 +30,14 @@ module EideticRML
         parent.children << self if parent.respond_to?(:children)
         attributes(attrs)
         @visible = true
+      end
+
+      def clone
+        @clone ||= super
+      end
+
+      def initialize_copy(other)
+        @is_clone = true
       end
 
       def attributes(attrs)
@@ -162,6 +170,7 @@ module EideticRML
           @width_pct = nil
         end
         @right = nil unless @left.nil?
+        width_set
       end
 
       def height(value=nil, units=nil)
@@ -178,6 +187,7 @@ module EideticRML
           @height_pct = nil
         end
         @bottom = nil unless @top.nil?
+        height_set
       end
 
       def max_width(value=nil, units=nil)
@@ -560,7 +570,7 @@ module EideticRML
           self.send(keys[0], :copy).send(keys[1], value)
         end
       rescue NoMethodError => e
-        raise RuntimeError, "Unknown attribute #{id}", e.backtrace
+        raise ArgumentError, "Unknown attribute #{id}", e.backtrace
       end
 
       def attributes_first
@@ -586,8 +596,12 @@ module EideticRML
         bs
       end
 
-      def draw_border(writer)
-        if [@border_top, @border_right, @border_bottom, @border_left].all? { |b| b.nil? }
+      def draw_border(writer, pen=nil)
+        if pen
+          pen.apply(writer)
+          writer.rectangle(left + margin_left, top + margin_top,
+            width - margin_left - margin_right, height - margin_top - margin_bottom)
+        elsif [@border_top, @border_right, @border_bottom, @border_left].all? { |b| b.nil? }
           unless @border.nil?
             @border.apply(writer)
             writer.rectangle(left + margin_left, top + margin_top,
@@ -625,6 +639,10 @@ module EideticRML
         fs = root.styles.for_id(id)
         raise ArgumentError, "Font Style #{id} not found." unless fs.is_a?(Styles::FontStyle)
         fs
+      end
+
+      def height_set
+        # override this callback
       end
 
       def paint_background(writer)
@@ -670,6 +688,10 @@ module EideticRML
       def widget_for(id)
         root.widgets[id]
       end
+
+      def width_set
+        # override this callback
+      end
     end
 
     module HasLocation
@@ -696,6 +718,10 @@ module EideticRML
     protected
       def draw_border(writer)
         # suppress default behavior
+        debug_pen_style = "debug_#{tag}_border"
+        if root.styles.for_id(debug_pen_style)
+          super(writer, pen_style_for(debug_pen_style))
+        end
       end
 
       def paint_background(writer)
@@ -794,7 +820,7 @@ module EideticRML
       end
 
       def load_image(writer)
-        raise ArgumentError, "Image url must be specified." if url.nil?
+        raise Exception, "Image url must be specified." if url.nil?
         @image, @name = writer.load_image(url, stream) if @image.nil?
         url
       end
@@ -1057,7 +1083,7 @@ module EideticRML
 
     protected
       def draw_content(writer)
-        raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
+        raise Exception, "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
         font.apply(writer)
         writer.puts_xy(content_left, content_top + writer.text_ascent, @lines)
       end
@@ -1065,7 +1091,7 @@ module EideticRML
       def text_for(url)
         open(url) { |f| f.read }
       rescue Exception => e
-        raise ArgumentError, "Error opening #{url}", e.backtrace
+        raise RuntimeError, "Error opening #{url}", e.backtrace
       end
     end
 
@@ -1077,6 +1103,12 @@ module EideticRML
       def initialize(parent, attrs={})
         super(parent, attrs)
         @children = []
+      end
+
+      def initialize_copy(other)
+        super(other)
+        @children = other.children.map { |child| child.clone }
+        @children.each { |child| child.parent = self }
       end
 
       def after_layout
@@ -1240,6 +1272,7 @@ module EideticRML
           return if pcw.nil? and pch.nil?
           Math.sqrt(((pcw || pch) / 2.0) ** 2 + ((pch || pcw) / 2.0) ** 2)
         end
+        # $stderr.puts "preferred_radius = #{@preferred_radius}"
         to_units(units, @preferred_radius)
       end
 
@@ -1276,8 +1309,19 @@ module EideticRML
         # puts "before_print 1 @r: #{@r.inspect}"
         # puts "@r ||= [(#{width} - #{margin_left} - #{margin_right}).quo(2), (#{height} - #{margin_top} - #{margin_bottom}).quo(2)].min"
         @r ||= [(width - margin_left - margin_right).quo(2), (height - margin_top - margin_bottom).quo(2)].min
+        # @r ||= preferred_radius(writer)
+        # @width ||= @r * 2 + margin_left + margin_right
+        # @height ||= @r * 2 + margin_top + margin_bottom
         # puts "before_print 2 @r: #{@r.inspect}"
         super(writer)
+      end
+
+      def height_set
+        # puts "height: #{height}\n#{caller * "<br />\n"}"
+      end
+      
+      def width_set
+        # puts "width: #{width}"
       end
 
       def x_offset
@@ -1289,6 +1333,7 @@ module EideticRML
       end
 
       def draw_content(writer)
+        super(writer)
         options = {}
         options[:border] = !!@border
         options[:fill] = !!@fill
@@ -1296,7 +1341,6 @@ module EideticRML
         @fill.apply(writer) unless @fill.nil?
         # puts "writer.circle(#{@x} + #{x_offset}, #{@y} + #{y_offset}, #{r}, #{options.inspect})"
         writer.circle(@x + x_offset, @y + y_offset, r, options)
-        super(writer)
       end
     end
 
@@ -1453,12 +1497,14 @@ module EideticRML
       end
 
       def preferred_height(writer, units=:pt)
-        ph = if width.nil?
-          rich_text(writer).height(parent.content_width - bullet_width - non_content_width) * line_height
-        else
-          rich_text(writer).height(content_width - bullet_width) * line_height
+        @preferred_height = @height || begin
+          ph = if width.nil?
+            rich_text(writer).height(parent.content_width - bullet_width - non_content_width) * line_height
+          else
+            rich_text(writer).height(content_width - bullet_width) * line_height
+          end
+          @preferred_height = ph + non_content_height - rich_text(writer).height * (line_height - 1)
         end
-        @preferred_height = ph + non_content_height - rich_text(writer).height * (line_height - 1)
         to_units(units, @preferred_height)
       end
 
@@ -1502,7 +1548,7 @@ module EideticRML
           options[:bullet] = bullet.id unless bullet.nil?
         end
         pen_style_for('solid').apply(writer)
-        raise "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
+        raise Exception, "left & top must be set: #{text.inspect}" if left.nil? or top.nil?
         writer.paragraph_xy(content_left, content_top + rich_text(writer).ascent(content_width), rich_text(writer), options)
         @rich_text = nil
       end
@@ -1606,7 +1652,7 @@ module EideticRML
 
     protected
       def draw_content(writer)
-        raise "left, top, width & height must be set" if [left, top, width, height].any? { |value| value.nil? }
+        raise Exception, "left, top, width & height must be set" if [left, top, width, height].any? { |value| value.nil? }
         options = {}
         options[:corners] = @corners unless @corners.nil?
         options[:border] = !!@border
@@ -1628,6 +1674,7 @@ module EideticRML
         @more = true
         @overflow = true
         super(parent, attrs)
+        raise ArgumentError, "Page must be child of Document." unless parent.nil? or parent.is_a?(Document)
       end
 
       def bottom(units=:pt)
