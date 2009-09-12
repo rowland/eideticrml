@@ -949,8 +949,8 @@ class ParagraphTestCases < Test::Unit::TestCase
     @page.margin("1in")
     @p.text(Lorem)
     pw = @p.preferred_width(@writer, :in)
-    assert(pw <= 6.5)
-    assert(pw >= 6.0)
+    assert(pw <= 8.5, "Width is #{pw}. Should be <= 8.5.")
+    assert(pw >= 8.0, "Width is #{pw}. Should be >= 8.0.")
   end
 
   def test_preferred_height_small

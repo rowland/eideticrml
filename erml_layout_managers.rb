@@ -332,7 +332,7 @@ module EideticRML
         container_full = unaligned.last && !unaligned.last.visible
         container.more(true) if container_full and container.overflow
         # container.height(top - container.content_top + @style.vpadding, :pt) if container.height.nil?
-        container.height(dy + container.non_content_height, :pt) if container.height.nil?
+        # container.height(dy + container.non_content_height, :pt) if container.height.nil?
         super(container, writer)
       end
 
@@ -592,10 +592,10 @@ module EideticRML
             rh = heights[c,r]
             next if rh.nil?
             # carry height in excess of max height of cells with min_rowspan to cell in next row, subtracting vpadding
-            if rh[0] > min_rowspan
-              heights[c,r+1] = [rh[0] - 1, [rh[1] - max_height - @style.vpadding, 0].max]
+            if rh[ROW_SPAN] > min_rowspan
+              heights[c,r+1] = [rh[ROW_SPAN] - 1, [rh[ROW_HEIGHT] - max_height - @style.vpadding, 0].max]
             end
-            rh[1] = max_height
+            rh[ROW_HEIGHT] = max_height
           end
         end
 
@@ -604,8 +604,8 @@ module EideticRML
           max_height = 0
           grid.cols.times do |c|
             if (widget = grid[c, r]) and (rh = heights[c,r])
-              height = (0...rh[0]).inject((rh[0] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][1] }
-              max_height = [max_height, rh[1]].max if rh[0] == 1
+              height = (0...rh[ROW_SPAN]).inject((rh[ROW_SPAN] - 1) * @style.vpadding) { |height, row_offset| height + heights[c,r+row_offset][ROW_HEIGHT] }
+              max_height = [max_height, rh[ROW_HEIGHT]].max if rh[ROW_SPAN] == 1
             end
           end
           result += max_height + @style.vpadding
