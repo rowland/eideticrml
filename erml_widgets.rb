@@ -353,41 +353,41 @@ module EideticRML
       end
 
       def default_padding_top
-        @default_padding_top || 0
+        0
       end
 
       def default_padding_right
-        @default_padding_right || 0
+        0
       end
 
       def default_padding_bottom
-        @default_padding_bottom || 0
+        0
       end
 
       def default_padding_left
-        @default_padding_left || 0
+        0
       end
 
       def padding_top(value=nil)
-        return (@padding_top || 0) + default_padding_top if value.nil?
+        return @padding_top || default_padding_top if value.nil?
         return to_units(value, padding_top) if value.is_a?(Symbol)
         @padding_top = parse_measurement_pts(value, units)
       end
 
       def padding_right(value=nil)
-        return (@padding_right || 0) + default_padding_right if value.nil?
+        return @padding_right || default_padding_right if value.nil?
         return to_units(value, padding_right) if value.is_a?(Symbol)
         @padding_right = parse_measurement_pts(value, units)
       end
 
       def padding_bottom(value=nil)
-        return (@padding_bottom || 0) + default_padding_bottom if value.nil?
+        return @padding_bottom || default_padding_bottom if value.nil?
         return to_units(value, padding_bottom) if value.is_a?(Symbol)
         @padding_bottom = parse_measurement_pts(value, units)
       end
 
       def padding_left(value=nil)
-        return (@padding_left || 0) + default_padding_left if value.nil?
+        return @padding_left || default_padding_left if value.nil?
         return to_units(value, padding_left) if value.is_a?(Symbol)
         @padding_left = parse_measurement_pts(value, units)
       end
@@ -1247,22 +1247,18 @@ module EideticRML
       end
 
       def default_padding_top
-        # @preferred_content_height ? @preferred_radius - @preferred_content_height / 2.0 : 0
         (@preferred_height and @preferred_content_height) ? @preferred_radius - @preferred_content_height / 2.0 : 0
       end
 
       def default_padding_right
-        # @preferred_content_width ? @preferred_radius - @preferred_content_width / 2.0 : 0
         (@preferred_width and @preferred_content_width) ? @preferred_radius - @preferred_content_width / 2.0 : 0
       end
 
       def default_padding_bottom
-        # @preferred_content_height ? @preferred_radius - @preferred_content_height / 2.0 : 0
         (@preferred_height and @preferred_content_height) ? @preferred_radius - @preferred_content_height / 2.0 : 0
       end
 
       def default_padding_left
-        # @preferred_content_width ? @preferred_radius - @preferred_content_width / 2.0 : 0
         (@preferred_width and @preferred_content_width) ? @preferred_radius - @preferred_content_width / 2.0 : 0
       end
 
@@ -1272,19 +1268,16 @@ module EideticRML
           return if pcw.nil? and pch.nil?
           Math.sqrt(((pcw || pch) / 2.0) ** 2 + ((pch || pcw) / 2.0) ** 2)
         end
-        # $stderr.puts "preferred_radius = #{@preferred_radius}"
         to_units(units, @preferred_radius)
       end
 
       def preferred_height(writer, units=:pt)
         @preferred_height ||= @height || @width || ((preferred_radius(writer) || return) * 2 + non_content_height)
-        # @preferred_height ||= ((preferred_radius(writer) || return) * 2 + non_content_height)
         to_units(units, @preferred_height)
       end
 
       def preferred_width(writer, units=:pt)
         @preferred_width ||= @width || @height || ((preferred_radius(writer) || return) * 2 + non_content_width)
-        # @preferred_width ||= ((preferred_radius(writer) || return) * 2 + non_content_width)
         to_units(units, @preferred_width)
       end
 
@@ -1317,11 +1310,13 @@ module EideticRML
       end
 
       def height_set
-        # puts "height: #{height}\n#{caller * "<br />\n"}"
+        @preferred_height ||= @height
+        @preferred_width ||= @height
       end
-      
+
       def width_set
-        # puts "width: #{width}"
+        @preferred_width ||= @width
+        @preferred_height ||= @width
       end
 
       def x_offset

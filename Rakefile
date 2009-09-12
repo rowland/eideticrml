@@ -5,8 +5,8 @@ require 'rcov/rcovtask'
 
 spec = Gem::Specification.new do |s|
   s.name = "eideticrml"
-  s.version = "0.1.9"
-  s.date = "2009-2-1"
+  s.version = "0.2.0"
+  s.date = "2009-8-24"
   s.summary = "Report Markup Language"
   s.requirements = "Ruby 1.8.x, eideticpdf"
   s.require_path = '.'
@@ -50,12 +50,15 @@ end
 desc "Render test erml files to pdf."
 task :ermls do
   start = Time.now
+  pdfs = []
   require 'erml'
   Dir["samples/*.erml","samples/*.haml"].each do |erml|
     puts erml
-    pdf = render_erml(erml)
-    `open -a Preview #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+    pdfs << render_erml(erml)
+    # `open -a Preview #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
   end
   elapsed = Time.now - start
   puts "Elapsed: #{(elapsed * 1000).round} ms"
+  `open -a Preview #{pdfs * ' '}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+  # system("open" "-a", "Preview", *pdfs) if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
 end
