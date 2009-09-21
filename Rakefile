@@ -52,7 +52,7 @@ task :ermls do
   start = Time.now
   pdfs = []
   require 'erml'
-  Dir["samples/*.erml","samples/*.haml"].each do |erml|
+  Dir["samples/*.erml","samples/*.haml","samples/*.erb"].each do |erml|
     puts erml
     pdfs << render_erml(erml)
     # `open -a Preview #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)

@@ -302,6 +302,7 @@ module EideticRML
         end
         footers.each { |widget| widget.visible = (widget.top >= top) } # or first static widget?
 
+        widgets_visible = 0
         unaligned.each_with_index do |widget, index|
           widget.visible = !container_full
           next if container_full
@@ -311,13 +312,16 @@ module EideticRML
           # puts "<2> vbox widget height: #{widget.height} #{widget.path}"
           widget.height(widget.preferred_height(writer), :pt) if widget.height.nil? # swapped
           # puts "<3> vbox widget height: #{widget.height} #{widget.path}"
-          top += (widget.height + @style.vpadding)
+          top += widget.height
           dy += widget.height + (index > 0 ? @style.vpadding : 0) #if widget.visible
           if top > bottom
             container_full = true
-            widget.visible = widget.leaves > 0 # container.root_page.positioned_widgets[:static] == 0
+            widget.visible = (widgets_visible == 0)
+            # widget.visible = widget.leaves > 0 and container.root_page.positioned_widgets[:static] == 0
             # $stderr.puts "+++vbox+++ #{container.root_page.positioned_widgets[:static]}, tag: #{widget.tag}, visible: #{widget.visible}"
           end
+          widgets_visible += 1 if widget.visible
+          top += @style.vpadding
         end
         # set_height = container.height.nil?
         # container.height(container.max_height_avail, :pt) if set_height
