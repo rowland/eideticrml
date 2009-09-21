@@ -209,13 +209,13 @@ module EideticRML
         end
 
         static.each do |widget|
-          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
           if container.align == :bottom
             widget.bottom(container.content_bottom, :pt)
           else
             container_full = true
             widget.top(container.content_top, :pt)
           end
+          widget.height(widget.preferred_height(writer), :pt) if widget.height.nil?
         end
         left = container.content_left
         right = container.content_right
@@ -443,7 +443,7 @@ module EideticRML
       def allocate_specified_widths(width_avail, specified)
         specified.each do |w|
           if width_avail < w[COL_WIDTH]
-            w[COL_WIDTH] = 0
+            # w[COL_WIDTH] = 0
           else
             width_avail -= (w[COL_WIDTH] + @style.hpadding)
           end
@@ -455,14 +455,14 @@ module EideticRML
         # allocate percent widths with a minimum width of 1 point
         if width_avail - (percents.size - 1) * @style.hpadding >= percents.size
           width_avail -= (percents.size - 1) * @style.hpadding
-          total_percents = percents.inject(0) { |total, w| total + w[1] }
+          total_percents = percents.inject(0) { |total, w| total + w[COL_WIDTH] }
           ratio = width_avail.quo(total_percents)
           percents.each do |w|
-            w[1] = w[1] * ratio if ratio < 1.0
-            width_avail -= w[1]
+            w[COL_WIDTH] = w[COL_WIDTH] * ratio if ratio < 1.0
+            width_avail -= w[COL_WIDTH]
           end
         else
-          percents.each { |w| w[1] = 0 }
+          percents.each { |w| w[COL_WIDTH] = 0 }
         end
         width_avail -= @style.hpadding
         width_avail
@@ -473,9 +473,9 @@ module EideticRML
         if width_avail - (others.size - 1) * @style.hpadding >= others.size
           width_avail -= (others.size - 1) * @style.hpadding
           others_width = width_avail.quo(others.size)
-          others.each { |w| w[1] = others_width }
+          others.each { |w| w[COL_WIDTH] = others_width }
         else
-          others.each { |w| w[1] = 0 }
+          others.each { |w| w[COL_WIDTH] = 0 }
         end
         width_avail
       end
@@ -499,7 +499,7 @@ module EideticRML
           grid.col(c).each_with_index do |widget, r|
             next unless widget
             if widths[c][COL_WIDTH] > 0
-              width = (0...widget.colspan).inject(0) { |width, i| width + widths[c + i][1] }
+              width = (0...widget.colspan).inject(0) { |width, i| width + widths[c + i][COL_WIDTH] }
               widget.width(width + (widget.colspan - 1) * @style.hpadding, :pt)
             else
               # widget.visible = false
@@ -544,12 +544,13 @@ module EideticRML
             end
             left += widths[c][1] + @style.hpadding
           end
+          next if container_full
           if top + max_height > bottom
             container_full = true
             grid.cols.times { |c| grid[c, r].visible = (r == 0) if grid[c, r] }
             container.more(true) if container.overflow and (r > 0)
           end
-          top += max_height + @style.vpadding
+          top += max_height + @style.vpadding unless container_full
         end
         if container.height.nil?
           container.height(top - container.content_top + container.non_content_height - @style.vpadding, :pt)

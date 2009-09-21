@@ -1172,17 +1172,15 @@ module EideticRML
 
       def preferred_content_height(writer)
         @preferred_content_height ||= layout.manager.preferred_height(layout_grid, writer)
-        @preferred_content_height
       end
 
       def preferred_content_width(writer)
         @preferred_content_width ||= layout.manager.preferred_width(layout_grid, writer)
-        @preferred_content_width
       end
 
       def preferred_height(writer, units=:pt)
         @preferred_height ||= @height || (preferred_content_height(writer) || return) + non_content_height
-        to_units(units, @preferred_height)
+        to_units(units, overflow ? [@preferred_height, max_height_avail].min : @preferred_height)
       end
 
       def preferred_width(writer, units=:pt)
