@@ -94,7 +94,7 @@ module EideticRML
 
       def apply(writer)
         writer.line_color(color)
-        writer.line_width([width, 1].max, units)
+        writer.line_width([width, 0.001].max, units)
         writer.line_dash_pattern(pattern)
         writer.line_cap_style(cap)
       end
