@@ -4,7 +4,7 @@
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
 $: << File.dirname(__FILE__) + '/../'
-require 'test/unit'
+require "minitest/autorun"
 require 'erml_widgets'
 require 'erml_widget_factories'
 
@@ -13,7 +13,7 @@ include EideticRML::Widgets
 class TestWidget < Widget
 end
 
-class FactoryTestCases < Test::Unit::TestCase
+class FactoryTestCases < Minitest::Test
   def setup
     @wf = WidgetFactory.new
     WidgetFactory.register_factory('test', @wf)
@@ -40,7 +40,7 @@ class FactoryTestCases < Test::Unit::TestCase
   def test_make_widget
     @wf.register_widget('test_widget', TestWidget)
     w = @wf.make_widget('test_widget', nil)
-    assert_not_nil(w)
+    refute_nil(w)
     assert(w.is_a?(TestWidget))
   end
 end

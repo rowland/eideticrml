@@ -19,7 +19,7 @@ module EideticRML
           @rect = Widgets::Rectangle.new(@circle)
           @p = Widgets::Paragraph.new(@rect, :width => "#{w}pt", :height => "#{h}pt", :text => "Paragraph with four words.")
           @writer = EideticPDF::DocumentWriter.new
-          @writer.open(:v_text_align => :base, :text_encoding => 'UTF8')
+          @writer.open(:v_text_align => :base, :text_encoding => 'UTF-8')
           @doc.to_s
         end
 

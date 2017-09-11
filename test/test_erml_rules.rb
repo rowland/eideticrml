@@ -4,13 +4,13 @@
 #  Copyright (c) 2008, Eidetic Software. All rights reserved.
 
 $: << File.dirname(__FILE__) + '/../'
-require 'test/unit'
+require "minitest/autorun"
 require 'erml'
 require 'erml_rules'
 
 include EideticRML::Rules
 
-class RuleTestCases < Test::Unit::TestCase
+class RuleTestCases < Minitest::Test
   def test_item_re_s
     assert_equal('foo(#\\w+)?(\\.\\w+)*',                 Rule.item_re_s('foo'))
     assert_equal('foo#bar(\\.\\w+)*',                     Rule.item_re_s('foo#bar'))

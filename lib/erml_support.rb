@@ -4,8 +4,8 @@
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
 require 'rubygems'
-if File.exist?('../eideticpdf')
-  $:.unshift('../eideticpdf')
+if File.exist?(File.expand_path(File.join('..', 'eideticpdf')))
+  $:.unshift(File.expand_path(File.join('..', 'eideticpdf', 'lib')))
 else
   gem 'eideticpdf'
 end

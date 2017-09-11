@@ -1848,7 +1848,7 @@ module EideticRML
 
       def print(writer)
         @document_page_no = 0
-        writer.open(:v_text_align => :base, :pages_up => pages_up, :pages_up_layout => pages_up_layout, :orientation => orientation, :text_encoding => 'UTF8')
+        writer.open(:v_text_align => :base, :pages_up => pages_up, :pages_up_layout => pages_up_layout, :orientation => orientation, :text_encoding => 'UTF-8')
         pages.each do |page|
           page.print(writer)
         end

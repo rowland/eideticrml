@@ -4,12 +4,12 @@
 #  Copyright (c) 2008, Eidetic Software. All rights reserved.
 
 $: << File.dirname(__FILE__) + '/../'
-require 'test/unit'
+require "minitest/autorun"
 require 'erml_support'
 
 include EideticRML
 
-class ErmlSupportTestCases < Test::Unit::TestCase
+class ErmlSupportTestCases < Minitest::Test
   def test_parse_measurement
     assert_equal([123, :pt], Support::parse_measurement("123"))
     assert_equal([123.456, :pt], Support::parse_measurement("123.456"))
@@ -27,7 +27,7 @@ class ErmlSupportTestCases < Test::Unit::TestCase
   end
 end
 
-class GridTestCases < Test::Unit::TestCase
+class GridTestCases < Minitest::Test
   def setup
     @grid = Support::Grid.new(3, 2)
   end
@@ -115,7 +115,7 @@ class GridTestCases < Test::Unit::TestCase
   end
 end
 
-class BoundsTestCases < Test::Unit::TestCase
+class BoundsTestCases < Minitest::Test
   def test_init_empty
     b = Support::Bounds.new
     assert_equal nil, b.left

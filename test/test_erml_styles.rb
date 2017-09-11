@@ -4,7 +4,7 @@
 #  Copyright (c) 2008, Eidetic Software. All rights reserved.
 
 $: << File.dirname(__FILE__) + '/../'
-require 'test/unit'
+require "minitest/autorun"
 require 'erml'
 require 'erml_styles'
 require 'erml_layout_managers'
@@ -15,7 +15,7 @@ include EideticRML::LayoutManagers
 class TestStyle < Style
 end
 
-class StyleTestCases < Test::Unit::TestCase
+class StyleTestCases < Minitest::Test
   def setup
     Style.register('test', TestStyle)
     @style = Style.new(nil)
@@ -38,13 +38,13 @@ class StyleTestCases < Test::Unit::TestCase
   end
 end
 
-class PenStyleTestCases < Test::Unit::TestCase
+class PenStyleTestCases < Minitest::Test
   def setup
     @pen_style = Style.for_name('pen').new(nil)
   end
 
   def test_initialize
-    assert_not_nil(@pen_style)
+    refute_nil(@pen_style)
     assert_kind_of(PenStyle, @pen_style)
   end
 
@@ -99,13 +99,13 @@ class PenStyleTestCases < Test::Unit::TestCase
   end
 end
 
-class BrushStyleTestCases < Test::Unit::TestCase
+class BrushStyleTestCases < Minitest::Test
   def setup
     @brush_style = Style.for_name('brush').new(nil)
   end
 
   def test_initialize
-    assert_not_nil(@brush_style)
+    refute_nil(@brush_style)
     assert_kind_of(BrushStyle, @brush_style)
   end
 
@@ -122,13 +122,13 @@ class BrushStyleTestCases < Test::Unit::TestCase
   end
 end
 
-class FontStyleTestCases < Test::Unit::TestCase
+class FontStyleTestCases < Minitest::Test
   def setup
     @font_style = Style.for_name('font').new(nil)
   end
 
   def test_initialize
-    assert_not_nil(@font_style)
+    refute_nil(@font_style)
     assert_kind_of(FontStyle, @font_style)
   end
 
@@ -199,7 +199,7 @@ class FontStyleTestCases < Test::Unit::TestCase
   end
 end
 
-class BulletStyleTestCases < Test::Unit::TestCase
+class BulletStyleTestCases < Minitest::Test
   def setup
     @styles = StyleCollection.new
     @font_style = @styles.add('font', :id => 'f1', :name => 'Courier', :size => 13)
@@ -239,7 +239,7 @@ class BulletStyleTestCases < Test::Unit::TestCase
   end
 end
 
-class ParagraphStyleTestCases < Test::Unit::TestCase
+class ParagraphStyleTestCases < Minitest::Test
   def setup
     @styles = StyleCollection.new
     @bullet_style = @styles.add('bullet', :id => '*')
@@ -247,7 +247,7 @@ class ParagraphStyleTestCases < Test::Unit::TestCase
   end
 
   def test_initialize
-    assert_not_nil(@paragraph_style)
+    refute_nil(@paragraph_style)
     assert_kind_of(ParagraphStyle, @paragraph_style)
   end
 
@@ -278,13 +278,13 @@ class ParagraphStyleTestCases < Test::Unit::TestCase
   end
 end
 
-class PageStyleTestCases < Test::Unit::TestCase
+class PageStyleTestCases < Minitest::Test
   def setup
     @page_style = Style.for_name('page').new(nil)
   end
 
   def test_initialize
-    assert_not_nil(@page_style)
+    refute_nil(@page_style)
     assert_kind_of(PageStyle, @page_style)
   end
 
@@ -323,13 +323,13 @@ class PageStyleTestCases < Test::Unit::TestCase
   end
 end
 
-class LayoutStyleTestCases < Test::Unit::TestCase
+class LayoutStyleTestCases < Minitest::Test
   def setup
     @layout_style = Style.for_name('layout').new(nil)
   end
 
   def test_initialize
-    assert_not_nil(@layout_style)
+    refute_nil(@layout_style)
     assert_kind_of(LayoutStyle, @layout_style)
   end
 

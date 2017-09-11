@@ -1,16 +1,16 @@
 require 'rubygems'
-require 'rake/gempackagetask'
+require 'rubygems/package_task'
 require 'rake/testtask'
-require 'rcov/rcovtask'
 
 spec = Gem::Specification.new do |s|
   s.name = "eideticrml"
-  s.version = "0.2.3"
-  s.date = "2010-9-16"
+  s.version = "0.3.0"
+  s.date = "2017-09-11"
   s.summary = "Report Markup Language"
-  s.requirements = "Ruby 1.8.x, eideticpdf"
-  # s.require_path = '.'
-  # s.autorequire = 'erml'
+  s.requirements = "Ruby 2.x, eideticpdf"
+  s.add_runtime_dependency "eideticpdf", [">= 1.0.2"]
+  # s.require_paths = ['lib']
+  # s.autorequire = 'lib'
   s.email = "brent.rowland@eideticsoftware.com"
   s.homepage = "http://www.eideticsoftware.com"
   s.author = "Brent Rowland, Eidetic Software, LLC"
@@ -23,19 +23,12 @@ spec = Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
 end
 
-Rake::GemPackageTask.new(spec) do |pkg|
+Gem::PackageTask.new(spec) do |pkg|
   pkg.need_tar = true
   pkg.need_zip = true
 end
 
 Rake::TestTask.new do |t|
-  # t.libs << "test"
-  t.test_files = FileList['test/test*.rb']
-  t.verbose = true
-end
-
-Rcov::RcovTask.new do |t|
-  # t.libs << "test"
   t.test_files = FileList['test/test*.rb']
   t.verbose = true
 end
@@ -51,14 +44,12 @@ desc "Render test erml files to pdf."
 task :ermls do
   start = Time.now
   pdfs = []
-  require 'erml'
+  require_relative 'lib/erml'
   Dir["samples/*.erml","samples/*.haml","samples/*.erb"].each do |erml|
     puts erml
     pdfs << render_erml(erml)
-    # `open -a Preview #{pdf}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
   end
   elapsed = Time.now - start
   puts "Elapsed: #{(elapsed * 1000).round} ms"
-  `open -a Preview #{pdfs * ' '}` if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
-  # system("open" "-a", "Preview", *pdfs) if RUBY_PLATFORM =~ /darwin/ and ($0 !~ /rake_test_loader/ and $0 !~ /rcov/)
+  `open -a Preview #{pdfs * ' '}` if (RUBY_PLATFORM =~ /darwin/) and ($0 !~ /rake_test_loader/)
 end

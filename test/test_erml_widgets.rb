@@ -4,7 +4,7 @@
 #  Copyright (c) 2008 Eidetic Software. All rights reserved.
 
 $: << File.dirname(__FILE__) + '/../'
-require 'test/unit'
+require "minitest/autorun"
 require File.join(File.dirname(__FILE__), 'test_helpers')
 require 'erml_widgets'
 require 'erml_styles'
@@ -14,13 +14,13 @@ include EideticRML::Widgets
 include EideticRML::Styles
 include EideticRML::Support
 
-class StdWidgetFactoryTestCases < Test::Unit::TestCase
+class StdWidgetFactoryTestCases < Minitest::Test
   def test_for_namespace
     assert_equal(StdWidgetFactory.instance, WidgetFactory.for_namespace('std'))
   end
 end
 
-class WidgetTestCases < Test::Unit::TestCase
+class WidgetTestCases < Minitest::Test
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @alt = @doc.styles.add('font', :id => 'alt', :name => 'Times', :size => 10, :style => 'Bold', :encoding => 'CP1252', :color => '0xFFFFFF')
@@ -32,7 +32,7 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def test_initialize
-    assert_not_nil(@widget)
+    refute_nil(@widget)
     assert_equal(@page, @widget.parent)
   end
 
@@ -225,7 +225,7 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 
   def assert_font_defaults(f)
-    assert_not_nil(f)
+    refute_nil(f)
     assert_equal('Helvetica', f.name)
     assert_equal(12, f.size)
     assert_equal('', f.style)
@@ -247,7 +247,7 @@ class WidgetTestCases < Test::Unit::TestCase
     assert_font_defaults(@widget.font) # same as parent
     @widget.font(:copy).size(20)
     assert_equal(20, @widget.font.size)
-    assert_not_equal(@alt, @widget.font)
+    refute_equal(@alt, @widget.font)
     assert_font_defaults(@doc.font) # unchanged
   end
 
@@ -499,7 +499,7 @@ class WidgetTestCases < Test::Unit::TestCase
   def test_border
     assert_nil(@widget.border)
     @widget.border('blue_dash')
-    assert_not_nil(@widget.border)
+    refute_nil(@widget.border)
     assert_equal('blue_dash', @widget.border.id)
     assert_equal('Blue', @widget.border.color)
     assert_equal(4, @widget.border.width)
@@ -655,7 +655,7 @@ class WidgetTestCases < Test::Unit::TestCase
   def test_fill
     assert_nil(@widget.fill)
     @widget.fill('battleship')
-    assert_not_nil(@widget.fill)
+    refute_nil(@widget.fill)
     assert_equal('battleship', @widget.fill.id)
     assert_equal('LightSteelBlue', @widget.fill.color)
   end
@@ -844,7 +844,7 @@ class WidgetTestCases < Test::Unit::TestCase
   end
 end
 
-class RectangleTestCases < Test::Unit::TestCase
+class RectangleTestCases < Minitest::Test
   def setup
     page = Page.new(nil, :units => :pt)
     @rect = Rectangle.new(page)
@@ -865,14 +865,14 @@ class RectangleTestCases < Test::Unit::TestCase
   end
 end
 
-class LabelTestCases < Test::Unit::TestCase
+class LabelTestCases < Minitest::Test
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @label = StdWidgetFactory.instance.make_widget('label', @doc)
   end
 
   def test_make_widget
-    assert_not_nil(@label)
+    refute_nil(@label)
     assert(@label.is_a?(Label))
   end
 
@@ -889,7 +889,7 @@ class LabelTestCases < Test::Unit::TestCase
   end
 end
 
-class ParagraphTestCases < Test::Unit::TestCase
+class ParagraphTestCases < Minitest::Test
   Lorem = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
   def setup
@@ -940,7 +940,7 @@ class ParagraphTestCases < Test::Unit::TestCase
     assert_paragraph_defaults(@doc.paragraph_style)
     assert_paragraph_defaults(@p.style)
     @p.style(:copy).text_align('right')
-    assert_not_equal(@centered, @p.style)
+    refute_equal(@centered, @p.style)
     assert_equal(:right, @p.text_align)
     assert_paragraph_defaults(@doc.paragraph_style)
   end
@@ -998,7 +998,7 @@ class ParagraphTestCases < Test::Unit::TestCase
   end
 end
 
-class ContainerTestCases < Test::Unit::TestCase
+class ContainerTestCases < Minitest::Test
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @page = StdWidgetFactory.instance.make_widget('page', @doc)
@@ -1090,7 +1090,7 @@ class ContainerTestCases < Test::Unit::TestCase
   end
 end
 
-class PageTestCases < Test::Unit::TestCase
+class PageTestCases < Minitest::Test
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @doc.units('in')
@@ -1099,7 +1099,7 @@ class PageTestCases < Test::Unit::TestCase
   end
 
   def test_make_widget
-    assert_not_nil(@page)
+    refute_nil(@page)
     assert(@page.is_a?(Page))
     assert_equal(@doc, @page.parent)
   end
@@ -1159,7 +1159,7 @@ class PageTestCases < Test::Unit::TestCase
     assert_equal(:letter, @page.style.size)
     default_style = @page.style
     @page.style(:copy).orientation('landscape')
-    assert_not_equal(default_style, @page.style)
+    refute_equal(default_style, @page.style)
     assert_equal(:landscape, @page.style.orientation) # changed
     assert_equal(:letter, @page.style.size) # unchanged
   end
@@ -1201,7 +1201,7 @@ class PageTestCases < Test::Unit::TestCase
   end
 end
 
-class DocumentTestCases < Test::Unit::TestCase
+class DocumentTestCases < Minitest::Test
   def setup
     @doc = StdWidgetFactory.instance.make_widget('erml', nil)
     @doc.units('in')
@@ -1209,7 +1209,7 @@ class DocumentTestCases < Test::Unit::TestCase
   end
 
   def test_make_widget
-    assert_not_nil(@doc)
+    refute_nil(@doc)
     assert(@doc.is_a?(Document))
   end
 
